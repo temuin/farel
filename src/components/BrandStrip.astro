@@ -1,0 +1,35 @@
+---
+import { BRANDS, BRAND_PROFILES } from '../config/catalog';
+
+interface Props {
+  /** Adds each brand's blurb below the logo, in a bordered card. */
+  detailed?: boolean;
+}
+
+const { detailed = false }: Props = Astro.props;
+---
+
+<ul
+  class:list={[
+    'grid',
+    detailed ? 'gap-6 sm:grid-cols-2' : 'grid-cols-2 items-center gap-10 sm:gap-16',
+  ]}
+>
+  {
+    BRANDS.map((brand) => {
+      const profile = BRAND_PROFILES[brand];
+      return (
+        <li class:list={detailed ? 'rounded-2xl border border-neutral-200 p-8' : 'flex justify-center'}>
+          <img
+            src={profile.logo}
+            alt={`${brand} logo`}
+            width="240"
+            height="64"
+            class:list={['w-auto', detailed ? 'h-12' : 'h-10 sm:h-14']}
+          />
+          {detailed && <p class="mt-5 text-sm leading-relaxed text-neutral-600">{profile.summary}</p>}
+        </li>
+      );
+    })
+  }
+</ul>

@@ -1,0 +1,80 @@
+---
+import ProductMarquee from './ProductMarquee.astro';
+import type { BrandPreview } from '../lib/products';
+
+/** Brand toggle over one photo strip per brand, built as an ARIA tab set. */
+interface Props {
+  previews: BrandPreview[];
+}
+
+const { previews }: Props = Astro.props;
+---
+
+<div data-brand-tabs>
+  <div
+    role="tablist"
+    aria-label="Choose a brand"
+    class="inline-flex gap-1 rounded-full border border-neutral-200 bg-neutral-100 p-1"
+  >
+    {
+      previews.map((preview, index) => (
+        <button
+          type="button"
+          role="tab"
+          id={`brand-tab-${preview.brand}`}
+          aria-controls={`brand-panel-${preview.brand}`}
+          aria-selected={index === 0 ? 'true' : 'false'}
+          tabindex={index === 0 ? 0 : -1}
+          class="rounded-full px-6 py-2.5 text-sm font-semibold text-neutral-600 transition-colors aria-selected:bg-neutral-900 aria-selected:text-white"
+        >
+          {preview.brand}
+        </button>
+      ))
+    }
+  </div>
+
+  {
+    previews.map((preview, index) => (
+      <div
+        role="tabpanel"
+        id={`brand-panel-${preview.brand}`}
+        aria-labelledby={`brand-tab-${preview.brand}`}
+        hidden={index !== 0}
+        class="mt-10"
+      >
+        <ProductMarquee products={preview.products} label={`${preview.brand} products`} />
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-brand-tabs]').forEach((tabs) => {
+    const buttons = [...tabs.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+
+    const select = (index: number) => {
+      buttons.forEach((button, position) => {
+        const selected = position === index;
+        button.setAttribute('aria-selected', String(selected));
+        button.tabIndex = selected ? 0 : -1;
+
+        const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !selected;
+      });
+    };
+
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => select(index));
+
+      button.addEventListener('keydown', (event) => {
+        const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+        if (step === 0) return;
+
+        event.preventDefault();
+        const target = (index + step + buttons.length) % buttons.length;
+        select(target);
+        buttons[target].focus();
+      });
+    });
+  });
+</script>

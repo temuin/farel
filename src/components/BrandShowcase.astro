@@ -1,0 +1,128 @@
+---
+import { Image } from 'astro:assets';
+import { BRAND_PROFILES } from '../config/catalog';
+import { imageAlt } from '../lib/products';
+import type { BrandPreview } from '../lib/products';
+
+/**
+ * Two logo tiles that double as an ARIA tab set, swapping a statement panel
+ * below them.
+ *
+ * Sits inside a section sized to fit one screen, so sizing is tight by default
+ * (mobile is where the fold binds) and scales up at `lg:`, where the available
+ * height far exceeds what the content needs.
+ *
+ * The photo is `preview.products[0]` — the first featured product for that
+ * brand. To use dedicated highlight photography instead, mark that product
+ * `featured: true` or point this component at a new field.
+ */
+interface Props {
+  previews: BrandPreview[];
+}
+
+const { previews }: Props = Astro.props;
+---
+
+<div data-brand-showcase>
+  <div role="tablist" aria-label="Choose a brand" class="grid grid-cols-2 gap-3 lg:gap-4">
+    {
+      previews.map((preview, index) => (
+        <button
+          type="button"
+          role="tab"
+          id={`brand-logo-tab-${preview.brand}`}
+          aria-controls={`brand-logo-panel-${preview.brand}`}
+          aria-selected={index === 0 ? 'true' : 'false'}
+          tabindex={index === 0 ? 0 : -1}
+          class="flex items-center justify-center rounded-xl border-2 border-neutral-200 bg-white px-4 py-2 transition-colors hover:border-neutral-400 aria-selected:border-ink lg:px-6 lg:py-4"
+        >
+          <img
+            src={BRAND_PROFILES[preview.brand].logo}
+            alt={`${preview.brand} logo`}
+            width="240"
+            height="64"
+            class="h-7 w-auto lg:h-10"
+          />
+        </button>
+      ))
+    }
+  </div>
+
+  {
+    previews.map((preview, index) => {
+      const profile = BRAND_PROFILES[preview.brand];
+      const highlight = preview.products[0];
+
+      return (
+        <div
+          role="tabpanel"
+          id={`brand-logo-panel-${preview.brand}`}
+          aria-labelledby={`brand-logo-tab-${preview.brand}`}
+          hidden={index !== 0}
+          class="mt-3 lg:mt-6"
+        >
+          <div class="overflow-hidden rounded-2xl bg-ink p-4 lg:p-8">
+            <p class="text-xs font-semibold tracking-[0.2em] text-accent-500 uppercase">
+              {preview.brand}
+            </p>
+            <p class="mt-1 text-base font-bold tracking-tight text-balance text-white sm:text-lg lg:mt-3 lg:text-2xl">
+              {profile.statement}
+            </p>
+            <p class="mt-1 text-sm leading-relaxed text-neutral-400 lg:mt-3 lg:text-base">
+              {profile.summary}
+            </p>
+
+            {/*
+              Fixed height rather than an aspect ratio: keeps the photo
+              predictable regardless of column width, and is the main lever for
+              fitting the section to one screen.
+            */}
+            {highlight && (
+              <div class="mt-3 h-20 overflow-hidden rounded-xl bg-neutral-800 sm:h-24 lg:mt-6 lg:h-56">
+                <Image
+                  src={highlight.data.images[0]}
+                  alt={imageAlt(highlight, 0)}
+                  widths={[400, 800]}
+                  sizes="(min-width: 1024px) 34vw, 90vw"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    })
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-brand-showcase]').forEach((showcase) => {
+    const buttons = [...showcase.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+
+    const select = (index: number) => {
+      buttons.forEach((button, position) => {
+        const selected = position === index;
+        button.setAttribute('aria-selected', String(selected));
+        button.tabIndex = selected ? 0 : -1;
+
+        const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !selected;
+      });
+    };
+
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => select(index));
+
+      button.addEventListener('keydown', (event) => {
+        const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+        if (step === 0) return;
+
+        event.preventDefault();
+        const target = (index + step + buttons.length) % buttons.length;
+        select(target);
+        buttons[target].focus();
+      });
+    });
+  });
+</script>

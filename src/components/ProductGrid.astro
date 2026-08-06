@@ -1,0 +1,29 @@
+---
+import ProductCard from './ProductCard.astro';
+import type { Product } from '../lib/products';
+
+interface Props {
+  products: Product[];
+  /** Number of leading cards to load eagerly. */
+  eagerCount?: number;
+  /** Tags each item for the client-side filter, so the card itself stays
+   * unaware that filtering exists. */
+  filterable?: boolean;
+}
+
+const { products, eagerCount = 0, filterable = false } = Astro.props;
+---
+
+<ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+  {
+    products.map((product, index) => (
+      <li
+        data-product-item={filterable ? '' : undefined}
+        data-brand={filterable ? product.data.brand : undefined}
+        data-category={filterable ? product.data.category : undefined}
+      >
+        <ProductCard product={product} eager={index < eagerCount} />
+      </li>
+    ))
+  }
+</ul>

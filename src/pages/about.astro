@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandStrip from '../components/BrandStrip.astro';
+import Button from '../components/Button.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { site } from '../config/site';
+
+const yearsActive = new Date().getFullYear() - site.foundedYear;
+
+const values = [
+  {
+    title: 'Authorised supply only',
+    body: 'Every item we carry is sourced through the brands’ official distribution channels, with documentation available on request.',
+  },
+  {
+    title: 'Stock held locally',
+    body: 'Core lines are warehoused in Indonesia, so standard team orders ship without waiting on an overseas production run.',
+  },
+  {
+    title: 'Built for team orders',
+    body: 'Full size runs from youth to adult, plus crest, number and sponsor application handled in-house.',
+  },
+];
+---
+
+<BaseLayout
+  title="About"
+  description={`Company profile for ${site.legalName}, an authorised Indonesian distributor of Kelme and Adidas team sportswear.`}
+>
+  <section class="border-b border-neutral-200 bg-neutral-50">
+    <div class="shell py-16 sm:py-20">
+      <SectionHeading
+        as="h1"
+        eyebrow="Company profile"
+        title={`About ${site.name}`}
+        description={`Established in ${site.foundedYear}, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.`}
+      />
+    </div>
+  </section>
+
+  <section class="shell grid gap-12 py-16 sm:py-20 lg:grid-cols-2">
+    <div class="space-y-5 text-base leading-relaxed text-neutral-600">
+      <h2 class="text-2xl font-bold tracking-tight text-neutral-900">Our story</h2>
+      <p>
+        {site.legalName} started as a small team-kit supplier and has spent the last {yearsActive}
+        years growing into a national distributor for two performance sportswear brands. What began
+        with local club orders now covers school programmes, futsal venues, sports retailers and
+        corporate teams throughout the archipelago.
+      </p>
+      <p>
+        Our focus has not changed: keep genuine product in stock, quote quickly, and get kit
+        delivered before the season starts. Most of our customers come back each year, which means
+        we plan our stock around real team calendars rather than seasonal guesswork.
+      </p>
+      <p>
+        This is placeholder copy. Replace it with the company&rsquo;s own history, milestones and
+        positioning before launch.
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-8">
+      <h2 class="text-lg font-bold tracking-tight text-neutral-900">Official distributor statement</h2>
+      <p class="mt-4 text-base leading-relaxed text-neutral-600">
+        {site.legalName} is an authorised distributor of Kelme and Adidas products for the
+        Indonesian market. All goods we supply are genuine, sourced through official channels, and
+        covered by the manufacturers&rsquo; standard warranty terms.
+      </p>
+      <p class="mt-4 text-sm leading-relaxed text-neutral-500">
+        Placeholder wording. Confirm the exact distributor status, territory and any wording
+        required by each brand before publishing.
+      </p>
+      <div class="mt-8">
+        <Button href="/contact">Talk to our team</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell pb-16 sm:pb-20">
+    <h2 class="text-2xl font-bold tracking-tight text-neutral-900">How we work</h2>
+    <ul class="mt-8 grid gap-6 sm:grid-cols-3">
+      {
+        values.map((value) => (
+          <li class="rounded-2xl border border-neutral-200 p-6">
+            <h3 class="text-base font-semibold text-neutral-900">{value.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-neutral-600">{value.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="shell pb-4">
+    <SectionHeading
+      eyebrow="Partner brands"
+      title="The brands we represent"
+      description="Both labels are supplied under the same terms, with a single account manager for your orders."
+    />
+    <div class="mt-12">
+      <BrandStrip detailed />
+    </div>
+  </section>
+</BaseLayout>

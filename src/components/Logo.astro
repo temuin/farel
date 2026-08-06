@@ -1,0 +1,39 @@
+---
+import LogoMark from './LogoMark.astro';
+import { site } from '../config/site';
+
+/**
+ * The wordmark is real text rather than a second image asset, so it picks up
+ * the page font and stays selectable.
+ */
+interface Props {
+  variant?: 'full' | 'mark';
+  /** Sets the colour for light or dark backgrounds. */
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+
+const { variant = 'full', tone = 'dark', class: className }: Props = Astro.props;
+
+const toneClass = tone === 'light' ? 'text-white' : 'text-ink';
+---
+
+<span class:list={['inline-flex items-center gap-3', toneClass, className]}>
+  <LogoMark />
+
+  {
+    variant === 'full' && (
+      <span class="flex flex-col leading-none">
+        <span class="text-base font-bold tracking-tight sm:text-lg">{site.name}</span>
+        <span
+          class:list={[
+            'mt-1 hidden text-[10px] tracking-wide uppercase sm:block',
+            tone === 'light' ? 'text-neutral-400' : 'text-neutral-500',
+          ]}
+        >
+          {site.tagline}
+        </span>
+      </span>
+    )
+  }
+</span>

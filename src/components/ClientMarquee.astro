@@ -1,0 +1,29 @@
+---
+import { clients } from '../config/clients';
+
+/** Rendered twice so the animation can loop without a seam. */
+const COPIES = [0, 1] as const;
+---
+
+<div class="marquee marquee--up" role="group" aria-label="Organisations we supply">
+  <div class="marquee__track">
+    {
+      COPIES.map((copy) => (
+        <ul class="marquee__grid" aria-hidden={copy === 1 ? 'true' : undefined}>
+          {clients.map((client) => (
+            <li class="flex items-center justify-center">
+              <img
+                src={client.logo}
+                alt={copy === 0 ? client.name : ''}
+                width="210"
+                height="56"
+                loading="lazy"
+                class="h-10 w-auto opacity-70 grayscale"
+              />
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</div>

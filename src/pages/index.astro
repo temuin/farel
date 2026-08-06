@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandShowcase from '../components/BrandShowcase.astro';
+import Button from '../components/Button.astro';
+import ClientMarquee from '../components/ClientMarquee.astro';
+import CollectionPreview from '../components/CollectionPreview.astro';
+import HeroPhotoWall from '../components/HeroPhotoWall.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { getBrandPreviews, getProducts } from '../lib/products';
+import { site } from '../config/site';
+
+const previews = await getBrandPreviews();
+const products = await getProducts();
+
+const highlights = [
+  { value: 'Two brands', label: 'Kelme and Adidas under one supplier' },
+  { value: 'Full size runs', label: 'Youth through adult sizing held in stock' },
+  { value: 'Team orders', label: 'Crest, number and sponsor application' },
+  { value: 'Nationwide', label: 'Shipping across Indonesia' },
+];
+---
+
+<BaseLayout title="Kelme & Adidas Team Sportswear Distributor" description={site.description}>
+  {/* Viewport minus the sticky header, so it fills exactly one screen. The
+      trailing 1px is the header's bottom border. */}
+  <section
+    class="relative flex min-h-[calc(100svh-4rem-1px)] items-center overflow-hidden bg-ink lg:min-h-[calc(100svh-5rem-1px)]"
+  >
+    <HeroPhotoWall products={products} />
+
+    {/* Two scrims: one to knock the photos back, one to hold the text side. */}
+    <div class="absolute inset-0 bg-ink/75"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/90 to-ink/40"></div>
+
+    <div class="shell relative z-10 py-20">
+      <div class="max-w-2xl">
+        <p class="text-xs font-semibold tracking-[0.2em] text-accent-500 uppercase">
+          {site.tagline}
+        </p>
+        <h1
+          class="mt-5 text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
+        >
+          Team sportswear that holds up, season after season
+        </h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-neutral-300">
+          We supply clubs, schools and retailers across Indonesia with genuine Kelme and Adidas
+          jerseys, footwear and accessories &mdash; sourced through authorised channels and stocked
+          in full size runs.
+        </p>
+        <div class="mt-10 flex flex-wrap gap-3">
+          <Button href="/contact">Request a quote</Button>
+          <Button href="/collections" variant="inverted">Browse the catalogue</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-white/10 bg-ink">
+    <dl class="shell grid grid-cols-2 gap-x-8 gap-y-10 py-12 lg:grid-cols-4">
+      {
+        highlights.map((item) => (
+          <div>
+            <dt class="text-base font-semibold text-white">{item.value}</dt>
+            <dd class="mt-2 text-sm leading-relaxed text-neutral-400">{item.label}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  {/* Intro and brand toggle sit side by side on large screens so the whole
+      section fits one viewport, with no scrolling to reach either brand. */}
+  <section
+    class="shell flex min-h-[calc(100svh-4rem-1px)] flex-col justify-center py-6 lg:min-h-[calc(100svh-5rem-1px)] lg:py-10"
+  >
+    <div class="grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <div>
+        <SectionHeading
+          size="compact"
+          eyebrow="Who we are"
+          title="An authorised distributor, not a reseller"
+          description={`${site.legalName} is an authorised distributor of Kelme and Adidas, covering match kit, training wear and footwear in one order since ${site.foundedYear}.`}
+        />
+        <div class="mt-4 lg:mt-6">
+          <Button href="/about" variant="secondary">Read our company profile</Button>
+        </div>
+      </div>
+
+      <BrandShowcase previews={previews} />
+    </div>
+  </section>
+
+  <section class="shell pb-16 sm:pb-20">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <SectionHeading
+        eyebrow="Collections"
+        title="A look at what we carry"
+        description="Switch between brands to preview the range. The full catalogue lives in Collections."
+      />
+      <Button href="/collections" variant="secondary">See all products</Button>
+    </div>
+
+    <div class="mt-10">
+      <CollectionPreview previews={previews} />
+    </div>
+  </section>
+
+  <section class="border-t border-neutral-200 py-16 sm:py-20">
+    <div class="shell">
+      <SectionHeading
+        eyebrow="Trusted by"
+        title="Used by large organisations"
+        description="From multinationals and government agencies to sports clubs, teams across Indonesia order their apparel through us."
+        align="center"
+      />
+    </div>
+    <div class="shell mt-12">
+      <ClientMarquee />
+    </div>
+  </section>
+
+  <section class="bg-ink">
+    <div class="shell flex flex-wrap items-center justify-between gap-8 py-16">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-balance text-white sm:text-3xl">
+          Planning kit for the coming season?
+        </h2>
+        <p class="mt-3 max-w-xl text-base leading-relaxed text-neutral-400">
+          Send us your sizes and quantities and we will come back with a quote and current stock.
+        </p>
+      </div>
+      <Button href="/contact" variant="inverted">Get in touch</Button>
+    </div>
+  </section>
+</BaseLayout>

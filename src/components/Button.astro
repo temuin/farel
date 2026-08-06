@@ -1,0 +1,42 @@
+---
+/**
+ * Renders an anchor when `href` is set and a native button otherwise, so link
+ * and form actions stay visually identical.
+ */
+type Variant = 'primary' | 'secondary' | 'inverted';
+
+interface Props {
+  href?: string;
+  type?: 'button' | 'submit';
+  variant?: Variant;
+  class?: string;
+  /** Adds target/rel hardening for links that leave the site. */
+  external?: boolean;
+}
+
+const { href, type = 'button', variant = 'primary', class: className, external = false } = Astro.props;
+
+const BASE =
+  'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors';
+
+const VARIANTS: Record<Variant, string> = {
+  primary: 'bg-accent-600 text-white hover:bg-accent-700',
+  secondary: 'border border-neutral-300 bg-white text-neutral-900 hover:border-neutral-900',
+  inverted: 'bg-white text-neutral-900 hover:bg-neutral-200',
+};
+
+const classes = [BASE, VARIANTS[variant], className].filter(Boolean).join(' ');
+const externalAttrs = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+{
+  href ? (
+    <a href={href} class={classes} {...externalAttrs}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={classes}>
+      <slot />
+    </button>
+  )
+}

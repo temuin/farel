@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import { imageAlt, type Product } from '../lib/products';
+
+/**
+ * Preview only — no names, prices or links, because the browsable catalogue
+ * lives on /collections. Motion comes from the .marquee classes in global.css.
+ */
+interface Props {
+  products: Product[];
+  label: string;
+}
+
+const { products, label }: Props = Astro.props;
+
+/** Rendered twice so the animation can loop without a seam. */
+const COPIES = [0, 1] as const;
+---
+
+<div class="marquee marquee--left" role="group" aria-label={label} style="--marquee-duration: 40s">
+  <div class="marquee__track">
+    {
+      COPIES.map((copy) => (
+        <ul class="marquee__row" aria-hidden={copy === 1 ? 'true' : undefined}>
+          {products.map((product) => (
+            <li class="w-56 shrink-0 sm:w-64">
+              <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100">
+                <Image
+                  src={product.data.images[0]}
+                  alt={copy === 0 ? imageAlt(product, 0) : ''}
+                  widths={[256, 512]}
+                  sizes="256px"
+                  loading="lazy"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</div>

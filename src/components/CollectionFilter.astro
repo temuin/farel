@@ -1,0 +1,92 @@
+---
+import type { Brand, Category } from '../config/catalog';
+
+interface Props {
+  brands: Brand[];
+  categories: Category[];
+  total: number;
+}
+
+const { brands, categories, total } = Astro.props;
+
+/** One group per filter dimension; `all` is that dimension's reset option. */
+const groups = [
+  { key: 'brand', label: 'Brand', allLabel: 'All brands', values: brands },
+  { key: 'category', label: 'Category', allLabel: 'All categories', values: categories },
+] as const;
+---
+
+<div class="flex flex-col gap-6 sm:flex-row sm:flex-wrap sm:gap-10">
+  {
+    groups.map((group) => (
+      <div role="group" aria-label={`Filter by ${group.label.toLowerCase()}`}>
+        <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">{group.label}</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {['all', ...group.values].map((value) => (
+            <button
+              type="button"
+              data-filter={group.key}
+              data-value={value}
+              aria-pressed={value === 'all' ? 'true' : 'false'}
+              class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-900 aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+            >
+              {value === 'all' ? group.allLabel : value}
+            </button>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<p data-result-count aria-live="polite" class="mt-8 text-sm text-neutral-500">
+  Showing {total} of {total} products
+</p>
+
+<script>
+  type Dimension = 'brand' | 'category';
+
+  const ALL = 'all';
+
+  document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
+    const buttons = catalog.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const items = catalog.querySelectorAll<HTMLElement>('[data-product-item]');
+    const emptyState = catalog.querySelector<HTMLElement>('[data-empty-state]');
+    const resultCount = catalog.querySelector<HTMLElement>('[data-result-count]');
+
+    const selection: Record<Dimension, string> = { brand: ALL, category: ALL };
+
+    const matches = (item: HTMLElement) =>
+      (selection.brand === ALL || item.dataset.brand === selection.brand) &&
+      (selection.category === ALL || item.dataset.category === selection.category);
+
+    const render = () => {
+      let visible = 0;
+
+      items.forEach((item) => {
+        const shown = matches(item);
+        item.hidden = !shown;
+        if (shown) visible += 1;
+      });
+
+      buttons.forEach((button) => {
+        const dimension = button.dataset.filter as Dimension;
+        button.setAttribute('aria-pressed', String(selection[dimension] === button.dataset.value));
+      });
+
+      if (emptyState) emptyState.hidden = visible > 0;
+      if (resultCount) {
+        resultCount.textContent = `Showing ${visible} of ${items.length} products`;
+      }
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        selection[button.dataset.filter as Dimension] = button.dataset.value ?? ALL;
+        render();
+      });
+    });
+
+    render();
+  });
+</script>

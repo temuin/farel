@@ -1,0 +1,42 @@
+---
+interface Props {
+  /** Small label above the heading. */
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  /** Set per page so headings nest in a sensible order. */
+  as?: 'h1' | 'h2';
+  align?: 'left' | 'center';
+  /** `compact` trims the type scale for headings in a one-screen section. */
+  size?: 'default' | 'compact';
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  as: Tag = 'h2',
+  align = 'left',
+  size = 'default',
+}: Props = Astro.props;
+
+const titleSize =
+  size === 'compact' ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-3xl sm:text-4xl';
+const descriptionSize = size === 'compact' ? 'text-sm lg:text-base' : 'text-base';
+---
+
+<div class:list={['max-w-2xl', align === 'center' && 'mx-auto text-center']}>
+  {
+    eyebrow && (
+      <p class="text-xs font-semibold tracking-[0.2em] text-accent-600 uppercase">{eyebrow}</p>
+    )
+  }
+  <Tag class:list={['mt-3 font-bold tracking-tight text-balance text-neutral-900', titleSize]}>
+    {title}
+  </Tag>
+  {
+    description && (
+      <p class:list={['mt-4 leading-relaxed text-neutral-600', descriptionSize]}>{description}</p>
+    )
+  }
+</div>

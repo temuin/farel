@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CollectionFilter from '../../components/CollectionFilter.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import { getProducts, getUsedBrands, getUsedCategories } from '../../lib/products';
+
+const products = await getProducts();
+const brands = getUsedBrands(products);
+const categories = getUsedCategories(products);
+---
+
+<BaseLayout
+  title="Collections"
+  description="Browse the full Kelme and Adidas catalogue — jerseys, footwear and accessories for clubs, schools and retailers in Indonesia."
+>
+  <section class="border-b border-neutral-200 bg-neutral-50">
+    <div class="shell py-16 sm:py-20">
+      <SectionHeading
+        as="h1"
+        eyebrow="Catalogue"
+        title="Collections"
+        description="Filter by brand and category to find what you need, then send us the product name on WhatsApp for pricing and availability."
+      />
+    </div>
+  </section>
+
+  <section class="shell py-12 sm:py-16" data-catalog>
+    <CollectionFilter brands={brands} categories={categories} total={products.length} />
+
+    <div class="mt-8">
+      <ProductGrid products={products} eagerCount={4} filterable />
+    </div>
+
+    <p data-empty-state hidden class="rounded-2xl border border-dashed border-neutral-300 p-12 text-center text-sm text-neutral-500">
+      No products match this combination. Try clearing one of the filters.
+    </p>
+  </section>
+</BaseLayout>

@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import { imageAlt, productUrl, type Product } from '../lib/products';
+
+interface Props {
+  product: Product;
+  /** Set on above-the-fold cards to skip lazy loading. */
+  eager?: boolean;
+}
+
+const { product, eager = false } = Astro.props;
+const { name, brand, category, images, description } = product.data;
+---
+
+<a
+  href={productUrl(product)}
+  class="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-colors hover:border-neutral-900"
+>
+  <div class="aspect-square overflow-hidden bg-neutral-100">
+    <Image
+      src={images[0]}
+      alt={imageAlt(product, 0)}
+      widths={[300, 600]}
+      sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
+      loading={eager ? 'eager' : 'lazy'}
+      class="h-full w-full object-cover"
+    />
+  </div>
+
+  <div class="flex flex-1 flex-col p-5">
+    <div class="flex items-center gap-2 text-[11px] font-semibold tracking-wide uppercase">
+      <span class="text-neutral-900">{brand}</span>
+      <span aria-hidden="true" class="text-neutral-300">/</span>
+      <span class="text-neutral-500">{category}</span>
+    </div>
+
+    <h3 class="mt-2 text-base font-semibold text-neutral-900">{name}</h3>
+    <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-neutral-600">{description}</p>
+
+    <span class="mt-4 text-sm font-semibold text-accent-600 group-hover:underline">
+      View details
+    </span>
+  </div>
+</a>

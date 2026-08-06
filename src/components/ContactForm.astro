@@ -1,0 +1,66 @@
+---
+import Button from './Button.astro';
+import { WEB3FORMS_ACCESS_KEY, site } from '../config/site';
+
+/**
+ * Native form post to Web3Forms — no JavaScript. The browser submits directly
+ * and Web3Forms renders its own confirmation page, keeping the site static.
+ */
+const fields = [
+  { name: 'name', label: 'Name', type: 'text', autocomplete: 'name', required: true },
+  { name: 'organisation', label: 'Club / company', type: 'text', autocomplete: 'organization', required: false },
+  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email', required: true },
+  { name: 'phone', label: 'Phone / WhatsApp', type: 'tel', autocomplete: 'tel', required: false },
+] as const;
+
+const inputClass =
+  'mt-2 block w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none';
+---
+
+<form action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
+  <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+  <input type="hidden" name="subject" value={`New enquiry from ${site.name} website`} />
+  <input type="hidden" name="from_name" value={site.name} />
+
+  {/* Web3Forms honeypot: real users never see or fill this. */}
+  <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    {
+      fields.map((field) => (
+        <div>
+          <label for={field.name} class="text-sm font-medium text-neutral-900">
+            {field.label}
+            {!field.required && <span class="ml-1 text-neutral-400">(optional)</span>}
+          </label>
+          <input
+            id={field.name}
+            name={field.name}
+            type={field.type}
+            autocomplete={field.autocomplete}
+            required={field.required}
+            class={inputClass}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <div>
+    <label for="message" class="text-sm font-medium text-neutral-900">Message</label>
+    <textarea
+      id="message"
+      name="message"
+      rows="5"
+      required
+      placeholder="Tell us the products, quantities and sizes you need."
+      class={inputClass}></textarea>
+  </div>
+
+  <Button type="submit">Send enquiry</Button>
+
+  <p class="text-xs leading-relaxed text-neutral-500">
+    Submitting this form sends your message to our inbox via Web3Forms. For a faster reply, message
+    us on WhatsApp.
+  </p>
+</form>

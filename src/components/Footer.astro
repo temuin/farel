@@ -1,0 +1,66 @@
+---
+import { BRANDS, BRAND_PROFILES } from '../config/catalog';
+import { addressLine, contact, navLinks, site } from '../config/site';
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 bg-ink text-neutral-400">
+  <div class="shell grid gap-12 py-16 md:grid-cols-3">
+    <div>
+      <Logo tone="light" />
+      <p class="mt-4 max-w-xs text-sm leading-relaxed">{site.tagline}</p>
+
+      <ul class="mt-6 flex flex-wrap gap-3">
+        {
+          BRANDS.map((brand) => (
+            <li class="rounded-md bg-white/90 px-3 py-2">
+              <img src={BRAND_PROFILES[brand].logo} alt={brand} width="96" height="26" class="h-6 w-auto" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <nav aria-label="Footer">
+      <h2 class="text-sm font-semibold tracking-wide text-white uppercase">Site</h2>
+      <ul class="mt-4 space-y-3 text-sm">
+        {
+          navLinks.map((link) => (
+            <li>
+              <a href={link.href} class="transition-colors hover:text-white">
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="text-sm font-semibold tracking-wide text-white uppercase">Contact</h2>
+      <address class="mt-4 space-y-3 text-sm not-italic">
+        <p>{addressLine}</p>
+        <p>
+          <a href={`tel:+${contact.whatsappNumber}`} class="transition-colors hover:text-white">
+            {contact.phoneDisplay}
+          </a>
+        </p>
+        <p>
+          <a href={`mailto:${contact.email}`} class="transition-colors hover:text-white">
+            {contact.email}
+          </a>
+        </p>
+        <p>{contact.openingHours}</p>
+      </address>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <p class="shell py-6 text-xs">
+      &copy; {year} {site.legalName}. All rights reserved. Brand names and logos are the property of
+      their respective owners.
+    </p>
+  </div>
+</footer>

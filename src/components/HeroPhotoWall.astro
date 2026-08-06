@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import type { Product } from '../lib/products';
+
+/**
+ * Decorative backdrop. Purely visual — the hero copy carries the meaning, so
+ * the whole wall is hidden from assistive technology.
+ */
+interface Props {
+  products: Product[];
+}
+
+const { products }: Props = Astro.props;
+
+const COLUMN_COUNT = 4;
+const PHOTOS_PER_COLUMN = 5;
+/** Rendered twice per column so the vertical loop has no seam. */
+const COPIES = [0, 1] as const;
+
+const covers = products.map((product) => product.data.images[0]);
+
+/** Offset each column so neighbours never show the same photo side by side. */
+const columns = Array.from({ length: COLUMN_COUNT }, (_, index) =>
+  Array.from(
+    { length: PHOTOS_PER_COLUMN },
+    (_, slot) => covers[(index * PHOTOS_PER_COLUMN + slot) % covers.length],
+  ),
+);
+---
+
+<div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+  <div class="grid h-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+    {
+      columns.map((photos, index) => (
+        <div
+          class:list={[
+            'marquee',
+            index % 2 === 0 ? 'marquee--up' : 'marquee--down',
+            // Exact indices: `>=` would match column 4 twice and reveal it at
+            // the `sm` breakpoint, wrapping it onto a second grid row.
+            index === 2 && 'hidden sm:block',
+            index === 3 && 'hidden lg:block',
+          ]}
+          style={`--marquee-height: 100%; --marquee-duration: ${52 + index * 7}s`}
+        >
+          <div class="marquee__track">
+            {COPIES.map(() => (
+              <ul class="marquee__stack">
+                {photos.map((photo) => (
+                  <li class="aspect-square overflow-hidden rounded-2xl bg-neutral-800">
+                    <Image
+                      src={photo}
+                      alt=""
+                      widths={[300, 600]}
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 34vw, 50vw"
+                      loading="eager"
+                      decoding="async"
+                      class="h-full w-full object-cover"
+                    />
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
