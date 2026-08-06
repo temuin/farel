@@ -20,7 +20,9 @@ Built with **Astro** (static output) and **Tailwind CSS v4**. No database, no SS
 
 ```text
 src/
-├── assets/products/     Product photography (optimised at build time)
+├── assets/
+│   ├── brand/logo-icon.png  The real logo mark, cropped from design/logo-icon.jpeg
+│   └── products/            Product photography (optimised at build time)
 ├── components/          Presentational components
 ├── config/
 │   ├── catalog.ts       Brand + category vocabulary — the source of truth
@@ -33,10 +35,17 @@ src/
 ├── pages/               / · /about · /collections · /collections/[slug] · /contact
 └── styles/global.css    Tailwind entry, theme tokens, .shell container
 public/
-├── brands/              Brand logos (placeholders)
+├── brands/              Kelme/Adidas partner logos (placeholders)
 ├── clients/             Client logos (placeholders)
+├── favicon.ico, favicon.png  Generated from the real logo icon
 └── og-default.png       Default social preview image (placeholder)
+design/
+├── logo.jpeg            Original company lockup, as supplied
+└── logo-icon.jpeg       Original company icon, as supplied
 ```
+
+`design/` holds the original client-supplied artwork, unprocessed. Everything under `src/assets`
+and `public` derived from it was cropped and resized locally — see "The logo" below.
 
 The landing page is company introduction only: hero, who-we-are, partner brands, an auto-scrolling
 photo strip with a Kelme/Adidas toggle, the client logo wall and a closing CTA. The photo strip is
@@ -62,7 +71,6 @@ Everything below is placeholder content.
 
 | What                                    | Where                                        |
 | :-------------------------------------- | :------------------------------------------- |
-| **Company logo** (see below)             | `src/components/LogoMark.astro`, `public/brand/logo-mark.svg`, `public/favicon.svg` |
 | Address, phone, email                    | `src/config/site.ts`                          |
 | Legal entity name + distributor wording  | `src/config/site.ts` (both marked `TODO`)     |
 | Web3Forms access key                     | `src/config/site.ts` → `WEB3FORMS_ACCESS_KEY` |
@@ -73,26 +81,28 @@ Everything below is placeholder content.
 | Social preview image (1200×630)          | `public/og-default.png`                       |
 | Product data and photography             | `src/content/products/`, `src/assets/products/` |
 
-### The logo is a trace — replace it
+### The logo
 
-The triangle mark was rebuilt by eye from a raster image. It is close, but it is **not** the
-official artwork and should not ship as-is. Drop in the real vector and the paths are the only
-thing that changes.
+`src/components/Logo.astro` uses the real company icon — a Vite-imported PNG cropped from
+`design/logo-icon.jpeg` (the raw file the client supplied over WhatsApp). The wordmark and tagline
+next to it are live text, not baked into the image: the source photo's tagline goes illegible if
+scaled down to logo-in-a-header size, while real text stays crisp at any size.
 
-It lives in three places, because each needs a different form:
+The icon is dark-on-white, so it can't sit directly on the dark footer. On `tone="light"` it gets a
+small white chip behind it — the same treatment already used for the Kelme/Adidas logos in the
+footer.
 
-- `src/components/LogoMark.astro` — inline SVG used by the header and footer. The charcoal strokes
-  use `currentColor` so the same component works on white and on charcoal; an `<img>` cannot do
-  this, because `currentColor` does not cross a document boundary.
-- `public/brand/logo-mark.svg` — standalone file, for anything that needs a URL.
-- `public/favicon.svg` — the mark reversed out of a charcoal tile.
+`public/favicon.ico` and `public/favicon.png` were generated from the same source icon (cropped,
+padded to a square, resized). If the client provides real vector artwork (AI/EPS/SVG) later, it's a
+straight swap: replace `src/assets/brand/logo-icon.png` and regenerate the two favicon files.
 
 ### Colours
 
-The palette comes from the logo: charcoal `#212121` (the `ink` token) and green `#0B6B47` (the
-`accent` ramp), both defined in the `@theme` block of `src/styles/global.css`. Neutrals use
-Tailwind's `neutral` scale rather than `zinc`, since `zinc`'s blue cast fights the untinted
-charcoal. Sample the exact green from the official artwork when you swap the logo in.
+The palette is sampled directly from `src/assets/brand/logo-icon.png`: charcoal `#202020` (the
+`ink` token) and green `#095D3E` (the `accent` ramp), both defined in the `@theme` block of
+`src/styles/global.css`. Neutrals use Tailwind's `neutral` scale rather than `zinc`, since `zinc`'s
+blue cast fights the untinted charcoal. Re-sample both if the logo is ever replaced with sharper
+source artwork.
 
 The Google Maps embed is keyless and built from the address in `src/config/site.ts`, so it starts
 working as soon as the real address is in place.

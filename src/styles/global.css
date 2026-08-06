@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  /* Palette taken from the Amalia Utama mark. Neutrals use Tailwind's untinted
-     `neutral` scale rather than `zinc`, whose blue cast fights the charcoal. */
-  --color-ink: #212121;
+  /* Sampled from the real logo icon (src/assets/brand/logo-icon.png). Neutrals
+     use Tailwind's untinted `neutral` scale rather than `zinc`, whose blue
+     cast fights the charcoal. */
+  --color-ink: #202020;
 
-  --color-accent-50: #eef6f2;
-  --color-accent-100: #d3e8de;
-  --color-accent-500: #0f8757;
-  --color-accent-600: #0b6b47;
-  --color-accent-700: #085539;
+  --color-accent-50: #edf8f4;
+  --color-accent-100: #d1f0e4;
+  --color-accent-500: #0d7750;
+  --color-accent-600: #095d3e;
+  --color-accent-700: #06462f;
 }
 
 @layer base {

@@ -1,39 +1,54 @@
 ---
-import LogoMark from './LogoMark.astro';
+import { Image } from 'astro:assets';
+import logoIcon from '../assets/brand/logo-icon.png';
 import { site } from '../config/site';
 
 /**
- * The wordmark is real text rather than a second image asset, so it picks up
- * the page font and stays selectable.
+ * The wordmark is real text rather than baked into the image, so it stays
+ * crisp and selectable at any size — the source photo's fine print goes
+ * illegible well before a useful logo height.
  */
 interface Props {
-  variant?: 'full' | 'mark';
   /** Sets the colour for light or dark backgrounds. */
   tone?: 'dark' | 'light';
   class?: string;
 }
 
-const { variant = 'full', tone = 'dark', class: className }: Props = Astro.props;
+const { tone = 'dark', class: className }: Props = Astro.props;
 
 const toneClass = tone === 'light' ? 'text-white' : 'text-ink';
 ---
 
 <span class:list={['inline-flex items-center gap-3', toneClass, className]}>
-  <LogoMark />
-
   {
-    variant === 'full' && (
-      <span class="flex flex-col leading-none">
-        <span class="text-base font-bold tracking-tight sm:text-lg">{site.name}</span>
-        <span
-          class:list={[
-            'mt-1 hidden text-[10px] tracking-wide uppercase sm:block',
-            tone === 'light' ? 'text-neutral-400' : 'text-neutral-500',
-          ]}
-        >
-          {site.tagline}
-        </span>
+    tone === 'light' ? (
+      // The icon is dark-on-white — on a dark background it needs a light
+      // backing to read, the same trick already used for the partner brand
+      // logos in the footer.
+      <span class="flex h-9 items-center rounded-md bg-white/95 px-1.5 lg:h-10">
+        <Image src={logoIcon} alt="" widths={[64, 128]} sizes="32px" loading="eager" class="h-6 w-auto lg:h-7" />
       </span>
+    ) : (
+      <Image
+        src={logoIcon}
+        alt=""
+        widths={[72, 144]}
+        sizes="36px"
+        loading="eager"
+        class="h-9 w-auto lg:h-10"
+      />
     )
   }
+
+  <span class="flex flex-col leading-none">
+    <span class="text-base font-bold tracking-tight sm:text-lg">{site.name}</span>
+    <span
+      class:list={[
+        'mt-1 hidden text-[10px] tracking-wide uppercase sm:block',
+        tone === 'light' ? 'text-neutral-400' : 'text-neutral-500',
+      ]}
+    >
+      {site.tagline}
+    </span>
+  </span>
 </span>
