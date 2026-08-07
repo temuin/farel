@@ -141,5 +141,41 @@ automatically; no adapter or platform config file is needed.
 - **Build command:** `npm run build`
 - **Output directory:** `dist`
 
-Set `site` in `astro.config.mjs` to the production domain first, or canonical and Open Graph URLs
-will point at `example.com`.
+Set the public origin at build time with `SITE_URL`, or canonical and Open Graph URLs fall back to
+`example.com`:
+
+```bash
+SITE_URL="https://your-domain.com" npm run build
+```
+
+### Current preview deployment (temporary)
+
+Live at **https://amaliautama-preview.azurewebsites.net** — an Azure App Service in `rg-temuin`
+(subscription `Azure for Students`, Indonesia Central). It shares the existing `tse-web-plan`
+B1 plan, so it costs nothing extra.
+
+`deploy/` holds the hosting shim: App Service needs a process listening on `$PORT`, so
+`server.mjs` serves `dist/` using only Node built-ins — no dependencies, therefore no install step
+on the host. Vercel and Netlify serve `dist/` directly and do not need it; a plain VPS can run it
+as-is.
+
+To redeploy after a change:
+
+```bash
+SITE_URL="https://amaliautama-preview.azurewebsites.net" npm run build
+```
+
+Then stage `deploy/server.mjs`, `deploy/package.json` and `dist/` into one folder, zip it (with
+forward-slash paths), and run:
+
+```bash
+az webapp deploy -g rg-temuin -n amaliautama-preview --src-path deploy.zip --type zip
+```
+
+To tear the whole preview down when the client moves to their own infrastructure:
+
+```bash
+az webapp delete -g rg-temuin -n amaliautama-preview
+```
+
+That removes only the preview app; `tse-web` and the shared plan are untouched.

@@ -1,0 +1,13 @@
+{
+  "name": "amalia-utama-hosting",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hosting shim for the built site. No dependencies by design.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}
