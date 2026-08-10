@@ -2,10 +2,21 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BrandStrip from '../components/BrandStrip.astro';
 import Button from '../components/Button.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import SectionHeading from '../components/SectionHeading.astro';
+import { CATEGORIES, BRANDS } from '../config/catalog';
+import { getProducts } from '../lib/products';
 import { site } from '../config/site';
 
+const products = await getProducts();
 const yearsActive = new Date().getFullYear() - site.foundedYear;
+
+const stats = [
+  { value: `${yearsActive}+`, label: 'Years in business' },
+  { value: String(BRANDS.length), label: 'Authorised brands' },
+  { value: String(CATEGORIES.length), label: 'Product categories' },
+  { value: String(products.length), label: 'Products in catalogue' },
+];
 
 const values = [
   {
@@ -27,20 +38,37 @@ const values = [
   title="About"
   description={`Company profile for ${site.legalName}, an authorised Indonesian distributor of Kelme and Adidas team sportswear.`}
 >
-  <section class="border-b border-neutral-200 bg-neutral-50">
-    <div class="shell py-16 sm:py-20">
-      <SectionHeading
-        as="h1"
-        eyebrow="Company profile"
-        title={`About ${site.name}`}
-        description={`Established in ${site.foundedYear}, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.`}
-      />
+  <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
+    <div class="shell grid gap-10 py-16 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <div>
+        <SectionHeading
+          as="h1"
+          eyebrow="Company profile"
+          title={`About ${site.name}`}
+          description={`Established in ${site.foundedYear}, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.`}
+        />
+
+        <dl class="mt-10 grid grid-cols-2 gap-x-6 gap-y-8">
+          {
+            stats.map((stat) => (
+              <div>
+                <dt class="text-3xl font-bold tracking-tight text-accent-600 dark:text-accent-500">{stat.value}</dt>
+                <dd class="mt-1 text-xs font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+                  {stat.label}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <MediaPlaceholder label="Team or storefront photo" class="aspect-[4/3] lg:aspect-[4/5]" />
     </div>
   </section>
 
   <section class="shell grid gap-12 py-16 sm:py-20 lg:grid-cols-2">
-    <div class="space-y-5 text-base leading-relaxed text-neutral-600">
-      <h2 class="text-2xl font-bold tracking-tight text-neutral-900">Our story</h2>
+    <div class="space-y-5 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
+      <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Our story</h2>
       <p>
         {site.legalName} started as a small team-kit supplier and has spent the last {yearsActive}
         years growing into a national distributor for two performance sportswear brands. What began
@@ -58,31 +86,64 @@ const values = [
       </p>
     </div>
 
-    <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-8">
-      <h2 class="text-lg font-bold tracking-tight text-neutral-900">Official distributor statement</h2>
-      <p class="mt-4 text-base leading-relaxed text-neutral-600">
-        {site.legalName} is an authorised distributor of Kelme and Adidas products for the
-        Indonesian market. All goods we supply are genuine, sourced through official channels, and
-        covered by the manufacturers&rsquo; standard warranty terms.
-      </p>
-      <p class="mt-4 text-sm leading-relaxed text-neutral-500">
-        Placeholder wording. Confirm the exact distributor status, territory and any wording
-        required by each brand before publishing.
-      </p>
-      <div class="mt-8">
-        <Button href="/contact">Talk to our team</Button>
+    <div class="flex flex-col gap-6">
+      <MediaPlaceholder label="Warehouse or office interior" class="aspect-video" />
+
+      <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-8 dark:border-neutral-800 dark:bg-neutral-900">
+        <h2 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">Official distributor statement</h2>
+        <p class="mt-4 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
+          {site.legalName} is an authorised distributor of Kelme and Adidas products for the
+          Indonesian market. All goods we supply are genuine, sourced through official channels, and
+          covered by the manufacturers&rsquo; standard warranty terms.
+        </p>
+        <p class="mt-4 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+          Placeholder wording. Confirm the exact distributor status, territory and any wording
+          required by each brand before publishing.
+        </p>
+        <div class="mt-8">
+          <Button href="/contact">Talk to our team</Button>
+        </div>
       </div>
     </div>
   </section>
 
+  <section class="border-y border-neutral-200 bg-neutral-50 py-16 sm:py-20 dark:border-neutral-800 dark:bg-neutral-900">
+    <div class="shell">
+      <SectionHeading
+        eyebrow="Behind the scenes"
+        title="Inside our operation"
+        description="Where your order actually comes from. Swap these for real photos of the warehouse, packing and dispatch."
+      />
+      <div class="mt-10 grid gap-6 sm:grid-cols-3">
+        <MediaPlaceholder label="Warehouse shelving" class="aspect-square" />
+        <MediaPlaceholder label="Packing & quality check" class="aspect-square" />
+        <MediaPlaceholder label="Dispatch & delivery" class="aspect-square" />
+      </div>
+    </div>
+  </section>
+
+  <section class="shell py-16 sm:py-20">
+    <SectionHeading
+      eyebrow="See us in action"
+      title="Company video"
+      description="A short walkthrough of who we are and how we work — drop an embed or uploaded file in here."
+    />
+    <div class="mt-10">
+      <MediaPlaceholder type="video" label="Company or product video" class="aspect-video" />
+    </div>
+  </section>
+
   <section class="shell pb-16 sm:pb-20">
-    <h2 class="text-2xl font-bold tracking-tight text-neutral-900">How we work</h2>
+    <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">How we work</h2>
     <ul class="mt-8 grid gap-6 sm:grid-cols-3">
       {
-        values.map((value) => (
-          <li class="rounded-2xl border border-neutral-200 p-6">
-            <h3 class="text-base font-semibold text-neutral-900">{value.title}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-neutral-600">{value.body}</p>
+        values.map((value, index) => (
+          <li class="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-accent-50 text-sm font-bold text-accent-600 dark:bg-accent-500/10 dark:text-accent-500">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="mt-4 text-base font-semibold text-neutral-900 dark:text-white">{value.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{value.body}</p>
           </li>
         ))
       }

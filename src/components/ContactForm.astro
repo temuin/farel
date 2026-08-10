@@ -14,7 +14,7 @@ const fields = [
 ] as const;
 
 const inputClass =
-  'mt-2 block w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none';
+  'mt-2 block w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-white';
 ---
 
 <form action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
@@ -29,9 +29,9 @@ const inputClass =
     {
       fields.map((field) => (
         <div>
-          <label for={field.name} class="text-sm font-medium text-neutral-900">
+          <label for={field.name} class="text-sm font-medium text-neutral-900 dark:text-white">
             {field.label}
-            {!field.required && <span class="ml-1 text-neutral-400">(optional)</span>}
+            {!field.required && <span class="ml-1 text-neutral-400 dark:text-neutral-500">(optional)</span>}
           </label>
           <input
             id={field.name}
@@ -47,7 +47,7 @@ const inputClass =
   </div>
 
   <div>
-    <label for="message" class="text-sm font-medium text-neutral-900">Message</label>
+    <label for="message" class="text-sm font-medium text-neutral-900 dark:text-white">Message</label>
     <textarea
       id="message"
       name="message"
@@ -59,7 +59,7 @@ const inputClass =
 
   <Button type="submit">Send enquiry</Button>
 
-  <p class="text-xs leading-relaxed text-neutral-500">
+  <p class="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
     Submitting this form sends your message to our inbox via Web3Forms. For a faster reply, message
     us on WhatsApp.
   </p>

@@ -2,6 +2,7 @@
 import { navLinks, site } from '../config/site';
 import { generalEnquiryUrl } from '../lib/whatsapp';
 import Logo from './Logo.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import WhatsAppIcon from './WhatsAppIcon.astro';
 
 const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
@@ -10,7 +11,7 @@ const isActive = (href: string) =>
   href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
-<header class="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
+<header class="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
   <div class="shell flex h-16 items-center justify-between gap-4 lg:h-20">
     <a href="/" aria-label={`${site.name} — home`}>
       <Logo />
@@ -24,7 +25,9 @@ const isActive = (href: string) =>
             aria-current={isActive(link.href) ? 'page' : undefined}
             class:list={[
               'text-sm font-medium transition-colors',
-              isActive(link.href) ? 'text-accent-600' : 'text-neutral-600 hover:text-neutral-900',
+              isActive(link.href)
+                ? 'text-accent-600 dark:text-accent-500'
+                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white',
             ]}
           >
             {link.label}
@@ -44,12 +47,14 @@ const isActive = (href: string) =>
         WhatsApp
       </a>
 
+      <ThemeToggle />
+
       <button
         type="button"
         id="nav-toggle"
         aria-expanded="false"
         aria-controls="mobile-nav"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 text-neutral-900 lg:hidden"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 text-neutral-900 lg:hidden dark:border-neutral-700 dark:text-white"
       >
         <span class="sr-only">Toggle navigation</span>
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -59,7 +64,7 @@ const isActive = (href: string) =>
     </div>
   </div>
 
-  <nav id="mobile-nav" aria-label="Main" hidden class="border-t border-neutral-200 bg-white lg:hidden">
+  <nav id="mobile-nav" aria-label="Main" hidden class="border-t border-neutral-200 bg-white lg:hidden dark:border-neutral-800 dark:bg-neutral-950">
     <ul class="shell flex flex-col py-2">
       {
         navLinks.map((link) => (
@@ -69,7 +74,7 @@ const isActive = (href: string) =>
               aria-current={isActive(link.href) ? 'page' : undefined}
               class:list={[
                 'block py-3 text-base font-medium',
-                isActive(link.href) ? 'text-accent-600' : 'text-neutral-700',
+                isActive(link.href) ? 'text-accent-600 dark:text-accent-500' : 'text-neutral-700 dark:text-neutral-300',
               ]}
             >
               {link.label}

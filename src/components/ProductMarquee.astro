@@ -24,7 +24,7 @@ const COPIES = [0, 1] as const;
         <ul class="marquee__row" aria-hidden={copy === 1 ? 'true' : undefined}>
           {products.map((product) => (
             <li class="w-56 shrink-0 sm:w-64">
-              <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100">
+              <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
                 <Image
                   src={product.data.images[0]}
                   alt={copy === 0 ? imageAlt(product, 0) : ''}

@@ -1,0 +1,43 @@
+---
+/**
+ * A labelled slot for photography or video that hasn't been shot or sourced
+ * yet. Dashed border and muted icon keep it visually distinct from a real
+ * asset — the same "replace me" language already used for the brand logo
+ * placeholders in public/brands/.
+ */
+interface Props {
+  type?: 'photo' | 'video';
+  /** What should eventually go here, e.g. "Warehouse interior". */
+  label: string;
+  class?: string;
+}
+
+const { type = 'photo', label, class: className }: Props = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50 p-6 text-center dark:border-neutral-700 dark:bg-neutral-900',
+    className,
+  ]}
+>
+  <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-neutral-400 shadow-sm dark:bg-neutral-800 dark:text-neutral-500">
+    {
+      type === 'video' ? (
+        <svg class="h-5 w-5 translate-x-0.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      ) : (
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="M21 15l-5-5L5 21" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      )
+    }
+  </span>
+  <p class="text-sm font-semibold text-neutral-500 dark:text-neutral-400">{label}</p>
+  <p class="text-xs text-neutral-400 dark:text-neutral-600">
+    {type === 'video' ? 'Replace with an embedded or uploaded video' : 'Replace with a photo'}
+  </p>
+</div>

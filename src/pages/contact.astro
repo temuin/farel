@@ -19,7 +19,7 @@ const details = [
   title="Contact"
   description={`Get in touch with ${site.name} on WhatsApp, by email or at our Jakarta office for Kelme and Adidas team orders.`}
 >
-  <section class="border-b border-neutral-200 bg-neutral-50">
+  <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
     <div class="shell py-16 sm:py-20">
       <SectionHeading
         as="h1"
@@ -38,17 +38,17 @@ const details = [
 
   <section class="shell grid gap-12 py-16 sm:py-20 lg:grid-cols-2 lg:gap-16">
     <div>
-      <h2 class="text-2xl font-bold tracking-tight text-neutral-900">Company details</h2>
+      <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Company details</h2>
       <dl class="mt-8 space-y-6">
         {
           details.map((detail) => (
             <div>
-              <dt class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">
+              <dt class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">
                 {detail.label}
               </dt>
-              <dd class="mt-2 text-base text-neutral-900">
+              <dd class="mt-2 text-base text-neutral-900 dark:text-white">
                 {detail.href ? (
-                  <a href={detail.href} class="hover:text-accent-600">
+                  <a href={detail.href} class="hover:text-accent-600 dark:hover:text-accent-500">
                     {detail.value}
                   </a>
                 ) : (
@@ -60,7 +60,7 @@ const details = [
         }
       </dl>
 
-      <div class="mt-10 overflow-hidden rounded-2xl border border-neutral-200">
+      <div class="mt-10 overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
         <iframe
           src={mapEmbedUrl}
           title={`Map showing the ${site.name} office`}
@@ -73,8 +73,8 @@ const details = [
     </div>
 
     <div>
-      <h2 class="text-2xl font-bold tracking-tight text-neutral-900">Send an enquiry</h2>
-      <p class="mt-3 text-base leading-relaxed text-neutral-600">
+      <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Send an enquiry</h2>
+      <p class="mt-3 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
         Prefer email? Fill in the form and we will get back to you within one business day.
       </p>
       <div class="mt-8">

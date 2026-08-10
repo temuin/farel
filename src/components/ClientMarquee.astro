@@ -5,7 +5,7 @@ import { clients } from '../config/clients';
 const COPIES = [0, 1] as const;
 ---
 
-<div class="marquee marquee--up" role="group" aria-label="Organisations we supply">
+<div class="marquee marquee--up" role="group" aria-label="Organisations we supply" style="--marquee-duration: 22s">
   <div class="marquee__track">
     {
       COPIES.map((copy) => (

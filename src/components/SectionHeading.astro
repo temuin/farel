@@ -28,15 +28,15 @@ const descriptionSize = size === 'compact' ? 'text-sm lg:text-base' : 'text-base
 <div class:list={['max-w-2xl', align === 'center' && 'mx-auto text-center']}>
   {
     eyebrow && (
-      <p class="text-xs font-semibold tracking-[0.2em] text-accent-600 uppercase">{eyebrow}</p>
+      <p class="text-xs font-semibold tracking-[0.2em] text-accent-600 uppercase dark:text-accent-500">{eyebrow}</p>
     )
   }
-  <Tag class:list={['mt-3 font-bold tracking-tight text-balance text-neutral-900', titleSize]}>
+  <Tag class:list={['mt-3 font-bold tracking-tight text-balance text-neutral-900 dark:text-white', titleSize]}>
     {title}
   </Tag>
   {
     description && (
-      <p class:list={['mt-4 leading-relaxed text-neutral-600', descriptionSize]}>{description}</p>
+      <p class:list={['mt-4 leading-relaxed text-neutral-600 dark:text-neutral-400', descriptionSize]}>{description}</p>
     )
   }
 </div>

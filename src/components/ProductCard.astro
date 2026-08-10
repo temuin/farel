@@ -14,9 +14,9 @@ const { name, brand, category, images, description } = product.data;
 
 <a
   href={productUrl(product)}
-  class="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-colors hover:border-neutral-900"
+  class="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-colors hover:border-neutral-900 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-100"
 >
-  <div class="aspect-square overflow-hidden bg-neutral-100">
+  <div class="aspect-square overflow-hidden bg-neutral-100 dark:bg-neutral-800">
     <Image
       src={images[0]}
       alt={imageAlt(product, 0)}
@@ -29,15 +29,15 @@ const { name, brand, category, images, description } = product.data;
 
   <div class="flex flex-1 flex-col p-5">
     <div class="flex items-center gap-2 text-[11px] font-semibold tracking-wide uppercase">
-      <span class="text-neutral-900">{brand}</span>
-      <span aria-hidden="true" class="text-neutral-300">/</span>
-      <span class="text-neutral-500">{category}</span>
+      <span class="text-neutral-900 dark:text-white">{brand}</span>
+      <span aria-hidden="true" class="text-neutral-300 dark:text-neutral-700">/</span>
+      <span class="text-neutral-500 dark:text-neutral-400">{category}</span>
     </div>
 
-    <h3 class="mt-2 text-base font-semibold text-neutral-900">{name}</h3>
-    <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-neutral-600">{description}</p>
+    <h3 class="mt-2 text-base font-semibold text-neutral-900 dark:text-white">{name}</h3>
+    <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{description}</p>
 
-    <span class="mt-4 text-sm font-semibold text-accent-600 group-hover:underline">
+    <span class="mt-4 text-sm font-semibold text-accent-600 group-hover:underline dark:text-accent-500">
       View details
     </span>
   </div>

@@ -1,12 +1,16 @@
 ---
 import { Image } from 'astro:assets';
-import { BRAND_PROFILES } from '../config/catalog';
+import { BRANDS, BRAND_PROFILES } from '../config/catalog';
 import { imageAlt } from '../lib/products';
+import { site } from '../config/site';
+import Button from './Button.astro';
 import type { BrandPreview } from '../lib/products';
 
 /**
- * Two logo tiles that double as an ARIA tab set, swapping a statement panel
- * below them.
+ * The homepage "Who we are" split: an intro column on the left and two logo
+ * tiles on the right that double as an ARIA tab set. Both columns are driven
+ * by the same tab state, so pressing a logo swaps the intro heading and
+ * description as well as the statement panel below the logos.
  *
  * Sits inside a section sized to fit one screen, so sizing is tight by default
  * (mobile is where the fold binds) and scales up at `lg:`, where the available
@@ -21,84 +25,190 @@ interface Props {
 }
 
 const { previews }: Props = Astro.props;
+
+/**
+ * Shared by every stacked pair (intro column, statement panel): the classes
+ * that make the swap read as a single crossfade instead of an instant cut or
+ * a layout jump. `[grid-area:1/1]` stacks all siblings in one grid cell so
+ * the container's height tracks whichever one is tallest while the inactive
+ * sibling sits right behind the active one. The slight scale gives the swap
+ * a bit of pop instead of a flat fade.
+ */
+const STACK_ITEM = '[grid-area:1/1] transition-all duration-300 ease-out motion-reduce:transition-none';
+const stackState = (active: boolean) =>
+  active ? 'opacity-100 scale-100 translate-y-0' : 'pointer-events-none opacity-0 scale-[0.98] translate-y-1';
+
+const meta = [
+  { label: `Est. ${site.foundedYear}` },
+  { label: `${BRANDS.length} authorised brands` },
+  { label: 'Nationwide shipping' },
+];
 ---
 
-<div data-brand-showcase>
-  <div role="tablist" aria-label="Choose a brand" class="grid grid-cols-2 gap-3 lg:gap-4">
-    {
-      previews.map((preview, index) => (
-        <button
-          type="button"
-          role="tab"
-          id={`brand-logo-tab-${preview.brand}`}
-          aria-controls={`brand-logo-panel-${preview.brand}`}
-          aria-selected={index === 0 ? 'true' : 'false'}
-          tabindex={index === 0 ? 0 : -1}
-          class="flex items-center justify-center rounded-xl border-2 border-neutral-200 bg-white px-4 py-2 transition-colors hover:border-neutral-400 aria-selected:border-ink lg:px-6 lg:py-4"
-        >
-          <img
-            src={BRAND_PROFILES[preview.brand].logo}
-            alt={`${preview.brand} logo`}
-            width="240"
-            height="64"
-            class="h-7 w-auto lg:h-10"
-          />
-        </button>
-      ))
-    }
+<div
+  data-brand-showcase
+  class="grid gap-10 rounded-3xl border border-neutral-200/70 bg-white/70 p-6 shadow-xl shadow-neutral-900/5 backdrop-blur-sm sm:p-10 lg:grid-cols-2 lg:items-center lg:gap-16 lg:p-14 dark:border-neutral-800/70 dark:bg-neutral-900/40 dark:shadow-black/20"
+>
+  <div>
+    <p class="flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-accent-600 uppercase dark:text-accent-500">
+      <span aria-hidden="true" class="h-1.5 w-4 rounded-full bg-accent-500"></span>
+      Who we are
+    </p>
+
+    <div class="relative mt-4 grid border-l-2 border-accent-500/30 pl-4 dark:border-accent-500/20">
+      {
+        previews.map((preview, index) => {
+          const profile = BRAND_PROFILES[preview.brand];
+          const active = index === 0;
+
+          return (
+            <div
+              data-brand-intro-panel={preview.brand}
+              aria-hidden={!active}
+              class:list={[STACK_ITEM, stackState(active)]}
+            >
+              <h2 class="text-2xl font-bold tracking-tight text-balance text-neutral-900 sm:text-3xl lg:text-4xl dark:text-white">
+                An authorised distributor of {preview.brand}, not a reseller
+              </h2>
+              <p class="mt-4 text-sm leading-relaxed text-neutral-600 lg:text-base dark:text-neutral-400">
+                {site.legalName} is an authorised distributor of {preview.brand}, covering {profile.focus} in
+                one order since {site.foundedYear}.
+              </p>
+            </div>
+          );
+        })
+      }
+    </div>
+
+    <div class="mt-6 lg:mt-8">
+      <Button href="/about" variant="secondary">Read our company profile</Button>
+    </div>
+
+    <dl class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+      {
+        meta.map((item, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true" class="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />}
+            <dt class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{item.label}</dt>
+          </>
+        ))
+      }
+    </dl>
   </div>
 
-  {
-    previews.map((preview, index) => {
-      const profile = BRAND_PROFILES[preview.brand];
-      const highlight = preview.products[0];
+  <div>
+    <div role="tablist" aria-label="Choose a brand" class="grid grid-cols-2 gap-3 lg:gap-4">
+      {
+        previews.map((preview, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`brand-logo-tab-${preview.brand}`}
+            aria-controls={`brand-logo-panel-${preview.brand}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+            data-brand={preview.brand}
+            class="flex items-center justify-center rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md aria-selected:-translate-y-0.5 aria-selected:border-accent-600 aria-selected:shadow-lg aria-selected:shadow-accent-600/20 aria-selected:ring-2 aria-selected:ring-accent-500/30 lg:px-6 lg:py-5 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-600 dark:aria-selected:border-accent-500 dark:aria-selected:shadow-accent-500/10 dark:aria-selected:ring-accent-500/20"
+          >
+            <img
+              src={BRAND_PROFILES[preview.brand].logo}
+              alt={`${preview.brand} logo`}
+              width="240"
+              height="64"
+              class="h-7 w-auto lg:h-10"
+            />
+          </button>
+        ))
+      }
+    </div>
 
-      return (
-        <div
-          role="tabpanel"
-          id={`brand-logo-panel-${preview.brand}`}
-          aria-labelledby={`brand-logo-tab-${preview.brand}`}
-          hidden={index !== 0}
-          class="mt-3 lg:mt-6"
-        >
-          <div class="overflow-hidden rounded-2xl bg-ink p-4 lg:p-8">
-            <p class="text-xs font-semibold tracking-[0.2em] text-accent-500 uppercase">
-              {preview.brand}
-            </p>
-            <p class="mt-1 text-base font-bold tracking-tight text-balance text-white sm:text-lg lg:mt-3 lg:text-2xl">
-              {profile.statement}
-            </p>
-            <p class="mt-1 text-sm leading-relaxed text-neutral-400 lg:mt-3 lg:text-base">
-              {profile.summary}
-            </p>
+    <div class="relative mt-3 grid lg:mt-6">
+      {
+        previews.map((preview, index) => {
+          const profile = BRAND_PROFILES[preview.brand];
+          const highlight = preview.products[0];
+          const active = index === 0;
 
-            {/*
-              Fixed height rather than an aspect ratio: keeps the photo
-              predictable regardless of column width, and is the main lever for
-              fitting the section to one screen.
-            */}
-            {highlight && (
-              <div class="mt-3 h-20 overflow-hidden rounded-xl bg-neutral-800 sm:h-24 lg:mt-6 lg:h-56">
-                <Image
-                  src={highlight.data.images[0]}
-                  alt={imageAlt(highlight, 0)}
-                  widths={[400, 800]}
-                  sizes="(min-width: 1024px) 34vw, 90vw"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  class="h-full w-full object-cover"
-                />
+          return (
+            <div
+              role="tabpanel"
+              id={`brand-logo-panel-${preview.brand}`}
+              aria-labelledby={`brand-logo-tab-${preview.brand}`}
+              aria-hidden={!active}
+              data-brand-panel
+              class:list={[STACK_ITEM, stackState(active)]}
+            >
+              <div class="brand-panel-glow relative overflow-hidden rounded-2xl bg-ink p-4 ring-1 ring-white/10 lg:p-8">
+                <div aria-hidden="true" class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent-500 via-accent-600 to-accent-700" />
+
+                <p class="text-xs font-semibold tracking-[0.2em] text-accent-500 uppercase">
+                  {preview.brand}
+                </p>
+                <p class="mt-1 text-base font-bold tracking-tight text-balance text-white sm:text-lg lg:mt-3 lg:text-2xl">
+                  {profile.statement}
+                </p>
+                <p class="mt-1 text-sm leading-relaxed text-neutral-400 lg:mt-3 lg:text-base">
+                  {profile.summary}
+                </p>
+
+                {/*
+                  Fixed height rather than an aspect ratio: keeps the photo
+                  predictable regardless of column width, and is the main lever for
+                  fitting the section to one screen.
+                */}
+                {highlight && (
+                  <div class="relative mt-3 h-24 overflow-hidden rounded-xl bg-neutral-800 ring-1 ring-white/10 sm:h-28 lg:mt-6 lg:h-64">
+                    <Image
+                      src={highlight.data.images[0]}
+                      alt={imageAlt(highlight, 0)}
+                      widths={[400, 800]}
+                      sizes="(min-width: 1024px) 34vw, 90vw"
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      class="h-full w-full object-cover"
+                    />
+                    <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  </div>
+                )}
+
+                <div class="mt-4 lg:mt-6">
+                  <Button href={`/collections?brand=${preview.brand}`} variant="inverted">
+                    Explore {preview.brand} range
+                  </Button>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      );
-    })
-  }
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
 </div>
+
+<style>
+  /* Two soft accent-coloured glows in the panel's corners, sitting over the
+     flat `bg-ink` base — flat black read as an afterthought next to the rest
+     of the page's colour. */
+  .brand-panel-glow {
+    background-image:
+      radial-gradient(120% 100% at 100% 0%, color-mix(in oklch, var(--color-accent-600) 35%, transparent) 0%, transparent 55%),
+      radial-gradient(100% 100% at 0% 100%, color-mix(in oklch, var(--color-accent-500) 20%, transparent) 0%, transparent 60%);
+  }
+</style>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-brand-showcase]').forEach((showcase) => {
     const buttons = [...showcase.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+
+    const setPanelState = (panel: HTMLElement, selected: boolean) => {
+      panel.setAttribute('aria-hidden', String(!selected));
+      panel.classList.toggle('opacity-100', selected);
+      panel.classList.toggle('scale-100', selected);
+      panel.classList.toggle('translate-y-0', selected);
+      panel.classList.toggle('opacity-0', !selected);
+      panel.classList.toggle('scale-[0.98]', !selected);
+      panel.classList.toggle('translate-y-1', !selected);
+      panel.classList.toggle('pointer-events-none', !selected);
+    };
 
     const select = (index: number) => {
       buttons.forEach((button, position) => {
@@ -107,7 +217,20 @@ const { previews }: Props = Astro.props;
         button.tabIndex = selected ? 0 : -1;
 
         const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
-        if (panel) panel.hidden = !selected;
+        if (panel) setPanelState(panel, selected);
+
+        const introPanel = showcase.querySelector<HTMLElement>(
+          `[data-brand-intro-panel="${button.dataset.brand}"]`,
+        );
+        if (introPanel) setPanelState(introPanel, selected);
+
+        // Optional page-level backdrop (e.g. a full-section logo wall sitting
+        // behind this component) — looked up on `document` since it lives
+        // outside this component's own markup.
+        const pageBackdrop = document.querySelector<HTMLElement>(
+          `[data-brand-page-backdrop="${button.dataset.brand}"]`,
+        );
+        if (pageBackdrop) setPanelState(pageBackdrop, selected);
       });
     };
 

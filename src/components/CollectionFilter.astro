@@ -20,7 +20,7 @@ const groups = [
   {
     groups.map((group) => (
       <div role="group" aria-label={`Filter by ${group.label.toLowerCase()}`}>
-        <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">{group.label}</p>
+        <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">{group.label}</p>
         <div class="mt-3 flex flex-wrap gap-2">
           {['all', ...group.values].map((value) => (
             <button
@@ -28,7 +28,7 @@ const groups = [
               data-filter={group.key}
               data-value={value}
               aria-pressed={value === 'all' ? 'true' : 'false'}
-              class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-900 aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+              class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-900 aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-white dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-neutral-900"
             >
               {value === 'all' ? group.allLabel : value}
             </button>
@@ -39,7 +39,7 @@ const groups = [
   }
 </div>
 
-<p data-result-count aria-live="polite" class="mt-8 text-sm text-neutral-500">
+<p data-result-count aria-live="polite" class="mt-8 text-sm text-neutral-500 dark:text-neutral-400">
   Showing {total} of {total} products
 </p>
 
@@ -55,6 +55,16 @@ const groups = [
     const resultCount = catalog.querySelector<HTMLElement>('[data-result-count]');
 
     const selection: Record<Dimension, string> = { brand: ALL, category: ALL };
+
+    // Lets links like `/collections?brand=Kelme` land pre-filtered.
+    const requested = new URLSearchParams(window.location.search);
+    (Object.keys(selection) as Dimension[]).forEach((dimension) => {
+      const value = requested.get(dimension);
+      const isValidOption = [...buttons].some(
+        (button) => button.dataset.filter === dimension && button.dataset.value === value,
+      );
+      if (value && isValidOption) selection[dimension] = value;
+    });
 
     const matches = (item: HTMLElement) =>
       (selection.brand === ALL || item.dataset.brand === selection.brand) &&

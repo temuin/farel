@@ -19,7 +19,7 @@ const { detailed = false }: Props = Astro.props;
     BRANDS.map((brand) => {
       const profile = BRAND_PROFILES[brand];
       return (
-        <li class:list={detailed ? 'rounded-2xl border border-neutral-200 p-8' : 'flex justify-center'}>
+        <li class:list={detailed ? 'rounded-2xl border border-neutral-200 p-8 dark:border-neutral-800' : 'flex justify-center'}>
           <img
             src={profile.logo}
             alt={`${brand} logo`}
@@ -27,7 +27,7 @@ const { detailed = false }: Props = Astro.props;
             height="64"
             class:list={['w-auto', detailed ? 'h-12' : 'h-10 sm:h-14']}
           />
-          {detailed && <p class="mt-5 text-sm leading-relaxed text-neutral-600">{profile.summary}</p>}
+          {detailed && <p class="mt-5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{profile.summary}</p>}
         </li>
       );
     })

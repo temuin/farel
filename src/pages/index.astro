@@ -5,12 +5,22 @@ import Button from '../components/Button.astro';
 import ClientMarquee from '../components/ClientMarquee.astro';
 import CollectionPreview from '../components/CollectionPreview.astro';
 import HeroPhotoWall from '../components/HeroPhotoWall.astro';
+import LogoMarqueeBackdrop from '../components/LogoMarqueeBackdrop.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import SectionHeading from '../components/SectionHeading.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { BRAND_PROFILES } from '../config/catalog';
 import { getBrandPreviews, getProducts } from '../lib/products';
 import { site } from '../config/site';
 
 const previews = await getBrandPreviews();
 const products = await getProducts();
+
+/** Matches the crossfade classes BrandShowcase uses for its own stacked panels. */
+const backdropState = (active: boolean) =>
+  active
+    ? 'opacity-100 scale-100 translate-y-0'
+    : 'pointer-events-none opacity-0 scale-[0.98] translate-y-1';
 
 const highlights = [
   { value: 'Two brands', label: 'Kelme and Adidas under one supplier' },
@@ -69,23 +79,40 @@ const highlights = [
   </section>
 
   {/* Intro and brand toggle sit side by side on large screens so the whole
-      section fits one viewport, with no scrolling to reach either brand. */}
-  <section
-    class="shell flex min-h-[calc(100svh-4rem-1px)] flex-col justify-center py-6 lg:min-h-[calc(100svh-5rem-1px)] lg:py-10"
-  >
-    <div class="grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-16">
-      <div>
-        <SectionHeading
-          size="compact"
-          eyebrow="Who we are"
-          title="An authorised distributor, not a reseller"
-          description={`${site.legalName} is an authorised distributor of Kelme and Adidas, covering match kit, training wear and footwear in one order since ${site.foundedYear}.`}
-        />
-        <div class="mt-4 lg:mt-6">
-          <Button href="/about" variant="secondary">Read our company profile</Button>
+      section fits one viewport, with no scrolling to reach either brand.
+      The gradient + glows run full-bleed behind the shell so the section
+      reads as a designed surface instead of white space either side of a
+      narrow column. */}
+  <section class="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950">
+    {/* Back-most layer: a running wall of the selected brand's logo, swapped
+        by BrandShowcase's own tab script via `data-brand-page-backdrop`. */}
+    {
+      previews.map((preview, index) => (
+        <div
+          data-brand-page-backdrop={preview.brand}
+          class:list={['absolute inset-0 transition-all duration-300 ease-out motion-reduce:transition-none', backdropState(index === 0)]}
+        >
+          {preview.brand === 'Adidas' ? (
+            <LogoMarqueeBackdrop text="adidas" rows={7} />
+          ) : (
+            <LogoMarqueeBackdrop src={BRAND_PROFILES[preview.brand].backdropMark} rows={7} invertForLightBg />
+          )}
         </div>
-      </div>
+      ))
+    }
 
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-32 -left-24 h-80 w-80 rounded-full bg-accent-500/10 blur-3xl dark:bg-accent-500/10"
+    >
+    </div>
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-accent-500/15 blur-3xl dark:bg-accent-500/10"
+    >
+    </div>
+
+    <div class="shell relative z-10 flex min-h-[calc(100svh-4rem-1px)] flex-col justify-center py-16 lg:min-h-[calc(100svh-5rem-1px)] lg:max-w-7xl lg:py-10">
       <BrandShowcase previews={previews} />
     </div>
   </section>
@@ -105,7 +132,7 @@ const highlights = [
     </div>
   </section>
 
-  <section class="border-t border-neutral-200 py-16 sm:py-20">
+  <section class="border-t border-neutral-200 py-16 sm:py-20 dark:border-neutral-800">
     <div class="shell">
       <SectionHeading
         eyebrow="Trusted by"
@@ -116,6 +143,29 @@ const highlights = [
     </div>
     <div class="shell mt-12">
       <ClientMarquee />
+    </div>
+
+    <div class="shell mt-16">
+      <SectionHeading eyebrow="Client stories" title="What teams say about working with us" align="center" />
+      <div class="mt-10">
+        <Testimonials />
+      </div>
+    </div>
+
+    <div class="shell mt-16">
+      <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">
+        Photos from the field
+      </p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MediaPlaceholder label="Team wearing supplied kit" class="aspect-square" />
+        <MediaPlaceholder label="Delivery or handover day" class="aspect-square" />
+        <MediaPlaceholder label="Matchday action shot" class="aspect-square" />
+        <MediaPlaceholder type="video" label="Client testimonial video" class="aspect-square" />
+      </div>
+      <p class="mt-4 text-xs text-neutral-400 dark:text-neutral-600">
+        Placeholder testimonials and photo slots — replace with real client quotes, photos and video
+        (with their consent) before launch.
+      </p>
     </div>
   </section>
 

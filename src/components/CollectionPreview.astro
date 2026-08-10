@@ -14,7 +14,7 @@ const { previews }: Props = Astro.props;
   <div
     role="tablist"
     aria-label="Choose a brand"
-    class="inline-flex gap-1 rounded-full border border-neutral-200 bg-neutral-100 p-1"
+    class="inline-flex gap-1 rounded-full border border-neutral-200 bg-neutral-100 p-1 dark:border-neutral-800 dark:bg-neutral-900"
   >
     {
       previews.map((preview, index) => (
@@ -25,7 +25,7 @@ const { previews }: Props = Astro.props;
           aria-controls={`brand-panel-${preview.brand}`}
           aria-selected={index === 0 ? 'true' : 'false'}
           tabindex={index === 0 ? 0 : -1}
-          class="rounded-full px-6 py-2.5 text-sm font-semibold text-neutral-600 transition-colors aria-selected:bg-neutral-900 aria-selected:text-white"
+          class="rounded-full px-6 py-2.5 text-sm font-semibold text-neutral-600 transition-colors aria-selected:bg-neutral-900 aria-selected:text-white dark:text-neutral-400 dark:aria-selected:bg-white dark:aria-selected:text-neutral-900"
         >
           {preview.brand}
         </button>
