@@ -159,14 +159,42 @@ B1 plan, so it costs nothing extra.
 on the host. Vercel and Netlify serve `dist/` directly and do not need it; a plain VPS can run it
 as-is.
 
-To redeploy after a change:
+### Continuous deployment
+
+`.github/workflows/deploy.yml` redeploys the preview on every push to `main`, so any contributor's
+merged work goes live automatically. It builds, asserts the package is complete, deploys, then
+polls the live URL and fails the run if the site does not come back healthy.
+
+Authentication uses **OIDC federation** — there is no password or publish profile stored anywhere.
+Entra ID trusts a short-lived token that GitHub mints, and only for `repo:temuin/farel` on
+`refs/heads/main`. This matters because the repo is public, and because App Service has SCM basic
+auth disabled, which rules out publish-profile deployment entirely.
+
+Three repository secrets are required (Settings → Secrets and variables → Actions). These are
+identifiers, not passwords — on their own they grant nothing without a GitHub-issued token for
+this exact repo:
+
+| Secret | Value |
+| :----- | :---- |
+| `AZURE_CLIENT_ID` | `b5bc9cd2-8d61-4855-9b11-42678ac314cc` |
+| `AZURE_TENANT_ID` | `7fe9e0ca-4f37-4bf5-8dc4-f052e6fe9e03` |
+| `AZURE_SUBSCRIPTION_ID` | `5387361f-a1f4-4c8e-b950-9efddd8c3a80` |
+
+The service principal holds **Contributor on the single web app only** — not the resource group —
+so it cannot touch `tse-web` or anything else in the subscription.
+
+To point the build at a different domain later, add a repository variable `SITE_URL`; the workflow
+prefers it over the Azure default.
+
+### Manual redeploy
 
 ```bash
 SITE_URL="https://amaliautama-preview.azurewebsites.net" npm run build
 ```
 
 Then stage `deploy/server.mjs`, `deploy/package.json` and `dist/` into one folder, zip it (with
-forward-slash paths), and run:
+forward-slash paths — Windows PowerShell's `Compress-Archive` writes backslashes, which Linux
+hosts cannot extract), and run:
 
 ```bash
 az webapp deploy -g rg-temuin -n amaliautama-preview --src-path deploy.zip --type zip
@@ -176,6 +204,8 @@ To tear the whole preview down when the client moves to their own infrastructure
 
 ```bash
 az webapp delete -g rg-temuin -n amaliautama-preview
+az ad app delete --id b5bc9cd2-8d61-4855-9b11-42678ac314cc
 ```
 
-That removes only the preview app; `tse-web` and the shared plan are untouched.
+That removes the preview app and the deploy identity; `tse-web` and the shared plan are untouched.
+Delete `.github/workflows/deploy.yml` too, or the workflow will start failing on every push.
