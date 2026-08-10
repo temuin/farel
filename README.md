@@ -183,6 +183,18 @@ this exact repo:
 The service principal holds **Contributor on the single web app only** — not the resource group —
 so it cannot touch `tse-web` or anything else in the subscription.
 
+Two federated credentials are registered on the app, because the subject claim GitHub sends
+depends on the workflow:
+
+| Subject | Applies when |
+| :------ | :----------- |
+| `repo:temuin/farel:environment:preview` | the job declares `environment:` (what `deploy.yml` does today) |
+| `repo:temuin/farel:ref:refs/heads/main` | the job does **not** declare an environment |
+
+Declaring an `environment:` swaps the subject from the branch ref to the environment name. If you
+add, rename or remove the environment in the workflow, add the matching credential or the login
+fails with `AADSTS700213: No matching federated identity record found`.
+
 To point the build at a different domain later, add a repository variable `SITE_URL`; the workflow
 prefers it over the Azure default.
 
