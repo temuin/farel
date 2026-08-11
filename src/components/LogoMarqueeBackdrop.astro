@@ -18,17 +18,21 @@ interface Props {
   /** Copies per row before the loop repeats — keep generous, see above. */
   repeat?: number;
   /**
-   * Image marks only. The source art is white. Set this when the backdrop
-   * sits on a background that flips light/dark with the site theme (as
-   * opposed to a literal-dark surface like `bg-ink`, which stays dark either
-   * way) so the mark stays visible in light mode and reverts to white in
-   * dark mode.
+   * Image marks only. The source art's native colour — set this when the
+   * backdrop sits on a background that flips light/dark with the site theme
+   * (as opposed to a literal-dark surface like `bg-ink`, which stays dark
+   * either way), so the mark inverts to stay visible against whichever
+   * background is showing. `'light'` art (white) inverts to dark in light
+   * mode; `'dark'` art (black) inverts to light in dark mode. Omit for a
+   * surface that never flips.
    */
-  invertForLightBg?: boolean;
+  tone?: 'light' | 'dark';
   class?: string;
 }
 
-const { src, text, rows = 3, repeat = 16, invertForLightBg = false, class: className }: Props = Astro.props;
+const { src, text, rows = 3, repeat = 16, tone, class: className }: Props = Astro.props;
+
+const invertClass = tone === 'dark' ? 'dark:invert' : tone === 'light' ? 'invert dark:invert-0' : undefined;
 
 const rowIndexes = Array.from({ length: rows }, (_, index) => index);
 /** Rendered twice per row so the horizontal loop has no seam. */
@@ -60,10 +64,7 @@ const COPIES = [0, 1] as const;
                       alt=""
                       width="120"
                       height="40"
-                      class:list={[
-                        'h-12 w-auto opacity-[0.12] sm:h-16',
-                        invertForLightBg && 'invert dark:invert-0',
-                      ]}
+                      class:list={['h-12 w-auto opacity-[0.12] sm:h-16', invertClass]}
                     />
                   </li>
                 ),

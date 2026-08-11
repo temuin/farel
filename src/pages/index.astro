@@ -92,11 +92,11 @@ const highlights = [
           data-brand-page-backdrop={preview.brand}
           class:list={['absolute inset-0 transition-all duration-300 ease-out motion-reduce:transition-none', backdropState(index === 0)]}
         >
-          {preview.brand === 'Adidas' ? (
-            <LogoMarqueeBackdrop text="adidas" rows={7} />
-          ) : (
-            <LogoMarqueeBackdrop src={BRAND_PROFILES[preview.brand].backdropMark} rows={7} invertForLightBg />
-          )}
+          <LogoMarqueeBackdrop
+            src={BRAND_PROFILES[preview.brand].backdropMark}
+            rows={7}
+            tone={preview.brand === 'Adidas' ? 'dark' : 'light'}
+          />
         </div>
       ))
     }
