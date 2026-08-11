@@ -17,11 +17,11 @@
 
 @layer base {
   html {
-    /* 20px base instead of the browser default 16px. Every Tailwind text-*
-       and spacing-* utility is rem-based off this, so the whole site's type
-       (and the padding/gaps around it) scales up together instead of text
-       alone growing out of proportion with its surroundings. */
-    font-size: 125%;
+    /* Back to the browser default (16px) — 18px and 20px both ran too big.
+       Every Tailwind text-* and spacing-* utility is rem-based off this, so
+       the whole site's type (and the padding/gaps around it) scales
+       together off whatever this is set to. */
+    font-size: 100%;
     -webkit-text-size-adjust: 100%;
     color-scheme: light;
   }

@@ -97,7 +97,11 @@ const meta = [
   </div>
 
   <div>
-    <div role="tablist" aria-label="Choose a brand" class="grid grid-cols-2 gap-3 lg:gap-4">
+    <div
+      role="tablist"
+      aria-label="Choose a brand"
+      class:list={['grid gap-3 lg:gap-4', previews.length > 1 ? 'grid-cols-2' : 'grid-cols-1']}
+    >
       {
         previews.map((preview, index) => (
           <button
@@ -115,7 +119,7 @@ const meta = [
               alt={`${preview.brand} logo`}
               width="240"
               height="64"
-              class="h-7 w-auto lg:h-10"
+              class:list={['h-7 w-auto lg:h-10', preview.brand === 'Adidas' && 'dark:invert']}
             />
           </button>
         ))

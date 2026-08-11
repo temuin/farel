@@ -8,7 +8,7 @@
 export const BRANDS = ['Kelme', 'Adidas'] as const;
 export type Brand = (typeof BRANDS)[number];
 
-export const CATEGORIES = ['Jerseys', 'Footwear', 'Accessories'] as const;
+export const CATEGORIES = ['Jerseys', 'Apparel', 'Footwear', 'Accessories'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 interface BrandProfile {
@@ -32,7 +32,7 @@ export const BRAND_PROFILES: Readonly<Record<Brand, BrandProfile>> = {
     backdropMark: '/brands/kelme-mark.svg',
   },
   Adidas: {
-    logo: '/brands/adidas.svg',
+    logo: '/brands/adidas-mark.png',
     summary:
       'Global performance sportswear. Team apparel, boots and team travel gear supplied through authorised distribution channels.',
     statement: 'Adidas, sourced right. Authorised stock, not a grey-market shortcut.',

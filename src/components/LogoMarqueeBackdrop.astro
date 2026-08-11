@@ -27,10 +27,14 @@ interface Props {
    * surface that never flips.
    */
   tone?: 'light' | 'dark';
+  /** 0–1. Set via inline style rather than a Tailwind opacity-[] class so an
+   * arbitrary runtime value always applies (Tailwind can't statically see a
+   * value that only exists as an interpolated prop). */
+  opacity?: number;
   class?: string;
 }
 
-const { src, text, rows = 3, repeat = 16, tone, class: className }: Props = Astro.props;
+const { src, text, rows = 3, repeat = 16, tone, opacity = 0.12, class: className }: Props = Astro.props;
 
 const invertClass = tone === 'dark' ? 'dark:invert' : tone === 'light' ? 'invert dark:invert-0' : undefined;
 
@@ -54,7 +58,10 @@ const COPIES = [0, 1] as const;
             <ul class="marquee__row">
               {Array.from({ length: repeat }).map(() =>
                 text ? (
-                  <li class="shrink-0 text-4xl font-black tracking-tight whitespace-nowrap text-neutral-900 opacity-[0.12] sm:text-6xl dark:text-white">
+                  <li
+                    class="shrink-0 text-4xl font-black tracking-tight whitespace-nowrap text-neutral-900 sm:text-6xl dark:text-white"
+                    style={`opacity: ${opacity}`}
+                  >
                     {text}
                   </li>
                 ) : (
@@ -64,7 +71,8 @@ const COPIES = [0, 1] as const;
                       alt=""
                       width="120"
                       height="40"
-                      class:list={['h-12 w-auto opacity-[0.12] sm:h-16', invertClass]}
+                      class:list={['h-12 w-auto sm:h-16', invertClass]}
+                      style={`opacity: ${opacity}`}
                     />
                   </li>
                 ),
