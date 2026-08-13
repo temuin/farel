@@ -105,7 +105,7 @@ function timingSafeEqual(a, b) {
   return diff === 0;
 }
 
-async function verifyPassword(password, encoded) {
+export async function verifyPassword(password, encoded) {
   const [scheme, iterations, saltB64, hashB64] = String(encoded).split('$');
   if (scheme !== 'pbkdf2' || !iterations || !saltB64 || !hashB64) return false;
   try {
@@ -306,20 +306,64 @@ function redirectToGitHub(url, env) {
   });
 }
 
+/**
+ * Confirms the stored token can actually write to the repo, so a wrong or
+ * expired token fails at sign-in with a clear message instead of surfacing
+ * later as a confusing "not found" when someone tries to save.
+ */
+async function checkToken(token, repo) {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'amalia-utama-cms',
+  };
+
+  try {
+    const whoami = await fetch('https://api.github.com/user', { headers });
+    if (whoami.status === 401) return 'The saved GitHub token is invalid or expired.';
+    if (!whoami.ok) return `GitHub rejected the saved token (HTTP ${whoami.status}).`;
+
+    if (!repo) return null;
+
+    const repoResponse = await fetch(`https://api.github.com/repos/${repo}`, { headers });
+    if (repoResponse.status === 404) {
+      return `The saved token cannot see ${repo}. A fine-grained token only works for repositories owned by the account that created it.`;
+    }
+    if (!repoResponse.ok) return `Could not check access to ${repo} (HTTP ${repoResponse.status}).`;
+
+    const data = await repoResponse.json();
+    if (!data.permissions?.push) {
+      return `The saved token can read ${repo} but not write to it. It needs Contents: read and write.`;
+    }
+    return null;
+  } catch {
+    return 'Could not reach GitHub to check the saved token.';
+  }
+}
+
 /** POST /api/auth — verify username + password, then issue the shared token. */
 export async function handleAuthPost(request, env) {
   const users = parseUsers(env);
   const token = env.CMS_GITHUB_TOKEN;
+  // The admin page asks for JSON so it can sign in without a popup.
+  const wantsJson = (request.headers.get('accept') ?? '').includes('application/json');
+  const fail = (message, username) =>
+    wantsJson
+      ? new Response(JSON.stringify({ error: message }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        })
+      : loginPage(env, { error: message, username });
 
   if (users.size === 0 || !token) {
-    return loginPage(env, { error: 'Sign-in is not configured on the server.' });
+    return fail('Sign-in is not configured on the server.');
   }
 
   let form;
   try {
     form = new URLSearchParams(await request.text());
   } catch {
-    return loginPage(env, { error: 'Could not read the sign-in form.' });
+    return fail('Could not read the sign-in form.');
   }
 
   const username = (form.get('username') ?? '').trim();
@@ -327,15 +371,15 @@ export async function handleAuthPost(request, env) {
   const nonce = form.get('nonce') ?? '';
   const expectedNonce = readCookie(request, STATE_COOKIE);
 
-  if (!nonce || !expectedNonce || nonce !== expectedNonce) {
-    return loginPage(env, { error: 'Your sign-in form expired. Please try again.', username });
+  // The inline sign-in on /admin posts with fetch and carries no nonce cookie,
+  // so the check applies to the standalone HTML form only. Both are same-origin
+  // POSTs whose response an attacker's page cannot read.
+  if (!wantsJson && (!nonce || !expectedNonce || nonce !== expectedNonce)) {
+    return fail('Your sign-in form expired. Please try again.', username);
   }
 
   if (isLockedOut(username)) {
-    return loginPage(env, {
-      error: 'Too many failed attempts. Wait 15 minutes and try again.',
-      username,
-    });
+    return fail('Too many failed attempts. Wait 15 minutes and try again.', username);
   }
 
   const stored = users.get(username);
@@ -346,13 +390,30 @@ export async function handleAuthPost(request, env) {
 
   if (!ok) {
     recordFailure(username);
-    return loginPage(env, { error: 'Wrong username or password.', username });
+    return fail('Wrong username or password.', username);
   }
 
   attempts.delete(username);
-  return popupResponse('success', { token, provider: PROVIDER }, {
-    'Set-Cookie': `${STATE_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
-  });
+
+  // Catch a bad token here, where the message can be specific, rather than
+  // letting it surface as an opaque failure the first time someone saves.
+  const tokenProblem = await checkToken(token, env.CMS_REPO ?? 'temuin/farel');
+  if (tokenProblem) return fail(tokenProblem, username);
+
+  const clearCookie = `${STATE_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+
+  if (wantsJson) {
+    return new Response(JSON.stringify({ token, provider: PROVIDER }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+        'Set-Cookie': clearCookie,
+      },
+    });
+  }
+
+  return popupResponse('success', { token, provider: PROVIDER }, { 'Set-Cookie': clearCookie });
 }
 
 /** GET /api/callback — GitHub OAuth return leg. */

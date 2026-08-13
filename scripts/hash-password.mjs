@@ -1,41 +1,105 @@
 /**
- * Generates a password hash for a CMS user.
+ * Manage CMS sign-in credentials.
  *
  *   node scripts/hash-password.mjs <username>
+ *       Prints the `user:hash` pair to put in CMS_USERS.
  *
- * Prompts for the password rather than taking it as an argument, so it does
- * not end up in your shell history or in the process list. Prints the
- * `user:hash` pair to append to the CMS_USERS environment variable.
+ *   node scripts/hash-password.mjs --verify <username> <hash>
+ *       Checks a password against an existing hash, so you can tell a wrong
+ *       password apart from a server-side problem without guessing at /admin.
+ *
+ * The password is prompted for, never taken as an argument, so it stays out of
+ * shell history and the process list.
  */
-import { createInterface } from 'node:readline';
-import { hashPassword } from '../deploy/auth.mjs';
+import { hashPassword, verifyPassword } from '../deploy/auth.mjs';
 
-const username = process.argv[2];
-if (!username) {
-  console.error('Usage: node scripts/hash-password.mjs <username>');
-  process.exit(1);
-}
-
-/** Reads a line without echoing it back to the terminal. */
+/**
+ * Reads a line without echoing it. Uses raw mode where there is a terminal,
+ * and falls back to a plain read when stdin is piped (CI, tests) rather than
+ * crashing on the TTY-only cursor calls.
+ */
 function readPassword(prompt) {
+  const { stdin, stdout } = process;
+
+  if (!stdin.isTTY) {
+    return new Promise((resolve) => {
+      let buffer = '';
+      stdin.setEncoding('utf8');
+      const onData = (chunk) => {
+        buffer += chunk;
+        const newline = buffer.indexOf('\n');
+        if (newline !== -1) {
+          stdin.removeListener('data', onData);
+          stdin.pause();
+          resolve(buffer.slice(0, newline).replace(/\r$/, ''));
+        }
+      };
+      stdin.on('data', onData);
+      stdin.on('end', () => resolve(buffer.replace(/\r?\n$/, '')));
+    });
+  }
+
   return new Promise((resolve) => {
-    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-    const onData = (char) => {
-      // Redraw the prompt without the typed characters.
-      if (!['\n', '\r', ''].includes(String(char))) {
-        process.stdout.clearLine(0);
-        process.stdout.cursorTo(0);
-        process.stdout.write(prompt);
+    stdout.write(prompt);
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding('utf8');
+
+    let password = '';
+    const finish = (value) => {
+      stdin.setRawMode(false);
+      stdin.pause();
+      stdin.removeListener('data', onData);
+      stdout.write('\n');
+      resolve(value);
+    };
+
+    const onData = (chunk) => {
+      // A paste arrives as one chunk, so walk it character by character.
+      for (const char of chunk) {
+        if (char === '\r' || char === '\n' || char === '\u0004') return finish(password);
+        if (char === '\u0003') {
+          stdin.setRawMode(false);
+          stdout.write('\n');
+          process.exit(130); // Ctrl-C
+        }
+        if (char === '\u007f' || char === '\b') {
+          if (password.length > 0) {
+            password = password.slice(0, -1);
+            stdout.write('\b \b');
+          }
+          continue;
+        }
+        // Skip remaining control characters, e.g. arrow-key escape sequences.
+        if (char < ' ') continue;
+        password += char;
+        stdout.write('*');
       }
     };
-    process.stdin.on('data', onData);
-    rl.question(prompt, (answer) => {
-      process.stdin.removeListener('data', onData);
-      rl.close();
-      process.stdout.write('\n');
-      resolve(answer);
-    });
+
+    stdin.on('data', onData);
   });
+}
+
+const args = process.argv.slice(2);
+
+if (args[0] === '--verify') {
+  const [, username, hash] = args;
+  if (!username || !hash) {
+    console.error('Usage: node scripts/hash-password.mjs --verify <username> <hash>');
+    process.exit(1);
+  }
+  const password = await readPassword(`Password for "${username}": `);
+  const ok = await verifyPassword(password, hash);
+  console.log(ok ? '\nMATCH — this password works with that hash.' : '\nNO MATCH — different password.');
+  process.exit(ok ? 0 : 1);
+}
+
+const username = args[0];
+if (!username) {
+  console.error('Usage: node scripts/hash-password.mjs <username>');
+  console.error('       node scripts/hash-password.mjs --verify <username> <hash>');
+  process.exit(1);
 }
 
 const password = await readPassword('Password: ');
