@@ -39,10 +39,11 @@ src/
 ├── pages/               / · /about · /collections · /collections/[slug] · /contact
 └── styles/global.css    Tailwind entry, theme tokens, .shell container
 deploy/
-├── server.mjs           Static server + CMS OAuth routes (Azure / VPS only)
-├── oauth.mjs            GitHub OAuth broker, shared with functions/
+├── server.mjs           Static server + CMS sign-in routes (Azure / VPS only)
+├── auth.mjs             CMS sign-in: password + GitHub OAuth, shared with functions/
 └── package.json         Hosting shim manifest — no dependencies by design
-functions/api/           Same OAuth routes as Cloudflare Pages Functions
+functions/api/           Same sign-in routes as Cloudflare Pages Functions
+scripts/hash-password.mjs  Generates a CMS_USERS entry
 public/
 ├── admin/index.html     Decap CMS panel
 ├── brands/              Kelme/Adidas partner logos (placeholders)
@@ -83,7 +84,7 @@ Everything below is placeholder content.
 | :-------------------------------------- | :------------------------------------------- |
 | Address, phone, email                    | `src/config/site.ts`                          |
 | Legal entity name + distributor wording  | `src/config/site.ts` (both marked `TODO`)     |
-| Web3Forms access key                     | `src/config/site.ts` → `WEB3FORMS_ACCESS_KEY` |
+| Web3Forms access key                     | `/admin` → Company details (or `src/data/settings.json`) |
 | Production domain                        | `src/config/site.ts` → `site.url` **and** `astro.config.mjs` → `site` |
 | Company story + distributor statement    | `src/pages/about.astro`                       |
 | Brand logos                              | `public/brands/kelme.svg`, `public/brands/adidas.svg` |
@@ -142,29 +143,67 @@ commits every upload into the repo, and video files would bloat it and slow ever
 Ordinary watch links are converted to embed URLs automatically; anything that is not YouTube or
 Vimeo is ignored rather than framed into the page.
 
-### One-time setup
+### Signing in
 
-The CMS signs in with GitHub. GitHub has no PKCE public-client flow, so the token exchange needs a
-client secret held server-side — that is what `deploy/oauth.mjs` does, wired into the Node server
-on Azure (`/api/auth`, `/api/callback`) and into `functions/api/` for Cloudflare Pages.
+Decap only requires that the sign-in popup hand it a GitHub token; it does not care how that token
+was obtained. `deploy/auth.mjs` uses that to offer two routes in, and it is shared by the Azure
+Node server and the Cloudflare Pages Functions in `functions/api/`.
+
+**Username and password (default).** Client staff who have no GitHub account sign in against
+credentials held on the server, and the CMS is handed a GitHub token the server holds.
+
+**Sign in with GitHub (optional).** Appears only when an OAuth app is configured. Better for
+developers, because commits are attributed to the real person.
+
+#### Setting up password sign-in
+
+1. Create a **fine-grained personal access token** at Settings → Developer settings → Personal
+   access tokens. Scope it to **this repository only**, with **Contents: read and write**. Nothing
+   else.
+2. Generate a hash for each person (the password is prompted for, never passed as an argument, so
+   it stays out of your shell history):
+
+```bash
+node scripts/hash-password.mjs client
+```
+
+3. Set both values on the server:
+
+```bash
+az webapp config appsettings set -g rg-temuin -n amaliautama-preview \
+  --settings CMS_GITHUB_TOKEN=<token> CMS_USERS='client:<hash>'
+```
+
+`CMS_USERS` takes comma-separated `user:hash` pairs, so several people can have their own login.
+
+**Understand the trade-off before using this.** Decap runs in the browser and calls the GitHub API
+directly, so on the password route the shared token does reach the signed-in user's browser. The
+password is the only thing protecting write access to the repository — use a long one, and keep
+the token scoped to this single repo so the blast radius stays small. Everyone shares one commit
+identity. Per-user GitHub sign-in is genuinely more secure; this exists because requiring GitHub
+accounts from non-technical staff is not realistic.
+
+Failed sign-ins lock a username out for 15 minutes after 8 attempts. That counter lives in the
+server process, so it protects a single App Service instance but would not survive a host that
+spreads requests across many isolates.
+
+#### Optional: also allow GitHub sign-in
 
 1. Create an OAuth app at **Settings → Developer settings → OAuth Apps → New OAuth App**:
    - Homepage URL: `https://amaliautama-preview.azurewebsites.net`
    - Authorization callback URL: `https://amaliautama-preview.azurewebsites.net/api/callback`
-2. Generate a client secret.
-3. Give the app the two values (never commit them):
+2. Generate a client secret, then:
 
 ```bash
 az webapp config appsettings set -g rg-temuin -n amaliautama-preview \
   --settings GITHUB_OAUTH_CLIENT_ID=<id> GITHUB_OAUTH_CLIENT_SECRET=<secret>
 ```
 
-Anyone who can push to the repo can sign in, since the CMS commits as that user. To let client
-staff in without giving them the whole repo, invite them as a collaborator with **Write** access.
+Anyone who can push to the repo can then sign in that way, committing as themselves.
 
-When the site moves to Cloudflare Pages, register a second OAuth app (or add the new callback URL)
-and set the same two variables in the Pages project — the callback URL must match the origin the
-CMS is served from.
+When the site moves to Cloudflare Pages, set the same variables in the Pages project. For the
+GitHub route the callback URL must match the origin the CMS is served from, so register the new
+one on the OAuth app.
 
 ## Adding a product
 

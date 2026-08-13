@@ -55,16 +55,16 @@ jobs:
         # install on the App Service side.
         run: |
           mkdir -p package
-          cp deploy/server.mjs deploy/oauth.mjs deploy/package.json package/
+          cp deploy/server.mjs deploy/auth.mjs deploy/package.json package/
           cp -r dist package/dist
 
       - name: Verify the package is complete
         # An incomplete package would deploy a broken site, so fail loudly here
-        # rather than after it is live. server.mjs imports oauth.mjs, so a
+        # rather than after it is live. server.mjs imports auth.mjs, so a
         # missing file here would crash the app on boot.
         run: |
           test -f package/server.mjs
-          test -f package/oauth.mjs
+          test -f package/auth.mjs
           test -f package/package.json
           test -f package/dist/index.html
           test -f package/dist/about/index.html

@@ -13,7 +13,7 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { routeOAuth } from './oauth.mjs';
+import { routeAuth } from './auth.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('./dist', import.meta.url)));
 const PORT = Number(process.env.PORT) || 8080;
@@ -94,7 +94,7 @@ function externalUrl(req) {
   return new URL(req.url || '/', `${proto}://${host}`);
 }
 
-/** Bridges node:http to the Web-standard handlers in oauth.mjs. */
+/** Bridges node:http to the Web-standard handlers in auth.mjs. */
 async function sendWebResponse(res, response) {
   const headers = {};
   const setCookies = [];
@@ -108,22 +108,58 @@ async function sendWebResponse(res, response) {
   res.end(response.body ? Buffer.from(await response.arrayBuffer()) : undefined);
 }
 
+/** Collects a request body, which the sign-in form needs. */
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      // A login form is tiny; refuse anything that is not.
+      if (size > 64 * 1024) {
+        reject(new Error('Request body too large'));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
 const server = createServer(async (req, res) => {
+  const url = externalUrl(req);
+  const isAuthRoute = url.pathname === '/api/auth' || url.pathname === '/api/callback';
+
+  if (isAuthRoute && (req.method === 'GET' || req.method === 'POST')) {
+    // Only the cookie and content type are read downstream, and node's raw
+    // header values can be arrays, so copy just what is needed.
+    const headers = new Headers();
+    if (typeof req.headers.cookie === 'string') headers.set('cookie', req.headers.cookie);
+    if (typeof req.headers['content-type'] === 'string') {
+      headers.set('content-type', req.headers['content-type']);
+    }
+
+    let body;
+    if (req.method === 'POST') {
+      try {
+        body = await readBody(req);
+      } catch {
+        res.writeHead(413, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Payload Too Large');
+        return;
+      }
+    }
+
+    const response = await routeAuth(new Request(url, { method: req.method, headers, body }), process.env);
+    if (response) return sendWebResponse(res, response);
+  }
+
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', Allow: 'GET, HEAD' });
     res.end('Method Not Allowed');
     return;
-  }
-
-  const url = externalUrl(req);
-  if (url.pathname === '/api/auth' || url.pathname === '/api/callback') {
-    // Only the cookie is read downstream, and node's raw header values can be
-    // arrays, so copy across just what is needed rather than the whole bag.
-    const headers = new Headers();
-    if (typeof req.headers.cookie === 'string') headers.set('cookie', req.headers.cookie);
-
-    const response = await routeOAuth(new Request(url, { method: 'GET', headers }), process.env);
-    if (response) return sendWebResponse(res, response);
   }
 
   const target = await resolveTarget(req.url || '/');

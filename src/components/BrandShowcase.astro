@@ -65,6 +65,7 @@ const meta = [
             <div
               data-brand-intro-panel={preview.brand}
               aria-hidden={!active}
+              inert={!active}
               class:list={[STACK_ITEM, stackState(active)]}
             >
               <h2 class="text-2xl font-bold tracking-tight text-balance text-neutral-900 sm:text-3xl lg:text-4xl dark:text-white">
@@ -139,6 +140,7 @@ const meta = [
               id={`brand-logo-panel-${preview.brand}`}
               aria-labelledby={`brand-logo-tab-${preview.brand}`}
               aria-hidden={!active}
+              inert={!active}
               data-brand-panel
               class:list={[STACK_ITEM, stackState(active)]}
             >
@@ -205,6 +207,11 @@ const meta = [
 
     const setPanelState = (panel: HTMLElement, selected: boolean) => {
       panel.setAttribute('aria-hidden', String(!selected));
+      // `pointer-events-none` only stops the mouse. Without `inert` the hidden
+      // panel's links stay in the tab order, so keyboard users land on an
+      // invisible control — and a focusable node inside aria-hidden is a
+      // WCAG violation.
+      panel.inert = !selected;
       panel.classList.toggle('opacity-100', selected);
       panel.classList.toggle('scale-100', selected);
       panel.classList.toggle('translate-y-0', selected);

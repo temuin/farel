@@ -1,10 +1,16 @@
 ---
 import Button from './Button.astro';
-import { WEB3FORMS_ACCESS_KEY, site } from '../config/site';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { WEB3FORMS_ACCESS_KEY, contact, isContactFormEnabled, site } from '../config/site';
+import { generalEnquiryUrl } from '../lib/whatsapp';
 
 /**
  * Native form post to Web3Forms — no JavaScript. The browser submits directly
  * and Web3Forms renders its own confirmation page, keeping the site static.
+ *
+ * Until an access key is set in /admin the form is not rendered at all: a form
+ * that accepts a message and quietly drops it is worse than no form, so the
+ * real contact channels are shown instead.
  */
 const fields = [
   { name: 'name', label: 'Name', type: 'text', autocomplete: 'name', required: true },
@@ -17,7 +23,25 @@ const inputClass =
   'mt-2 block w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-white';
 ---
 
-<form action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
+{
+  !isContactFormEnabled ? (
+    <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <p class="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+        The enquiry form is not switched on yet. In the meantime, WhatsApp is the fastest way to
+        reach us, or send an email and we will reply within one business day.
+      </p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <Button href={generalEnquiryUrl()} external>
+          <WhatsAppIcon />
+          Chat on WhatsApp
+        </Button>
+        <Button href={`mailto:${contact.email}`} variant="secondary">
+          Email us
+        </Button>
+      </div>
+    </div>
+  ) : (
+    <form action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
   <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
   <input type="hidden" name="subject" value={`New enquiry from ${site.name} website`} />
   <input type="hidden" name="from_name" value={site.name} />
@@ -59,8 +83,10 @@ const inputClass =
 
   <Button type="submit">Send enquiry</Button>
 
-  <p class="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
-    Submitting this form sends your message to our inbox via Web3Forms. For a faster reply, message
-    us on WhatsApp.
-  </p>
-</form>
+      <p class="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+        Submitting this form sends your message to our inbox via Web3Forms. For a faster reply,
+        message us on WhatsApp.
+      </p>
+    </form>
+  )
+}

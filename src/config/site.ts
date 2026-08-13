@@ -40,8 +40,16 @@ export const addressLine = [
 /** Keyless embed. Swap the query for a `place_id:` once the address is real. */
 export const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(addressLine)}&output=embed`;
 
-/** Replace with the key from https://web3forms.com. */
-export const WEB3FORMS_ACCESS_KEY = 'REPLACE_WITH_YOUR_WEB3FORMS_ACCESS_KEY';
+/**
+ * Access key from https://web3forms.com, set through /admin. Web3Forms keys are
+ * public by design — they ship inside the form markup — so this is safe to
+ * store in the repo and to let client staff paste in themselves.
+ *
+ * Empty means "not configured": the contact page then points people at
+ * WhatsApp and email instead of showing a form that silently posts nowhere.
+ */
+export const WEB3FORMS_ACCESS_KEY = settings.web3formsAccessKey?.trim() ?? '';
+export const isContactFormEnabled = WEB3FORMS_ACCESS_KEY.length > 0;
 
 export const navLinks = [
   { href: '/', label: 'Home' },
