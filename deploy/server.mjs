@@ -133,12 +133,13 @@ const server = createServer(async (req, res) => {
   const isAuthRoute = url.pathname === '/api/auth' || url.pathname === '/api/callback';
 
   if (isAuthRoute && (req.method === 'GET' || req.method === 'POST')) {
-    // Only the cookie and content type are read downstream, and node's raw
-    // header values can be arrays, so copy just what is needed.
+    // Node's raw header values can be arrays, so copy across just the ones the
+    // handlers read. `accept` matters: it is how the admin page asks for a JSON
+    // reply instead of the HTML sign-in form.
     const headers = new Headers();
-    if (typeof req.headers.cookie === 'string') headers.set('cookie', req.headers.cookie);
-    if (typeof req.headers['content-type'] === 'string') {
-      headers.set('content-type', req.headers['content-type']);
+    for (const name of ['cookie', 'content-type', 'accept']) {
+      const value = req.headers[name];
+      if (typeof value === 'string') headers.set(name, value);
     }
 
     let body;
