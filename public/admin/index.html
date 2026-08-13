@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Content Manager — Amalia Utama</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+  </head>
+  <body>
+    <!--
+      Order matters here, and both parts are load-bearing:
+        1. CMS_MANUAL_INIT must be set BEFORE the bundle loads, or Decap
+           auto-initialises and fetches a config.yml that does not exist.
+        2. The bundle must load inside <body>, not <head> — it mounts itself on
+           document.body as it evaluates, and crashes if body is not there yet.
+    -->
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <script src="https://unpkg.com/decap-cms@3.15.1/dist/decap-cms.js"></script>
+    <script>
+      /*
+       * Configured here rather than in a static config.yml so `base_url` can be
+       * the current origin. The OAuth endpoints are served by this same site,
+       * and the site moves hosts (Azure preview now, Cloudflare Pages later,
+       * then a custom domain) — reading the origin at runtime means the admin
+       * keeps working across all of them with no rebuild.
+       */
+      const BRANDS = ['Kelme', 'Adidas'];
+      const CATEGORIES = ['Jerseys', 'Tops', 'Bottoms', 'Footwear', 'Accessories'];
+
+      window.CMS.init({
+        config: {
+          // Everything is defined here, so stop Decap probing for a
+          // config.yml that does not exist and 404ing on every load.
+          load_config_file: false,
+
+          backend: {
+            name: 'github',
+            repo: 'temuin/farel',
+            branch: 'main',
+            // Points Decap at this site's own OAuth endpoints instead of
+            // Netlify's shared broker.
+            base_url: window.location.origin,
+            auth_endpoint: 'api/auth',
+            commit_messages: {
+              create: 'Add {{collection}} "{{slug}}" via CMS',
+              update: 'Update {{collection}} "{{slug}}" via CMS',
+              delete: 'Delete {{collection}} "{{slug}}" via CMS',
+              uploadMedia: 'Upload "{{path}}" via CMS',
+              deleteMedia: 'Delete "{{path}}" via CMS',
+            },
+          },
+
+          /*
+           * Product photos live in src/assets so Astro can optimise them at
+           * build time. public_folder is the relative path written into the
+           * markdown, matching what the content schema's image() helper
+           * resolves from src/content/products/.
+           */
+          media_folder: 'src/assets/products',
+          public_folder: '../../assets/products',
+
+          // Saves land straight on main, which is what triggers the deploy.
+          publish_mode: 'simple',
+
+          collections: [
+            {
+              name: 'products',
+              label: 'Products',
+              label_singular: 'Product',
+              description:
+                'Everything in the catalogue. Each product needs at least one photo.',
+              folder: 'src/content/products',
+              create: true,
+              // Keeps the filename in step with the slug field.
+              slug: '{{fields.slug}}',
+              identifier_field: 'name',
+              extension: 'md',
+              format: 'frontmatter',
+              summary: '{{name}} — {{brand}} / {{category}}',
+              sortable_fields: ['name', 'brand', 'category'],
+              fields: [
+                { name: 'name', label: 'Product name', widget: 'string' },
+                { name: 'brand', label: 'Brand', widget: 'select', options: BRANDS },
+                { name: 'category', label: 'Category', widget: 'select', options: CATEGORIES },
+                {
+                  name: 'slug',
+                  label: 'URL slug',
+                  widget: 'string',
+                  hint: 'Lowercase words separated by single hyphens, e.g. adidas-home-jersey. Changing this changes the page address.',
+                  pattern: [
+                    '^[a-z0-9]+(?:-[a-z0-9]+)*$',
+                    'Use lowercase letters, numbers and single hyphens only',
+                  ],
+                },
+                {
+                  name: 'description',
+                  label: 'Short description',
+                  widget: 'text',
+                  hint: 'One line. Shown on the product card and used as the page description in Google results. Max 200 characters.',
+                  pattern: ['^.{1,200}$', 'Keep this to 200 characters or fewer'],
+                },
+                {
+                  name: 'images',
+                  label: 'Photos',
+                  label_singular: 'Photo',
+                  widget: 'list',
+                  field: { name: 'image', label: 'Photo', widget: 'image' },
+                  hint: 'The first photo is used on the product card and when the page is shared on WhatsApp or social media.',
+                },
+                {
+                  name: 'featured',
+                  label: 'Feature on the homepage',
+                  widget: 'boolean',
+                  default: false,
+                  required: false,
+                },
+                {
+                  name: 'body',
+                  label: 'Full description',
+                  widget: 'markdown',
+                  required: false,
+                  hint: 'The longer text on the product page. Bullet lists work well for specs and sizing.',
+                },
+              ],
+            },
+
+            {
+              name: 'content',
+              label: 'Site content',
+              files: [
+                {
+                  name: 'testimonials',
+                  label: 'Testimonials',
+                  file: 'src/data/testimonials.json',
+                  description: 'Client quotes shown on the homepage.',
+                  fields: [
+                    {
+                      name: 'items',
+                      label: 'Testimonials',
+                      label_singular: 'Testimonial',
+                      widget: 'list',
+                      fields: [
+                        { name: 'quote', label: 'Quote', widget: 'text' },
+                        {
+                          name: 'role',
+                          label: 'Person’s role',
+                          widget: 'string',
+                          hint: 'e.g. Team Manager',
+                        },
+                        { name: 'organisation', label: 'Organisation', widget: 'string' },
+                        {
+                          name: 'videoUrl',
+                          label: 'Video link',
+                          widget: 'string',
+                          required: false,
+                          hint: 'Optional. Paste a YouTube or Vimeo link and the video appears on the card. Leave blank for a text-only testimonial.',
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: 'settings',
+                  label: 'Company details',
+                  file: 'src/data/settings.json',
+                  description:
+                    'Company name, contact details and address. These appear in the header, footer, contact page and WhatsApp links.',
+                  fields: [
+                    { name: 'name', label: 'Company name', widget: 'string' },
+                    {
+                      name: 'legalName',
+                      label: 'Legal entity name',
+                      widget: 'string',
+                      hint: 'The registered name, used in the footer copyright.',
+                    },
+                    {
+                      name: 'tagline',
+                      label: 'Tagline',
+                      widget: 'string',
+                      hint: 'The short line under the logo.',
+                    },
+                    {
+                      name: 'description',
+                      label: 'Site description',
+                      widget: 'text',
+                      hint: 'Used by Google and link previews. Aim for one or two sentences.',
+                    },
+                    { name: 'foundedYear', label: 'Year founded', widget: 'number', value_type: 'int' },
+                    {
+                      name: 'contact',
+                      label: 'Contact',
+                      widget: 'object',
+                      fields: [
+                        {
+                          name: 'whatsappNumber',
+                          label: 'WhatsApp number',
+                          widget: 'string',
+                          hint: 'Digits only, including country code, e.g. 6281234567890. No +, spaces or dashes.',
+                          pattern: ['^[0-9]{8,15}$', 'Digits only, 8–15 characters'],
+                        },
+                        {
+                          name: 'phoneDisplay',
+                          label: 'Phone number as displayed',
+                          widget: 'string',
+                          hint: 'How it should look on the page, e.g. +62 812-3456-7890',
+                        },
+                        { name: 'email', label: 'Email', widget: 'string' },
+                        { name: 'openingHours', label: 'Opening hours', widget: 'string' },
+                        {
+                          name: 'address',
+                          label: 'Address',
+                          widget: 'object',
+                          hint: 'Also drives the map on the contact page.',
+                          fields: [
+                            { name: 'street', label: 'Street', widget: 'string' },
+                            { name: 'district', label: 'District', widget: 'string' },
+                            { name: 'city', label: 'City', widget: 'string' },
+                            { name: 'province', label: 'Province', widget: 'string' },
+                            { name: 'postalCode', label: 'Postal code', widget: 'string' },
+                            { name: 'country', label: 'Country', widget: 'string' },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>

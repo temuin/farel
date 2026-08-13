@@ -27,14 +27,24 @@ src/
 ├── config/
 │   ├── catalog.ts       Brand + category vocabulary — the source of truth
 │   ├── clients.ts       Logos for the "trusted by" marquee — all placeholder
-│   └── site.ts          Company details, contact info, nav — all placeholder
+│   ├── site.ts          Types + derives the values in data/settings.json
+│   └── testimonials.ts  Types the entries in data/testimonials.json
+├── data/                CMS-editable content (written by /admin)
+│   ├── settings.json    Company name, tagline, contact details, address
+│   └── testimonials.json  Client quotes and optional video links
 ├── content/products/    One markdown file per product
 ├── content.config.ts    Content collection schema
 ├── layouts/             BaseLayout: <head>, SEO meta, header + footer
 ├── lib/                 Data access (products) and WhatsApp link building
 ├── pages/               / · /about · /collections · /collections/[slug] · /contact
 └── styles/global.css    Tailwind entry, theme tokens, .shell container
+deploy/
+├── server.mjs           Static server + CMS OAuth routes (Azure / VPS only)
+├── oauth.mjs            GitHub OAuth broker, shared with functions/
+└── package.json         Hosting shim manifest — no dependencies by design
+functions/api/           Same OAuth routes as Cloudflare Pages Functions
 public/
+├── admin/index.html     Decap CMS panel
 ├── brands/              Kelme/Adidas partner logos (placeholders)
 ├── clients/             Client logos (placeholders)
 ├── favicon.ico, favicon.png  Generated from the real logo icon
@@ -110,9 +120,56 @@ working as soon as the real address is in place.
 The client logos are invented companies with generated marks. Only replace them with organisations
 that have agreed to have their logo shown.
 
+## Admin panel (/admin)
+
+Client staff manage content at **`/admin`** — Decap CMS, loaded from a CDN on a single static
+page. It is git-backed: every save is a commit to this repo, which triggers the deploy workflow,
+so the live site updates a couple of minutes later. There is no database and no server to run.
+
+What is editable:
+
+| Section | Writes to | Covers |
+| :------ | :-------- | :----- |
+| Products | `src/content/products/*.md` | Name, brand, category, slug, description, photos, featured flag, full description |
+| Testimonials | `src/data/testimonials.json` | Quote, role, organisation, optional video link |
+| Company details | `src/data/settings.json` | Company name, tagline, contact details, address |
+
+Product photos upload into `src/assets/products/`, so Astro still optimises them at build time —
+the CMS writes the same relative path the content schema already expects.
+
+Testimonial videos are **linked, not uploaded**: paste a YouTube or Vimeo URL. A git-backed CMS
+commits every upload into the repo, and video files would bloat it and slow every clone and build.
+Ordinary watch links are converted to embed URLs automatically; anything that is not YouTube or
+Vimeo is ignored rather than framed into the page.
+
+### One-time setup
+
+The CMS signs in with GitHub. GitHub has no PKCE public-client flow, so the token exchange needs a
+client secret held server-side — that is what `deploy/oauth.mjs` does, wired into the Node server
+on Azure (`/api/auth`, `/api/callback`) and into `functions/api/` for Cloudflare Pages.
+
+1. Create an OAuth app at **Settings → Developer settings → OAuth Apps → New OAuth App**:
+   - Homepage URL: `https://amaliautama-preview.azurewebsites.net`
+   - Authorization callback URL: `https://amaliautama-preview.azurewebsites.net/api/callback`
+2. Generate a client secret.
+3. Give the app the two values (never commit them):
+
+```bash
+az webapp config appsettings set -g rg-temuin -n amaliautama-preview \
+  --settings GITHUB_OAUTH_CLIENT_ID=<id> GITHUB_OAUTH_CLIENT_SECRET=<secret>
+```
+
+Anyone who can push to the repo can sign in, since the CMS commits as that user. To let client
+staff in without giving them the whole repo, invite them as a collaborator with **Write** access.
+
+When the site moves to Cloudflare Pages, register a second OAuth app (or add the new callback URL)
+and set the same two variables in the Pages project — the callback URL must match the origin the
+CMS is served from.
+
 ## Adding a product
 
-Create `src/content/products/<slug>.md`:
+Products are normally added through `/admin`. To add one by hand, create
+`src/content/products/<slug>.md`:
 
 ```markdown
 ---

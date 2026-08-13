@@ -1,5 +1,6 @@
 ---
 import { testimonials } from '../config/testimonials';
+import { toEmbedUrl } from '../lib/video';
 
 /** Two-letter monogram for the avatar chip, e.g. "Garuda Karya" -> "GK". */
 const initials = (organisation: string) =>
@@ -15,6 +16,21 @@ const initials = (organisation: string) =>
   {
     testimonials.map((testimonial) => (
       <figure class="flex h-full flex-col rounded-2xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        {/* Only rendered once the client attaches a video in the CMS. */}
+        {toEmbedUrl(testimonial.videoUrl) && (
+          <div class="mb-5 aspect-video overflow-hidden rounded-xl bg-neutral-200 dark:bg-neutral-800">
+            <iframe
+              src={toEmbedUrl(testimonial.videoUrl)}
+              title={`Testimonial from ${testimonial.organisation}`}
+              loading="lazy"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              class="h-full w-full"
+              style="border:0"
+            />
+          </div>
+        )}
+
         <div aria-hidden="true" class="flex gap-0.5 text-accent-500 dark:text-accent-500">
           {Array.from({ length: 5 }).map(() => (
             <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

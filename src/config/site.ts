@@ -1,41 +1,34 @@
 /**
  * Company details.
  *
- * PLACEHOLDER CONTENT — nothing else in the codebase hardcodes these details,
- * so editing this file updates the header, footer, contact page, WhatsApp
- * links, map embed and SEO metadata at once.
+ * The client-editable values live in `src/data/settings.json` so the Decap CMS
+ * panel at /admin can write them; this module types them and derives the
+ * values the site actually renders. Everything below stays a plain synchronous
+ * import, so no page needed changing when the data moved out.
+ *
+ * Technical values (production origin, nav, form key) deliberately stay here —
+ * they are not things client staff should be editing.
  */
+import settings from '../data/settings.json';
 
 export const site = {
-  /** TODO: confirm the registered entity name (e.g. whether it carries "PT"). */
-  legalName: 'Amalia Utama',
-  name: 'Amalia Utama',
-  /** TODO: confirm the exact distributor wording each brand permits. The
-   * company logo reads "Indonesia official adidas B2B distributor". */
-  tagline: 'Indonesia official Kelme & Adidas B2B distributor',
-  description:
-    'Authorised Indonesian distributor of Kelme and Adidas team sportswear. Browse the catalogue of jerseys, footwear and accessories for clubs, schools and retailers.',
-  /** Absolute origin, no trailing slash. */
+  legalName: settings.legalName,
+  name: settings.name,
+  tagline: settings.tagline,
+  description: settings.description,
+  foundedYear: settings.foundedYear,
+  /** Absolute origin, no trailing slash. Overridden at build time by SITE_URL. */
   url: 'https://example.com',
-  foundedYear: 2010,
-} as const;
+};
 
 export const contact = {
   /** International format, digits only — this is what wa.me expects. */
-  whatsappNumber: '6281234567890',
-  phoneDisplay: '+62 812-3456-7890',
-  /** TODO: guessed from the company domain — confirm before launch. */
-  email: 'info@amaliautama.com',
-  address: {
-    street: 'Jl. Contoh Raya No. 123, Blok B',
-    district: 'Kebayoran Baru',
-    city: 'Jakarta Selatan',
-    province: 'DKI Jakarta',
-    postalCode: '12190',
-    country: 'Indonesia',
-  },
-  openingHours: 'Monday – Friday, 09.00 – 17.00 WIB',
-} as const;
+  whatsappNumber: settings.contact.whatsappNumber,
+  phoneDisplay: settings.contact.phoneDisplay,
+  email: settings.contact.email,
+  address: settings.contact.address,
+  openingHours: settings.contact.openingHours,
+};
 
 export const addressLine = [
   contact.address.street,

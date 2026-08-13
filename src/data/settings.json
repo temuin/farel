@@ -1,0 +1,21 @@
+{
+  "legalName": "Amalia Utama",
+  "name": "Amalia Utama",
+  "tagline": "Indonesia official Kelme & Adidas B2B distributor",
+  "description": "Authorised Indonesian distributor of Kelme and Adidas team sportswear. Browse the catalogue of jerseys, footwear and accessories for clubs, schools and retailers.",
+  "foundedYear": 2010,
+  "contact": {
+    "whatsappNumber": "6281234567890",
+    "phoneDisplay": "+62 812-3456-7890",
+    "email": "info@amaliautama.com",
+    "openingHours": "Monday – Friday, 09.00 – 17.00 WIB",
+    "address": {
+      "street": "Jl. Contoh Raya No. 123, Blok B",
+      "district": "Kebayoran Baru",
+      "city": "Jakarta Selatan",
+      "province": "DKI Jakarta",
+      "postalCode": "12190",
+      "country": "Indonesia"
+    }
+  }
+}
