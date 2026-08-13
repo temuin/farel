@@ -1,7 +1,7 @@
 ---
 name: Adidas Graphic Basketball Shorts
 brand: Adidas
-category: Apparel
+category: Bottoms
 slug: adidas-graphic-basketball-shorts
 description: Basketball shorts with an all-over graphic print and printed number, for team courtwear.
 images:

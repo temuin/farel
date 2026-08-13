@@ -1,7 +1,7 @@
 ---
 name: Adidas Quarter-Zip Performance Polo
 brand: Adidas
-category: Apparel
+category: Tops
 slug: adidas-quarter-zip-performance-polo
 description: Quarter-zip performance polo in engineered print, built for warm-up and travel.
 images:

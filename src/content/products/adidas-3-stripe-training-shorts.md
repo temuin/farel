@@ -1,7 +1,7 @@
 ---
 name: Adidas 3-Stripe Training Shorts
 brand: Adidas
-category: Apparel
+category: Bottoms
 slug: adidas-3-stripe-training-shorts
 description: Woven training shorts with a drawcord waist and signature side stripes.
 images:

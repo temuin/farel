@@ -1,7 +1,7 @@
 ---
 name: Adidas 3-Stripe Pique Polo
 brand: Adidas
-category: Apparel
+category: Tops
 slug: adidas-3-stripe-pique-polo
 description: Classic pique polo with signature shoulder stripes, built for team and staff orders.
 images:

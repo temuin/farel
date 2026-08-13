@@ -1,7 +1,7 @@
 ---
 name: Adidas Basketball Shorts
 brand: Adidas
-category: Apparel
+category: Bottoms
 slug: adidas-basketball-shorts
 description: Lightweight basketball shorts with a large logo hit and striped hem trim.
 images:

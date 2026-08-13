@@ -25,7 +25,7 @@ const { detailed = false }: Props = Astro.props;
             alt={`${brand} logo`}
             width="240"
             height="64"
-            class:list={['w-auto', detailed ? 'h-12' : 'h-10 sm:h-14', brand === 'Adidas' && 'dark:invert']}
+            class:list={['w-auto dark:invert', detailed ? 'h-12' : 'h-10 sm:h-14']}
           />
           {detailed && <p class="mt-5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{profile.summary}</p>}
         </li>

@@ -8,7 +8,7 @@
 export const BRANDS = ['Kelme', 'Adidas'] as const;
 export type Brand = (typeof BRANDS)[number];
 
-export const CATEGORIES = ['Jerseys', 'Apparel', 'Footwear', 'Accessories'] as const;
+export const CATEGORIES = ['Jerseys', 'Tops', 'Bottoms', 'Footwear', 'Accessories'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 interface BrandProfile {
@@ -24,12 +24,12 @@ interface BrandProfile {
 
 export const BRAND_PROFILES: Readonly<Record<Brand, BrandProfile>> = {
   Kelme: {
-    logo: '/brands/kelme.svg',
+    logo: '/brands/kelme-mark.png',
     summary:
       'Spanish football heritage since 1977. Match kits, training wear and indoor footwear built for club and academy programmes.',
     statement: 'Not a side line. Our Kelme catalogue is built for football, end to end.',
     focus: 'Kelme match kit, training wear and indoor footwear',
-    backdropMark: '/brands/kelme-mark.svg',
+    backdropMark: '/brands/kelme-mark.png',
   },
   Adidas: {
     logo: '/brands/adidas-mark.png',

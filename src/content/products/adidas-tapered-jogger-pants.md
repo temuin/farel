@@ -1,7 +1,7 @@
 ---
 name: Adidas Tapered Jogger Pants
 brand: Adidas
-category: Apparel
+category: Bottoms
 slug: adidas-tapered-jogger-pants
 description: Tapered fleece joggers with ribbed cuffs, built for warm-up and travel.
 images:

@@ -1,7 +1,7 @@
 ---
 name: Adidas Waffle-Knit Polo
 brand: Adidas
-category: Apparel
+category: Tops
 slug: adidas-waffle-knit-polo
 description: Textured knit polo with a striped hem, cropped for a modern fit.
 images:
