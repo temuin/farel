@@ -8,8 +8,16 @@
 export const BRANDS = ['Kelme', 'Adidas'] as const;
 export type Brand = (typeof BRANDS)[number];
 
-export const CATEGORIES = ['Jerseys', 'Tops', 'Bottoms', 'Footwear', 'Accessories'] as const;
+export const CATEGORIES = ['Apparel', 'Footwear', 'Accessories'] as const;
 export type Category = (typeof CATEGORIES)[number];
+
+/**
+ * Revealed as a second-level filter once a category is picked in
+ * Collections. Every category offers the same set — "Lifestyle" is the
+ * catch-all for items that aren't tied to a specific sport.
+ */
+export const SPORTS = ['Running', 'Football', 'Basketball', 'Lifestyle'] as const;
+export type Sport = (typeof SPORTS)[number];
 
 interface BrandProfile {
   /** Replace these files with the official brand assets. */

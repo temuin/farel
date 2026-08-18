@@ -2,6 +2,7 @@
 name: Adidas Ankle Socks (3-Pack)
 brand: Adidas
 category: Accessories
+sport: Lifestyle
 slug: adidas-ankle-socks-3-pack
 description: Cushioned ankle socks sold in a three-pack of black, white and grey.
 images:

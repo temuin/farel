@@ -1,7 +1,8 @@
 ---
 name: Adidas Argyle Knit Polo
 brand: Adidas
-category: Tops
+category: Apparel
+sport: Lifestyle
 slug: adidas-argyle-knit-polo
 description: Argyle-pattern knit polo with contrast side stripes, for off-pitch and clubhouse wear.
 images:

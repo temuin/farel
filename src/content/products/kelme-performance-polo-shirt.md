@@ -1,7 +1,8 @@
 ---
 name: Kelme Performance Polo Shirt
 brand: Kelme
-category: Tops
+category: Apparel
+sport: Football
 slug: kelme-performance-polo-shirt
 description: Mint-green performance polo with a contrast collar trim and Kelme paw logo.
 images:

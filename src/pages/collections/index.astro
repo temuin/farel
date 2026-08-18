@@ -4,6 +4,7 @@ import CollectionFilter from '../../components/CollectionFilter.astro';
 import ProductGrid from '../../components/ProductGrid.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import { getProducts, getUsedBrands, getUsedCategories } from '../../lib/products';
+import { SPORTS } from '../../config/catalog';
 
 const products = await getProducts();
 const brands = getUsedBrands(products);
@@ -12,7 +13,7 @@ const categories = getUsedCategories(products);
 
 <BaseLayout
   title="Collections"
-  description="Browse the full Kelme and Adidas catalogue — jerseys, footwear and accessories for clubs, schools and retailers in Indonesia."
+  description="Browse the full Kelme and Adidas catalogue — apparel, footwear and accessories for clubs, schools and retailers in Indonesia."
 >
   <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
     <div class="shell py-16 sm:py-20">
@@ -26,7 +27,7 @@ const categories = getUsedCategories(products);
   </section>
 
   <section class="shell py-12 sm:py-16" data-catalog>
-    <CollectionFilter brands={brands} categories={categories} total={products.length} />
+    <CollectionFilter brands={brands} categories={categories} sports={[...SPORTS]} total={products.length} />
 
     <div class="mt-8">
       <ProductGrid products={products} eagerCount={4} filterable />

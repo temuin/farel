@@ -1,7 +1,8 @@
 ---
 name: Kelme Women's Track Jacket
 brand: Kelme
-category: Tops
+category: Apparel
+sport: Football
 slug: kelme-womens-track-jacket
 description: Women's track jacket in cream, purple and teal colourblock with a full front zip.
 images:

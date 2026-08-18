@@ -1,7 +1,8 @@
 ---
 name: Adidas Manchester United Home Jersey
 brand: Adidas
-category: Jerseys
+category: Apparel
+sport: Football
 slug: adidas-manchester-united-home-jersey
 featured: true
 description: Manchester United home jersey in red with a polo-style collar and club crest.

@@ -2,6 +2,7 @@
 name: Adidas Samba Kids' Sneakers
 brand: Adidas
 category: Footwear
+sport: Lifestyle
 slug: adidas-samba-kids-sneakers
 description: Kids' Samba sneakers in a glitter and leather finish, for retail and gifting orders.
 images:

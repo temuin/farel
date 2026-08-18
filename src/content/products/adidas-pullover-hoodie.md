@@ -1,7 +1,8 @@
 ---
 name: Adidas Pullover Hoodie
 brand: Adidas
-category: Tops
+category: Apparel
+sport: Football
 slug: adidas-pullover-hoodie
 description: Fleece pullover hoodie with a kangaroo pocket, built for team travel and off-season wear.
 images:

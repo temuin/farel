@@ -1,7 +1,8 @@
 ---
 name: Kelme Chevron Track Jacket
 brand: Kelme
-category: Tops
+category: Apparel
+sport: Football
 slug: kelme-chevron-track-jacket
 description: Navy track jacket with a chevron panel design and Kelme branding at the chest.
 images:

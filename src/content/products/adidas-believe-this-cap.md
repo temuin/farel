@@ -2,6 +2,7 @@
 name: Adidas 'Believe This' Cap
 brand: Adidas
 category: Accessories
+sport: Lifestyle
 slug: adidas-believe-this-cap
 description: Structured cap in brown twill with embroidered branding and an adjustable strap.
 images:

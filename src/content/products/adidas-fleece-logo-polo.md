@@ -1,7 +1,8 @@
 ---
 name: Adidas Fleece Logo Polo
 brand: Adidas
-category: Tops
+category: Apparel
+sport: Lifestyle
 slug: adidas-fleece-logo-polo
 description: Brushed fleece polo with a bold logo band across the chest, oversized fit.
 images:

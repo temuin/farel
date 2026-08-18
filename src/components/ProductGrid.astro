@@ -21,6 +21,7 @@ const { products, eagerCount = 0, filterable = false } = Astro.props;
         data-product-item={filterable ? '' : undefined}
         data-brand={filterable ? product.data.brand : undefined}
         data-category={filterable ? product.data.category : undefined}
+        data-sport={filterable ? (product.data.sport ?? '') : undefined}
       >
         <ProductCard product={product} eager={index < eagerCount} />
       </li>

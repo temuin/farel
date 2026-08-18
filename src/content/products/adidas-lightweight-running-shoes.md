@@ -2,6 +2,7 @@
 name: Adidas Lightweight Running Shoes
 brand: Adidas
 category: Footwear
+sport: Running
 slug: adidas-lightweight-running-shoes
 description: Low-profile running shoes with a supportive overlay, built for speed sessions.
 images:

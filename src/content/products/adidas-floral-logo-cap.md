@@ -2,6 +2,7 @@
 name: Adidas Floral Logo Cap
 brand: Adidas
 category: Accessories
+sport: Lifestyle
 slug: adidas-floral-logo-cap
 description: White cap with a floral-embroidered logo and an adjustable strap.
 images:

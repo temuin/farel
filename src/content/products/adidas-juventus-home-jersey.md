@@ -1,7 +1,8 @@
 ---
 name: Adidas Juventus Home Jersey
 brand: Adidas
-category: Jerseys
+category: Apparel
+sport: Football
 slug: adidas-juventus-home-jersey
 featured: true
 description: Juventus home jersey in the club's classic black and white stripes, with club crest.

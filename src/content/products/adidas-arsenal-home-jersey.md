@@ -1,7 +1,8 @@
 ---
 name: Adidas Arsenal Home Jersey
 brand: Adidas
-category: Jerseys
+category: Apparel
+sport: Football
 slug: adidas-arsenal-home-jersey
 featured: true
 description: Arsenal home jersey in red and white with raglan sleeves and club crest.

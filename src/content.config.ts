@@ -1,7 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { BRANDS, CATEGORIES } from './config/catalog';
+import { BRANDS, CATEGORIES, SPORTS } from './config/catalog';
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -12,6 +12,9 @@ const products = defineCollection({
       name: z.string().min(1),
       brand: z.enum(BRANDS),
       category: z.enum(CATEGORIES),
+      /** Second-level Collections filter, revealed once a category is picked.
+       * Omitted for items that aren't tied to one sport (caps, socks, lifestyle sneakers). */
+      sport: z.enum(SPORTS).optional(),
       /** The first image doubles as the card thumbnail and the OG image. */
       images: z.array(image()).min(1),
       /** Also used as the meta description on detail pages. */

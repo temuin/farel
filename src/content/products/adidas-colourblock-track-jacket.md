@@ -1,7 +1,8 @@
 ---
 name: Adidas Colourblock Track Jacket
 brand: Adidas
-category: Tops
+category: Apparel
+sport: Football
 slug: adidas-colourblock-track-jacket
 description: Cropped track jacket in a woven shell with a colourblock chest panel.
 images:

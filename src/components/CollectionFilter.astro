@@ -1,15 +1,20 @@
 ---
-import type { Brand, Category } from '../config/catalog';
+import type { Brand, Category, Sport } from '../config/catalog';
 
 interface Props {
   brands: Brand[];
   categories: Category[];
+  /** Same set offered under every category. */
+  sports: Sport[];
   total: number;
 }
 
-const { brands, categories, total } = Astro.props;
+const { brands, categories, sports, total } = Astro.props;
 
-/** One group per filter dimension; `all` is that dimension's reset option. */
+const BUTTON =
+  'rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-900 aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-white dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-neutral-900';
+
+/** One group per top-level filter dimension; `all` is that dimension's reset option. */
 const groups = [
   { key: 'brand', label: 'Brand', allLabel: 'All brands', values: brands },
   { key: 'category', label: 'Category', allLabel: 'All categories', values: categories },
@@ -23,13 +28,7 @@ const groups = [
         <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">{group.label}</p>
         <div class="mt-3 flex flex-wrap gap-2">
           {['all', ...group.values].map((value) => (
-            <button
-              type="button"
-              data-filter={group.key}
-              data-value={value}
-              aria-pressed={value === 'all' ? 'true' : 'false'}
-              class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-900 aria-pressed:border-neutral-900 aria-pressed:bg-neutral-900 aria-pressed:text-white dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-white dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-neutral-900"
-            >
+            <button type="button" data-filter={group.key} data-value={value} aria-pressed={value === 'all' ? 'true' : 'false'} class={BUTTON}>
               {value === 'all' ? group.allLabel : value}
             </button>
           ))}
@@ -39,12 +38,30 @@ const groups = [
   }
 </div>
 
+{/* Same sport options for every category — revealed once any specific category is picked. */}
+<div
+  role="group"
+  aria-label="Filter by sport"
+  data-sport-panel
+  hidden
+  class="mt-6 transition-all duration-200 ease-out motion-reduce:transition-none"
+>
+  <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">Sport</p>
+  <div class="mt-3 flex flex-wrap gap-2">
+    {['all', ...sports].map((value) => (
+      <button type="button" data-filter="sport" data-value={value} aria-pressed={value === 'all' ? 'true' : 'false'} class={BUTTON}>
+        {value === 'all' ? 'All sports' : value}
+      </button>
+    ))}
+  </div>
+</div>
+
 <p data-result-count aria-live="polite" class="mt-8 text-sm text-neutral-500 dark:text-neutral-400">
   Showing {total} of {total} products
 </p>
 
 <script>
-  type Dimension = 'brand' | 'category';
+  type Dimension = 'brand' | 'category' | 'sport';
 
   const ALL = 'all';
 
@@ -53,8 +70,9 @@ const groups = [
     const items = catalog.querySelectorAll<HTMLElement>('[data-product-item]');
     const emptyState = catalog.querySelector<HTMLElement>('[data-empty-state]');
     const resultCount = catalog.querySelector<HTMLElement>('[data-result-count]');
+    const sportPanel = catalog.querySelector<HTMLElement>('[data-sport-panel]');
 
-    const selection: Record<Dimension, string> = { brand: ALL, category: ALL };
+    const selection: Record<Dimension, string> = { brand: ALL, category: ALL, sport: ALL };
 
     // Lets links like `/collections?brand=Kelme` land pre-filtered.
     const requested = new URLSearchParams(window.location.search);
@@ -68,7 +86,18 @@ const groups = [
 
     const matches = (item: HTMLElement) =>
       (selection.brand === ALL || item.dataset.brand === selection.brand) &&
-      (selection.category === ALL || item.dataset.category === selection.category);
+      (selection.category === ALL || item.dataset.category === selection.category) &&
+      (selection.sport === ALL || item.dataset.sport === selection.sport);
+
+    /** The sport panel only makes sense once a specific category is active. */
+    const syncSportPanel = () => {
+      if (!sportPanel) return;
+
+      const active = selection.category !== ALL;
+      sportPanel.hidden = !active;
+
+      if (!active && selection.sport !== ALL) selection.sport = ALL;
+    };
 
     const render = () => {
       let visible = 0;
@@ -92,11 +121,20 @@ const groups = [
 
     buttons.forEach((button) => {
       button.addEventListener('click', () => {
-        selection[button.dataset.filter as Dimension] = button.dataset.value ?? ALL;
+        const dimension = button.dataset.filter as Dimension;
+        const value = button.dataset.value ?? ALL;
+
+        selection[dimension] = value;
+        if (dimension === 'category') {
+          // Switching category invalidates whatever sport was picked before.
+          selection.sport = ALL;
+          syncSportPanel();
+        }
         render();
       });
     });
 
+    syncSportPanel();
     render();
   });
 </script>

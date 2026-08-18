@@ -2,6 +2,7 @@
 name: Adidas Cushioned Running Shoes
 brand: Adidas
 category: Footwear
+sport: Running
 slug: adidas-cushioned-running-shoes
 description: High-cushion running shoes with a lightweight knit upper, for road training.
 images:

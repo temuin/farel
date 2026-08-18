@@ -2,6 +2,7 @@
 name: Adidas Samba Leather Sneakers
 brand: Adidas
 category: Footwear
+sport: Lifestyle
 slug: adidas-samba-leather-sneakers
 description: The classic Samba silhouette in black leather, stocked for retail alongside team kit.
 images:

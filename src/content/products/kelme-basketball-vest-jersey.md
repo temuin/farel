@@ -1,7 +1,8 @@
 ---
 name: Kelme Basketball Vest Jersey
 brand: Kelme
-category: Jerseys
+category: Apparel
+sport: Basketball
 slug: kelme-basketball-vest-jersey
 featured: true
 description: Sleeveless basketball jersey in white and navy with a printed squad graphic.

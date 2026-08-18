@@ -1,7 +1,7 @@
 /**
- * PLACEHOLDER CONTENT — these are invented companies with generated logos.
- * Replace them with real clients, and only list organisations that have agreed
- * to have their logo used.
+ * Real client and partner logos for the "trusted by" marquee, supplied
+ * directly by PT Amalia Utama. Keep this list to organisations that have
+ * agreed to have their logo shown.
  */
 
 export interface Client {
@@ -10,16 +10,20 @@ export interface Client {
 }
 
 export const clients: readonly Client[] = [
-  { name: 'Nusantara Air', logo: '/clients/nusantara-air.svg' },
-  { name: 'Bank Contoh', logo: '/clients/bank-contoh.svg' },
-  { name: 'Contoh Energi', logo: '/clients/contoh-energi.svg' },
-  { name: 'Sinar Group', logo: '/clients/sinar-group.svg' },
-  { name: 'Cakra Logistik', logo: '/clients/cakra-logistik.svg' },
-  { name: 'Prima Retail', logo: '/clients/prima-retail.svg' },
-  { name: 'Garuda Karya', logo: '/clients/garuda-karya.svg' },
-  { name: 'Mitra Telekom', logo: '/clients/mitra-telekom.svg' },
-  { name: 'Samudra Niaga', logo: '/clients/samudra-niaga.svg' },
-  { name: 'Bumi Sentosa', logo: '/clients/bumi-sentosa.svg' },
-  { name: 'Anugerah Tbk', logo: '/clients/anugerah-tbk.svg' },
-  { name: 'Delta Industri', logo: '/clients/delta-industri.svg' },
+  { name: 'Bank Tabungan Negara', logo: '/clients/btn.png' },
+  { name: 'Bank Mandiri', logo: '/clients/mandiri.png' },
+  { name: 'Bank Mega', logo: '/clients/bank-mega.png' },
+  { name: 'Maybank', logo: '/clients/maybank.png' },
+  { name: 'Adira Finance', logo: '/clients/adira-finance.png' },
+  { name: 'Schneider Electric', logo: '/clients/schneider-electric.png' },
+  { name: 'Komatsu', logo: '/clients/komatsu.png' },
+  { name: 'Valvoline', logo: '/clients/valvoline.png' },
+  { name: 'Pernod Ricard', logo: '/clients/pernod-ricard.png' },
+  { name: 'HP', logo: '/clients/hp.png' },
+  { name: 'Westin Hotels & Resorts', logo: '/clients/westin-hotels-resorts.png' },
+  { name: 'Four Seasons', logo: '/clients/four-seasons.png' },
+  { name: 'Peruri', logo: '/clients/peruri.png' },
+  { name: 'Badan Intelijen Negara', logo: '/clients/bin.png' },
+  { name: 'Kementerian Imigrasi dan Pemasyarakatan', logo: '/clients/kementerian-imigrasi-pemasyarakatan.png' },
+  { name: 'Dinas Pemuda dan Olahraga', logo: '/clients/dispora.png' },
 ];
