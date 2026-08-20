@@ -8,14 +8,15 @@
   "contact": {
     "whatsappNumber": "6281234567890",
     "phoneDisplay": "+62 812-3456-7890",
-    "email": "info@amaliautama.com",
+    "email": "marketing@amaliautama.com",
+    "adminEmail": "admin@amaliautama.com",
     "openingHours": "Monday – Friday, 09.00 – 17.00 WIB",
     "address": {
-      "street": "Jl. Makau Raya Blok A Kavling. 123,",
-      "district": "Bekasi",
-      "city": "Bekasi",
-      "province": "West Java",
-      "postalCode": "12345",
+      "street": "Jl. Ahmad Yani, Ruko Mutiara Bekasi",
+      "district": "RT.005/RW.002, Marga Jaya, Center",
+      "city": "Kota Bekasi",
+      "province": "Jawa Barat",
+      "postalCode": "17141",
       "country": "Indonesia"
     }
   }

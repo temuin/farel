@@ -26,6 +26,8 @@ export const contact = {
   whatsappNumber: settings.contact.whatsappNumber,
   phoneDisplay: settings.contact.phoneDisplay,
   email: settings.contact.email,
+  /** Optional second contact address, shown alongside the primary one on the Contact page. */
+  adminEmail: settings.contact.adminEmail?.trim() || undefined,
   address: settings.contact.address,
   openingHours: settings.contact.openingHours,
 };

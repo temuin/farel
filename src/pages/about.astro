@@ -1,9 +1,13 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BrandStrip from '../components/BrandStrip.astro';
 import Button from '../components/Button.astro';
 import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import SectionHeading from '../components/SectionHeading.astro';
+import storefrontPhoto from '../assets/about/storefront.jpeg';
+import warehousePhoto from '../assets/about/warehouse-shelving.jpeg';
+import packingPhoto from '../assets/about/packing-quality-check.jpeg';
 import { CATEGORIES, BRANDS } from '../config/catalog';
 import { getProducts } from '../lib/products';
 import { site } from '../config/site';
@@ -62,7 +66,16 @@ const values = [
         </dl>
       </div>
 
-      <MediaPlaceholder label="Team or storefront photo" class="aspect-[4/3] lg:aspect-[4/5]" />
+      <div class="aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-[4/5]">
+        <Image
+          src={storefrontPhoto}
+          alt={`The ${site.name} team at our Adidas storefront display`}
+          widths={[400, 800]}
+          sizes="(min-width: 1024px) 40vw, 90vw"
+          loading="eager"
+          class="h-full w-full object-cover"
+        />
+      </div>
     </div>
   </section>
 
@@ -112,12 +125,41 @@ const values = [
       <SectionHeading
         eyebrow="Behind the scenes"
         title="Inside our operation"
-        description="Where your order actually comes from. Swap these for real photos of the warehouse, packing and dispatch."
+        description="Where your order actually comes from — the warehouse, the packing bench and dispatch."
       />
       <div class="mt-10 grid gap-6 sm:grid-cols-3">
-        <MediaPlaceholder label="Warehouse shelving" class="aspect-square" />
-        <MediaPlaceholder label="Packing & quality check" class="aspect-square" />
-        <MediaPlaceholder label="Dispatch & delivery" class="aspect-square" />
+        <div class="aspect-square overflow-hidden rounded-2xl">
+          <Image
+            src={warehousePhoto}
+            alt="Stacked and labelled stock on warehouse shelving"
+            widths={[300, 600]}
+            sizes="(min-width: 640px) 34vw, 90vw"
+            loading="lazy"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div class="aspect-square overflow-hidden rounded-2xl">
+          <Image
+            src={packingPhoto}
+            alt="Staff packing and quality-checking an order before dispatch"
+            widths={[300, 600]}
+            sizes="(min-width: 640px) 34vw, 90vw"
+            loading="lazy"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div class="aspect-square overflow-hidden rounded-2xl bg-black">
+          <video
+            class="h-full w-full object-cover"
+            src="/videos/dispatch-delivery.mp4"
+            poster="/videos/dispatch-delivery-poster.jpg"
+            aria-label="Orders being packed, labelled and dispatched from the Amalia Utama warehouse"
+            autoplay
+            muted
+            loop
+            playsinline
+          />
+        </div>
       </div>
     </div>
   </section>

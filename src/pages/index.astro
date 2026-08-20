@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BrandShowcase from '../components/BrandShowcase.astro';
 import Button from '../components/Button.astro';
@@ -9,6 +10,7 @@ import LogoMarqueeBackdrop from '../components/LogoMarqueeBackdrop.astro';
 import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Testimonials from '../components/Testimonials.astro';
+import teamWearingKitPhoto from '../assets/field/team-wearing-kit.jpg';
 import { BRAND_PROFILES } from '../config/catalog';
 import { getBrandPreviews, getProducts } from '../lib/products';
 import { site } from '../config/site';
@@ -39,8 +41,8 @@ const highlights = [
     <HeroPhotoWall products={products} />
 
     {/* Two scrims: one to knock the photos back, one to hold the text side. */}
-    <div class="absolute inset-0 bg-ink/75"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/90 to-ink/40"></div>
+    <div class="absolute inset-0 bg-ink/40"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/10"></div>
 
     <div class="shell relative z-10 py-20">
       <div class="max-w-2xl">
@@ -50,12 +52,13 @@ const highlights = [
         <h1
           class="mt-5 text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
         >
-          Team sportswear that holds up, season after season
+          Elevate Your Team with Branded Apparel from a Partner You Can Trust.
         </h1>
         <p class="mt-6 max-w-xl text-lg leading-relaxed text-neutral-300">
-          We supply clubs, schools and retailers across Indonesia with genuine Kelme and Adidas
-          jerseys, footwear and accessories &mdash; sourced through authorised channels and stocked
-          in full size runs.
+          Your people are an extension of your brand. Make every appearance count with premium
+          corporate apparel and teamwear from Adidas and Kelme, delivered through a trusted B2B
+          distribution partner. Amalia Utama provides reliable, end-to-end apparel solutions
+          designed to strengthen your corporate identity and bring your team together.
         </p>
         <div class="mt-10 flex flex-wrap gap-3">
           <Button href="/contact">Request a quote</Button>
@@ -158,7 +161,16 @@ const highlights = [
         Photos from the field
       </p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MediaPlaceholder label="Team wearing supplied kit" class="aspect-square" />
+        <div class="aspect-square overflow-hidden rounded-2xl">
+          <Image
+            src={teamWearingKitPhoto}
+            alt="Team members wearing Kelme polo shirts supplied through Amalia Utama"
+            widths={[300, 600]}
+            sizes="(min-width: 640px) 25vw, 90vw"
+            loading="lazy"
+            class="h-full w-full object-cover"
+          />
+        </div>
         <MediaPlaceholder label="Delivery or handover day" class="aspect-square" />
         <MediaPlaceholder label="Matchday action shot" class="aspect-square" />
         <MediaPlaceholder type="video" label="Client testimonial video" class="aspect-square" />

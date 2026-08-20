@@ -250,7 +250,19 @@
                           widget: 'string',
                           hint: 'How it should look on the page, e.g. +62 812-3456-7890',
                         },
-                        { name: 'email', label: 'Email', widget: 'string' },
+                        {
+                          name: 'email',
+                          label: 'Email (general / marketing)',
+                          widget: 'string',
+                          hint: 'The primary address — used for mailto links in the footer and contact form.',
+                        },
+                        {
+                          name: 'adminEmail',
+                          label: 'Email (admin)',
+                          widget: 'string',
+                          required: false,
+                          hint: 'Shown as a second contact option on the Contact page. Leave blank to show only the address above.',
+                        },
                         { name: 'openingHours', label: 'Opening hours', widget: 'string' },
                         {
                           name: 'address',
