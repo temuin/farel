@@ -7,10 +7,11 @@ import ClientMarquee from '../components/ClientMarquee.astro';
 import CollectionPreview from '../components/CollectionPreview.astro';
 import HeroPhotoWall from '../components/HeroPhotoWall.astro';
 import LogoMarqueeBackdrop from '../components/LogoMarqueeBackdrop.astro';
-import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Testimonials from '../components/Testimonials.astro';
 import teamWearingKitPhoto from '../assets/field/team-wearing-kit.jpg';
+import matchdayActionPhoto from '../assets/field/matchday-action-shot.png';
+import adidasGolfPhoto from '../assets/field/adidas-golf.png';
 import { BRAND_PROFILES } from '../config/catalog';
 import { getBrandPreviews, getProducts } from '../lib/products';
 import { site } from '../config/site';
@@ -160,7 +161,7 @@ const highlights = [
       <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">
         Photos from the field
       </p>
-      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div class="aspect-square overflow-hidden rounded-2xl">
           <Image
             src={teamWearingKitPhoto}
@@ -171,14 +172,62 @@ const highlights = [
             class="h-full w-full object-cover"
           />
         </div>
-        <MediaPlaceholder label="Delivery or handover day" class="aspect-square" />
-        <MediaPlaceholder label="Matchday action shot" class="aspect-square" />
-        <MediaPlaceholder type="video" label="Client testimonial video" class="aspect-square" />
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
+          <video
+            class="h-full w-full object-cover"
+            src="/videos/delivery-handover.mp4"
+            poster="/videos/delivery-handover-poster.jpg"
+            aria-label="Adidas gear on the terrain, supplied through Amalia Utama"
+            autoplay
+            muted
+            loop
+            playsinline
+          />
+        </div>
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
+          <Image
+            src={matchdayActionPhoto}
+            alt="Runners wearing Adidas gear supplied through Amalia Utama"
+            widths={[300, 600]}
+            sizes="(min-width: 640px) 25vw, 90vw"
+            loading="lazy"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div class="aspect-[9/16] overflow-hidden rounded-2xl bg-black">
+          <video
+            class="h-full w-full object-cover"
+            src="/videos/schneider-electric-testimonial.mp4"
+            poster="/videos/schneider-electric-testimonial-poster.jpg"
+            aria-label="Client testimonial from Schneider Electric Indonesia on choosing Adidas corporate wear through Amalia Utama"
+            controls
+            preload="metadata"
+            playsinline
+          />
+        </div>
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
+          <video
+            class="h-full w-full object-cover"
+            src="/videos/running-post.mp4"
+            poster="/videos/running-post-poster.jpg"
+            aria-label="Runners wearing Adidas gear supplied through Amalia Utama"
+            autoplay
+            muted
+            loop
+            playsinline
+          />
+        </div>
+        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
+          <Image
+            src={adidasGolfPhoto}
+            alt="Adidas golf apparel supplied through Amalia Utama"
+            widths={[300, 600]}
+            sizes="(min-width: 640px) 25vw, 90vw"
+            loading="lazy"
+            class="h-full w-full object-cover"
+          />
+        </div>
       </div>
-      <p class="mt-4 text-xs text-neutral-400 dark:text-neutral-600">
-        Placeholder testimonials and photo slots — replace with real client quotes, photos and video
-        (with their consent) before launch.
-      </p>
     </div>
   </section>
 

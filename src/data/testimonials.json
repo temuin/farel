@@ -1,21 +1,24 @@
 {
   "items": [
     {
-      "quote": "Full kit for three age groups arrived before pre-season training started. Sizing was accurate across the board and the order process was simple.",
-      "role": "Team Manager",
-      "organisation": "Nusantara Air",
+      "quote": "Working with this team reflects the highest level of professionalism. Product quality has consistently exceeded our expectations across every order.",
+      "role": "Procurement Director",
+      "organisation": "Ministry of Defense",
+      "logo": "/clients/kementerian-pertahanan.jpg",
       "videoUrl": ""
     },
     {
-      "quote": "We switched suppliers after one bad season with grey-market stock. Everything since has been genuine product, delivered on time.",
-      "role": "Procurement Lead",
-      "organisation": "Garuda Karya",
+      "quote": "Every shipment has arrived exactly on schedule, even with tight pre-event deadlines. Reliability like this is hard to find.",
+      "role": "Logistics Manager",
+      "organisation": "Angkasa Pura",
+      "logo": "/clients/angkasa-pura.png",
       "videoUrl": ""
     },
     {
-      "quote": "Reordering for a new cohort every year is painless — they already have our sizing and crest details on file.",
-      "role": "Athletics Coordinator",
-      "organisation": "Samudra Niaga",
+      "quote": "A seamless partner from first order to reorder. Responsive, consistent, and easy to work with at every step.",
+      "role": "Corporate Relations Lead",
+      "organisation": "Adira Finance",
+      "logo": "/clients/adira-finance.png",
       "videoUrl": ""
     }
   ]

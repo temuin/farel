@@ -188,6 +188,13 @@
                         },
                         { name: 'organisation', label: 'Organisation', widget: 'string' },
                         {
+                          name: 'logo',
+                          label: 'Organisation logo',
+                          widget: 'image',
+                          required: false,
+                          hint: 'Optional. Shown instead of the initials chip. Leave blank to fall back to initials.',
+                        },
+                        {
                           name: 'videoUrl',
                           label: 'Video link',
                           widget: 'string',

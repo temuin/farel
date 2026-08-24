@@ -44,9 +44,20 @@ const initials = (organisation: string) =>
         </blockquote>
 
         <figcaption class="mt-6 flex items-center gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-800">
-          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-50 text-sm font-bold text-accent-600 dark:bg-accent-500/10 dark:text-accent-500">
-            {initials(testimonial.organisation)}
-          </span>
+          {testimonial.logo ? (
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ring-neutral-200 dark:ring-neutral-800">
+              <img
+                src={testimonial.logo}
+                alt={`${testimonial.organisation} logo`}
+                loading="lazy"
+                class="h-full w-full object-contain p-1"
+              />
+            </span>
+          ) : (
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-50 text-sm font-bold text-accent-600 dark:bg-accent-500/10 dark:text-accent-500">
+              {initials(testimonial.organisation)}
+            </span>
+          )}
           <div>
             <p class="text-sm font-semibold text-neutral-900 dark:text-white">{testimonial.role}</p>
             <p class="text-xs text-neutral-500 dark:text-neutral-400">{testimonial.organisation}</p>
