@@ -163,6 +163,16 @@ function parseUsers(env) {
   return users;
 }
 
+/**
+ * Whether a stored value is even shaped like a hash this code can check.
+ *
+ * pbkdf2$<iterations>$<salt b64>$<hash b64>. The usual way it stops being
+ * that is shell interpolation: pasted into double quotes, a shell eats
+ * everything from each $ onward and silently stores a truncated string.
+ */
+const HASH_SHAPE = /^pbkdf2\$\d+\$[A-Za-z0-9+/=]{20,}\$[A-Za-z0-9+/=]{40,}$/;
+const looksLikeHash = (encoded) => HASH_SHAPE.test(String(encoded).trim());
+
 function isLockedOut(username) {
   const record = attempts.get(username);
   if (!record) return false;
@@ -417,6 +427,24 @@ export async function handleAuthPost(request, env) {
 
   if (users.size === 0 || !token) {
     return fail('Sign-in is not configured on the server.');
+  }
+
+  /*
+   * A malformed hash is indistinguishable from a wrong password to whoever is
+   * signing in, which makes a mangled CMS_USERS value maddening to diagnose --
+   * the server insists the password is wrong when it is actually incapable of
+   * checking it.
+   *
+   * Only reported when NOT ONE entry is usable. That is unambiguously a broken
+   * deployment rather than a bad guess, and because it says nothing about which
+   * usernames exist, it gives an attacker nothing either.
+   */
+  if (![...users.values()].some(looksLikeHash)) {
+    return fail(
+      'Sign-in is misconfigured: CMS_USERS contains no usable password hash. ' +
+        'It must look like username:pbkdf2$210000$<salt>$<hash> — check the ' +
+        'whole line was pasted, including every $ section, and redeploy.',
+    );
   }
 
   let form;
