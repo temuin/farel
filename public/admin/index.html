@@ -127,8 +127,18 @@
        * then a custom domain) — reading the origin at runtime means the admin
        * keeps working across all of them with no rebuild.
        */
+      /*
+       * These must match src/config/catalog.ts exactly. The content schema
+       * validates against that file, so a value offered here that is not in
+       * it produces markdown the site refuses to build -- and a value in it
+       * that is missing here renders as an empty dropdown on every entry that
+       * uses it, which is how "Apparel" (23 of 30 products) came to show blank.
+       *
+       * scripts/check-admin-html.mjs fails the build if the two drift apart.
+       */
       const BRANDS = ['Kelme', 'Adidas'];
-      const CATEGORIES = ['Jerseys', 'Tops', 'Bottoms', 'Footwear', 'Accessories'];
+      const CATEGORIES = ['Apparel', 'Footwear', 'Accessories'];
+      const SPORTS = ['Running', 'Football', 'Basketball', 'Lifestyle'];
 
       const CMS_CONFIG = {
         config: {
@@ -203,6 +213,21 @@
                 { name: 'name', label: 'Product name', widget: 'string' },
                 { name: 'brand', label: 'Brand', widget: 'select', options: BRANDS },
                 { name: 'category', label: 'Category', widget: 'select', options: CATEGORIES },
+                /*
+                 * Decap writes only the fields configured here and silently
+                 * discards the rest, so omitting this did not merely hide the
+                 * value -- it deleted it from the file on every save. All 30
+                 * products carry one, and the Collections page uses it as the
+                 * second-level filter.
+                 */
+                {
+                  name: 'sport',
+                  label: 'Sport',
+                  widget: 'select',
+                  options: SPORTS,
+                  required: false,
+                  hint: 'Second filter on the Collections page. Use Lifestyle for anything not tied to one sport.',
+                },
                 {
                   name: 'slug',
                   label: 'URL slug',

@@ -70,6 +70,69 @@ if (!cdn) {
   problems.push('The Decap bundle has no integrity hash. Recompute it before shipping.');
 }
 
+
+/*
+ * The admin panel's dropdowns and the content schema have to agree.
+ *
+ * They are declared in two places -- a hand-written HTML file and a TypeScript
+ * config -- with nothing connecting them, and they had silently drifted: the
+ * CMS offered Jerseys/Tops/Bottoms while the schema only accepts
+ * Apparel/Footwear/Accessories. Every one of the 23 products categorised
+ * "Apparel" opened with an empty Category dropdown, and saving one would have
+ * written frontmatter the site refuses to build.
+ */
+const catalog = readFileSync('src/config/catalog.ts', 'utf8');
+
+/** Pulls the quoted strings out of `const NAME = [...]`, without regex escaping. */
+const listFrom = (source, name) => {
+  const at = source.indexOf(name + ' = [');
+  if (at === -1) return null;
+  const open = source.indexOf('[', at);
+  const close = source.indexOf(']', open);
+  if (open === -1 || close === -1) return null;
+  return [...source.slice(open, close).matchAll(/'([^']+)'/g)].map((m) => m[1]);
+};
+
+for (const name of ['BRANDS', 'CATEGORIES', 'SPORTS']) {
+  const truth = listFrom(catalog, name);
+  const cms = listFrom(html, name);
+  if (!truth) {
+    problems.push(`Could not find ${name} in src/config/catalog.ts.`);
+    continue;
+  }
+  if (!cms) {
+    problems.push(`Could not find ${name} in ${FILE}.`);
+    continue;
+  }
+  if (truth.join('|') !== cms.join('|')) {
+    problems.push(
+      `${name} differs from src/config/catalog.ts — ` +
+        `schema has [${truth.join(', ')}], admin offers [${cms.join(', ')}]. ` +
+        `A value the schema rejects breaks the build; one the admin omits shows as an empty dropdown.`,
+    );
+  }
+}
+
+/*
+ * Every schema field must have a widget, or Decap drops it on save. That is
+ * how `sport` was being deleted from all 30 products by any edit.
+ */
+const schema = readFileSync('src/content.config.ts', 'utf8');
+const schemaFields = [...schema.matchAll(/^\s{6}([a-zA-Z]+):\s*z\./gm)].map((m) => m[1]);
+const productsBlock = html.slice(
+  html.indexOf("name: 'products'"),
+  html.indexOf("name: 'content'"),
+);
+const cmsFields = [...productsBlock.matchAll(/\{\s*name: '([a-zA-Z]+)'/g)].map((m) => m[1]);
+for (const field of schemaFields) {
+  if (!cmsFields.includes(field)) {
+    problems.push(
+      `The content schema defines "${field}" but the CMS has no widget for it. ` +
+        `Decap writes only its configured fields, so editing an entry would delete it.`,
+    );
+  }
+}
+
 if (problems.length) {
   console.error(`\n${FILE} failed its checks:\n`);
   for (const problem of problems) console.error(`  - ${problem}`);
