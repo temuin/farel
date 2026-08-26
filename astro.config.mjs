@@ -84,6 +84,14 @@ export default defineConfig({
          */
         `img-src 'self' data: ${MEDIA_BASE_URL}`,
         "font-src 'self' data:",
+        /*
+         * The <video> elements stream straight from the bucket -- unlike
+         * images, video is never processed at build time. Without this the
+         * browser falls back to default-src 'self' and blocks every one of
+         * them, with the video element reporting a bare format error and no
+         * network request ever made.
+         */
+        `media-src 'self' ${MEDIA_BASE_URL}`,
         // Testimonial videos and the office map on the contact page.
         'frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com',
         // The site is static and calls nothing at runtime.
