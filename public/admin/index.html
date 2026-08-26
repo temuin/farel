@@ -74,7 +74,16 @@
         <h1>Content Manager</h1>
         <p class="sub">Sign in to edit the website.</p>
         <div id="signin-error" role="alert" hidden></div>
-        <form id="signin-form">
+        <!--
+          method and action matter even though JavaScript normally handles this
+          submit and calls preventDefault. Without them the browser's fallback
+          is a GET to the current URL, which puts the username and password in
+          the query string, the address bar, and browser history. That is what
+          happens if the script below ever fails to run, so the markup has to
+          fail safe on its own: a POST sends the credentials in the body, and
+          /api/auth rejects it for a missing nonce rather than leaking anything.
+        -->
+        <form id="signin-form" method="POST" action="/api/auth">
           <label for="username">Username</label>
           <input id="username" name="username" autocomplete="username" required autofocus />
           <label for="password">Password</label>
@@ -454,9 +463,7 @@
                 onclick: async (event) => {
                   event.stopPropagation();
                   if (!confirm(
-                    'Delete ' + file.name + '?
-
-' +
+                    'Delete ' + file.name + '?\n\n' +
                     'If any product still uses this photo, the website will fail to ' +
                     'rebuild until that product is pointed at a different one. Check ' +
                     'first if you are unsure.'
@@ -547,7 +554,6 @@
         };
       })();
 
-      window.CMS.registerMediaLibrary(R2);
 
       /*
        * Decap reads the signed-in user from this localStorage key when it
@@ -601,6 +607,18 @@
           button.textContent = 'Login';
         }
       });
+
+      /*
+         Registered here, after the sign-in handler is attached, and guarded.
+         Anything thrown while setting up the picker used to abort the whole
+         script before that handler existed, which silently turned the login
+         form into a plain GET. Sign-in has to survive a broken picker.
+      */
+      try {
+        window.CMS.registerMediaLibrary(R2);
+      } catch (problem) {
+        console.error('Photo picker failed to register; sign-in still works.', problem);
+      }
 
       // Returning visitor with a stored session: skip the form entirely.
       if (localStorage.getItem(AUTH_KEY)) startCms();
