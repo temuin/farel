@@ -173,9 +173,23 @@ export async function handleMedia(request, env) {
     await bucket.put(key, file.stream(), {
       httpMetadata: {
         contentType: file.type,
-        // Immutable because the key never gets reused; a changed photo is a
-        // new key, so this can be cached hard at the edge.
-        cacheControl: 'public, max-age=31536000, immutable',
+        /*
+         * An hour, and deliberately not `immutable`.
+         *
+         * The obvious choice is a year, on the reasoning that a key is never
+         * reused -- an upload that collides gets a -2 suffix rather than
+         * overwriting. But deleting frees the key again, and delete-then-
+         * re-upload-under-the-same-name is a completely ordinary thing to do:
+         * upload a photo, notice it is wrong, remove it, upload the corrected
+         * one. With an immutable year the edge would keep serving the old
+         * bytes, and because the build fetches these to generate its variants,
+         * the wrong photo would be baked into the site with no obvious cause.
+         *
+         * An hour costs nothing here -- these are read through Cloudflare's
+         * cache on a free-tier bucket with very little traffic -- and it means
+         * a correction always lands.
+         */
+        cacheControl: 'public, max-age=3600',
       },
     });
 

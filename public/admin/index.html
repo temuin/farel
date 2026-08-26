@@ -453,7 +453,14 @@
                 title: 'Delete from the bucket',
                 onclick: async (event) => {
                   event.stopPropagation();
-                  if (!confirm('Delete ' + file.name + '? Any product still using it will lose its photo.')) return;
+                  if (!confirm(
+                    'Delete ' + file.name + '?
+
+' +
+                    'If any product still uses this photo, the website will fail to ' +
+                    'rebuild until that product is pointed at a different one. Check ' +
+                    'first if you are unsure.'
+                  )) return;
                   try {
                     await api({ method: 'DELETE', query: '?key=' + encodeURIComponent(file.key) });
                     load();
