@@ -35,12 +35,23 @@ const MAX_ATTEMPTS = 8;
 const LOCKOUT_MS = 15 * 60 * 1000;
 
 /*
- * Per-instance only: App Service runs one process, so this holds. It is
- * defence in depth, not a substitute for a strong password — a host that runs
- * many isolates gives each its own copy of this map.
+ * Per-isolate only, and on Cloudflare Pages that barely holds: requests are
+ * spread across many short-lived isolates, each getting its own copy of this
+ * map, so the counter is trivially sidestepped and resets constantly. Treat it
+ * as a speed bump against naive scripted bursts, nothing more. The defences
+ * that actually carry weight here are a strong password, PBKDF2's per-attempt
+ * cost, and a Cloudflare rate-limiting rule on /api/auth — see DEPLOYMENTS.md.
  */
 const attempts = new Map();
 
+/*
+ * Every header these pages need has to be set right here. Cloudflare Pages
+ * applies public/_headers to static assets only — a Function's response goes
+ * out exactly as it is built, so nothing in that file reaches /api/*.
+ * Framing is denied because these pages carry the sign-in form and, on the
+ * OAuth leg, the token handoff; neither should ever render inside someone
+ * else's page.
+ */
 const html = (body, status = 200, extraHeaders = {}) =>
   new Response(body, {
     status,
@@ -48,6 +59,11 @@ const html = (body, status = 200, extraHeaders = {}) =>
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store',
       'X-Robots-Tag': 'noindex, nofollow',
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Content-Security-Policy':
+        "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
       ...extraHeaders,
     },
   });
@@ -56,6 +72,21 @@ const escapeHtml = (value) =>
   String(value).replace(
     /[&<>"']/g,
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+  );
+
+/**
+ * JSON for embedding inside a <script> block, which is NOT the same as plain
+ * JSON.stringify. An HTML parser looks for `</script` in the raw text before
+ * any JavaScript runs, so a string containing one closes the block early and
+ * everything after it becomes live markup. GitHub's error_description comes
+ * straight off the query string, which made that reachable. Escaping the
+ * angle brackets (plus & and the two Unicode line terminators JS treats as
+ * newlines) keeps the value inert while staying valid JSON.
+ */
+const toScriptJson = (value) =>
+  JSON.stringify(value).replace(
+    /[<>&\u2028\u2029]/g,
+    (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'),
   );
 
 function randomHex(bytes = 16) {
@@ -151,36 +182,65 @@ function recordFailure(username) {
   }
 }
 
-/** The popup handshake Decap expects. */
-function popupResponse(status, content, extraHeaders = {}) {
-  const message = JSON.stringify(
+/**
+ * The popup handshake Decap expects.
+ *
+ * Async because the inline script is pinned by hash in this response's own CSP
+ * — belt and braces alongside toScriptJson, so that even a future escaping
+ * slip cannot get injected markup to execute here. This origin also serves
+ * /admin, whose localStorage holds the GitHub token, so script execution on it
+ * is exactly what must not be possible.
+ */
+async function popupResponse(status, content, extraHeaders = {}) {
+  const message = toScriptJson(
     `authorization:${PROVIDER}:${status}:${JSON.stringify(content)}`,
   );
 
-  return html(
-    `<!doctype html>
-<html><head><meta charset="utf-8" /><title>Signing in…</title></head>
-<body style="font:15px system-ui;padding:24px">
-  <p>Completing sign-in…</p>
-  <script>
+  const script = `
     (function () {
       var message = ${message};
+      /*
+       * The token may only ever go back to this same site's /admin. Pinning
+       * both the accepted sender and the postMessage target to our own origin
+       * means a page on another origin that manages to open this popup cannot
+       * coax the token out of it by messaging in first and having its own
+       * origin echoed back as the target.
+       */
+      var origin = window.location.origin;
       function receive(event) {
-        if (!window.opener) return;
-        window.opener.postMessage(message, event.origin);
+        if (event.origin !== origin || !window.opener) return;
+        window.opener.postMessage(message, origin);
         window.removeEventListener('message', receive, false);
       }
       window.addEventListener('message', receive, false);
       if (window.opener) {
-        window.opener.postMessage('authorizing:${PROVIDER}', '*');
+        window.opener.postMessage('authorizing:${PROVIDER}', origin);
       } else {
         document.body.textContent = 'Open the CMS at /admin and sign in from there.';
       }
     })();
-  </script>
+  `;
+
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(script));
+
+  return html(
+    `<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><title>Signing in…</title></head>
+<body style="font:15px system-ui;padding:24px">
+  <p>Completing sign-in…</p>
+  <script>${script}</script>
 </body></html>`,
     200,
-    extraHeaders,
+    {
+      'Content-Security-Policy': [
+        "default-src 'none'",
+        `script-src 'sha256-${toBase64(digest)}'`,
+        "style-src 'unsafe-inline'",
+        "base-uri 'none'",
+        "frame-ancestors 'none'",
+      ].join('; '),
+      ...extraHeaders,
+    },
   );
 }
 

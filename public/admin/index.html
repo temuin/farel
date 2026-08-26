@@ -54,7 +54,22 @@
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
-    <script src="https://unpkg.com/decap-cms@3.15.1/dist/decap-cms.js"></script>
+    <!--
+      Pinned by content, not just by version number. This page holds a GitHub
+      write token in localStorage, so a tampered bundle from the CDN would be
+      the single worst thing that could happen to it. The hash below was taken
+      from the npm registry tarball for decap-cms@3.15.1 and confirmed
+      byte-identical to what unpkg serves; the browser refuses to run anything
+      that does not match it. Recompute it if the version above ever changes:
+        npm pack decap-cms@<version>
+        openssl dgst -sha384 -binary package/dist/decap-cms.js | openssl base64 -A
+    -->
+    <script
+      src="https://unpkg.com/decap-cms@3.15.1/dist/decap-cms.js"
+      integrity="sha384-in6eHztHveqQ7uMZ1fDaKlDmacQLFuLH2wWrFTiymyuS8zQ5bixwL8U3AeRi8h/L"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script>
       /*
        * Configured here rather than in a static config.yml so `base_url` can be

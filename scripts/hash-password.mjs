@@ -83,15 +83,76 @@ function readPassword(prompt) {
 
 const args = process.argv.slice(2);
 
+/** Reads a visible line, used for the hash (which is not a secret to type). */
+function readLine(prompt) {
+  const { stdin, stdout } = process;
+  stdout.write(prompt);
+  return new Promise((resolve) => {
+    let buffer = '';
+    stdin.setEncoding('utf8');
+    stdin.resume();
+    const onData = (chunk) => {
+      buffer += chunk;
+      const newline = buffer.indexOf('\n');
+      if (newline !== -1) {
+        stdin.removeListener('data', onData);
+        stdin.pause();
+        resolve(buffer.slice(0, newline).replace(/\r$/, '').trim());
+      }
+    };
+    stdin.on('data', onData);
+  });
+}
+
+/** A healthy hash is pbkdf2$<iterations>$<24-char salt>$<44-char hash>. */
+function describeHash(hash) {
+  const parts = hash.split('$');
+  if (
+    parts.length === 4 &&
+    parts[0] === 'pbkdf2' &&
+    /^\d+$/.test(parts[1]) &&
+    parts[2].length === 24 &&
+    parts[3].length === 44
+  ) {
+    return null;
+  }
+  return [
+    `That hash does not look complete (${hash.length} characters, expected 83).`,
+    '',
+    'The usual cause is shell quoting. In PowerShell a hash in DOUBLE quotes has',
+    'its $... sections eaten as variable names:',
+    '',
+    '  wrong:  "pbkdf2$210000$abc..."   ->  pbkdf2abc...',
+    "  right:  'pbkdf2$210000$abc...'",
+    '',
+    'Re-run and paste the hash at the prompt instead, which avoids quoting entirely.',
+  ].join('\n');
+}
+
 if (args[0] === '--verify') {
-  const [, username, hash] = args;
-  if (!username || !hash) {
-    console.error('Usage: node scripts/hash-password.mjs --verify <username> <hash>');
+  const [, username] = args;
+  if (!username) {
+    console.error('Usage: node scripts/hash-password.mjs --verify <username> [hash]');
+    console.error('Omit the hash and you will be prompted for it, which avoids shell quoting.');
     process.exit(1);
   }
+
+  // Prefer the prompt: an argument has already been through the shell.
+  const hash = args[2] ?? (await readLine('Paste the hash (from CMS_USERS, after the colon): '));
+
+  const problem = describeHash(hash);
+  if (problem) {
+    console.error('\n' + problem);
+    process.exit(2);
+  }
+
   const password = await readPassword(`Password for "${username}": `);
   const ok = await verifyPassword(password, hash);
-  console.log(ok ? '\nMATCH — this password works with that hash.' : '\nNO MATCH — different password.');
+  console.log(
+    ok
+      ? '\nMATCH — this password works with that hash.'
+      : '\nNO MATCH — the hash is well-formed, so this is genuinely a different password.',
+  );
   process.exit(ok ? 0 : 1);
 }
 

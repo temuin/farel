@@ -1,0 +1,32 @@
+# Cloudflare Pages response headers.
+#
+# Astro emits a per-page CSP meta tag for the marketing site (see
+# security.csp in astro.config.mjs). This file covers the headers a meta tag
+# cannot express, plus everything for /admin -- a hand-written file in public/,
+# which Astro copies verbatim and therefore never adds a CSP to.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  # Two years, preload-eligible. Only ever served over HTTPS by Pages.
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+
+# The content manager holds a GitHub token in localStorage, so it gets the
+# strictest treatment: never indexed, never cached, never framed.
+#
+# 'unsafe-inline'/'unsafe-eval' are required by Decap itself -- it is a
+# pre-built bundle that compiles its own widget templates at runtime. The
+# script-src origin allowlist is the meaningful control here: only this site
+# and the exact pinned, SRI-checked Decap bundle can execute.
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://raw.githubusercontent.com https://avatars.githubusercontent.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://unpkg.com; frame-src 'self' blob:; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
+
+# NOTE: there is deliberately no /api/* block here. Cloudflare Pages applies
+# this file to STATIC ASSETS ONLY -- a Function builds its own Response and it
+# goes out untouched, so any rule written here for /api/* would look like
+# protection while doing nothing. The sign-in endpoints set their own headers
+# in deploy/auth.mjs instead; verified against `wrangler pages dev`.

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Staff-only content manager and its sign-in endpoints. Both also send
+# X-Robots-Tag: noindex, so this is belt and braces for crawlers that read it.
+Disallow: /admin
+Disallow: /api/
