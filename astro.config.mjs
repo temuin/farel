@@ -21,6 +21,13 @@ const serveAdminIndexInDev = {
   },
 };
 
+/*
+ * Public host of the R2 bucket holding product photos and videos, with no
+ * trailing slash. Set on the Pages project; the fallback only applies to a
+ * local build that has not been told otherwise.
+ */
+const MEDIA_BASE_URL = process.env.MEDIA_BASE_URL ?? 'https://media.amaliautama.co.id';
+
 // https://astro.build/config
 export default defineConfig({
   /*
@@ -35,6 +42,26 @@ export default defineConfig({
   site: process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? 'https://example.com',
   output: 'static',
 
+  image: {
+    /*
+     * Product photos are full-resolution originals in the R2 bucket, not files
+     * in this repository. Astro refuses to fetch a remote image unless its host
+     * is named here, so this list is what makes the build able to optimise
+     * them at all.
+     *
+     * Derived from MEDIA_BASE_URL so the allow-list and the URLs in the content
+     * can never drift apart. The originals are downloaded during the build and
+     * turned into the sized WebP variants under /_astro/; visitors are served
+     * those, and never reach the bucket.
+     */
+    remotePatterns: [
+      (() => {
+        const { protocol, hostname } = new URL(MEDIA_BASE_URL);
+        return { protocol: protocol.replace(':', ''), hostname };
+      })(),
+    ],
+  },
+
   security: {
     /*
      * Astro emits a per-page <meta http-equiv="content-security-policy"> and
@@ -48,8 +75,14 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        // Astro inlines small assets as data: URIs.
-        "img-src 'self' data:",
+        /*
+         * 'self' covers every product photo: those are downloaded at build
+         * time and served from /_astro. The bucket is listed because images
+         * the CMS stores as plain URLs -- testimonial logos -- are rendered as
+         * ordinary <img> and do load from it at runtime. data: is for the
+         * small assets Astro inlines.
+         */
+        `img-src 'self' data: ${MEDIA_BASE_URL}`,
         "font-src 'self' data:",
         // Testimonial videos and the office map on the contact page.
         'frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com',

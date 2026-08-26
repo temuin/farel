@@ -6,7 +6,7 @@ sport: Football
 slug: kelme-teamwear-long-sleeve-top
 description: Cream long-sleeve teamwear top with maroon colourblock panels and a printed graphic.
 images:
-  - ../../assets/products/kelme-teamwear-long-sleeve-top.jpg
+  - https://media.amaliautama.co.id/images/kelme-teamwear-long-sleeve-top.jpg
 ---
 
 A relaxed long-sleeve teamwear top in cream with maroon colourblock panels across the shoulders,

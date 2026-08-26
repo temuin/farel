@@ -1,10 +1,10 @@
 ---
-import { Image } from 'astro:assets';
 import { BRANDS, BRAND_PROFILES } from '../config/catalog';
 import { imageAlt } from '../lib/products';
 import { site } from '../config/site';
 import Button from './Button.astro';
 import type { BrandPreview } from '../lib/products';
+import ProductImage from './ProductImage.astro';
 
 /**
  * The homepage "Who we are" split: an intro column on the left and two logo
@@ -164,7 +164,7 @@ const meta = [
                 */}
                 {highlight && (
                   <div class="relative mt-3 h-24 overflow-hidden rounded-xl bg-neutral-800 ring-1 ring-white/10 sm:h-28 lg:mt-6 lg:h-64">
-                    <Image
+                    <ProductImage
                       src={highlight.data.images[0]}
                       alt={imageAlt(highlight, 0)}
                       widths={[400, 800]}

@@ -7,7 +7,7 @@ slug: kelme-basketball-vest-jersey
 featured: true
 description: Sleeveless basketball jersey in white and navy with a printed squad graphic.
 images:
-  - ../../assets/products/kelme-basketball-vest-jersey.jpg
+  - https://media.amaliautama.co.id/images/kelme-basketball-vest-jersey.jpg
 ---
 
 A sleeveless basketball jersey in white with navy trim down the sides, finished with a bold printed

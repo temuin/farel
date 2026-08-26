@@ -6,7 +6,7 @@ sport: Football
 slug: adidas-3-stripe-training-shorts
 description: Woven training shorts with a drawcord waist and signature side stripes.
 images:
-  - ../../assets/products/adidas-shorts-training-navy.jpeg
+  - https://media.amaliautama.co.id/images/adidas-shorts-training-navy.jpeg
 ---
 
 Lightweight woven training shorts with an elasticated, drawcord waist and the signature three

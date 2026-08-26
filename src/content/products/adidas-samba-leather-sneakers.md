@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-samba-leather-sneakers
 description: The classic Samba silhouette in black leather, stocked for retail alongside team kit.
 images:
-  - ../../assets/products/adidas-sneakers-samba-leather-black.jpeg
+  - https://media.amaliautama.co.id/images/adidas-sneakers-samba-leather-black.jpeg
 ---
 
 The classic Samba silhouette in smooth black leather with the signature three stripes and gum

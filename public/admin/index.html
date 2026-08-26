@@ -26,6 +26,46 @@
       #signin-error { background: #fdecec; color: #8c1c1c; border: 1px solid #f5c2c2;
         padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; }
       [hidden] { display: none !important; }
+
+      /* Photo picker. Sits above Decap's own modals, hence the z-index. */
+      #r2 { position: fixed; inset: 0; z-index: 100000; display: flex; flex-direction: column;
+        background: rgba(15,23,20,.55); backdrop-filter: blur(2px);
+        font: 14px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+      #r2 .panel { margin: auto; width: min(940px, calc(100vw - 32px)); max-height: calc(100vh - 64px);
+        display: flex; flex-direction: column; background: #fff; border-radius: 14px; overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0,0,0,.28); }
+      #r2 header { display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+        border-bottom: 1px solid #e6e6e6; }
+      #r2 h2 { margin: 0; font-size: 15px; font-weight: 600; flex: 1; }
+      #r2 .btn { border: 0; border-radius: 999px; padding: 9px 16px; font-size: 13px; font-weight: 600;
+        cursor: pointer; background: #095d3e; color: #fff; }
+      #r2 .btn:hover { background: #06462f; }
+      #r2 .btn.ghost { background: #f0f0f0; color: #333; }
+      #r2 .btn.ghost:hover { background: #e2e2e2; }
+      #r2 .btn[disabled] { opacity: .55; cursor: progress; }
+      #r2 .body { padding: 18px 20px; overflow-y: auto; }
+      #r2 .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+      #r2 figure { margin: 0; border: 1px solid #e2e2e2; border-radius: 10px; overflow: hidden;
+        background: #fafafa; position: relative; }
+      #r2 figure button.pick { display: block; width: 100%; border: 0; padding: 0; background: none; cursor: pointer; }
+      #r2 figure img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: #eee; }
+      #r2 figure:hover { border-color: #095d3e; }
+      #r2 figure:focus-within { outline: 2px solid #095d3e; outline-offset: 1px; }
+      #r2 figcaption { padding: 7px 9px; font-size: 11px; color: #555; word-break: break-all; text-align: left; }
+      #r2 .del { position: absolute; top: 6px; right: 6px; border: 0; border-radius: 6px; cursor: pointer;
+        background: rgba(255,255,255,.94); color: #8c1c1c; font-size: 11px; font-weight: 600; padding: 4px 7px; }
+      #r2 .del:hover { background: #fdecec; }
+      #r2 .note { padding: 26px 4px; color: #666; font-size: 13px; text-align: center; }
+      #r2 .err { margin: 0 20px 14px; background: #fdecec; color: #8c1c1c; border: 1px solid #f5c2c2;
+        padding: 9px 12px; border-radius: 9px; font-size: 13px; }
+      @media (prefers-color-scheme: dark) {
+        #r2 .panel { background: #1c1c1c; color: #f0f0f0; }
+        #r2 header { border-color: #333; }
+        #r2 figure { background: #232323; border-color: #333; }
+        #r2 figcaption { color: #bbb; }
+        #r2 .btn.ghost { background: #333; color: #eee; }
+        #r2 .del { background: rgba(30,30,30,.94); color: #f09a9a; }
+      }
     </style>
   </head>
   <body>
@@ -110,6 +150,24 @@
            * markdown, matching what the content schema's image() helper
            * resolves from src/content/products/.
            */
+          /*
+           * Every image widget uploads to the R2 bucket through /api/media.
+           *
+           * This has to be declared here rather than per field: Decap only
+           * instantiates an external media library from the top-level name,
+           * and a `media_library` on a field carries options, never a
+           * different library. So testimonial logos go to the bucket too.
+           * That is fine -- they are stored as absolute URLs and rendered as
+           * plain <img>, which is why the site's CSP allows the media host.
+           */
+          media_library: { name: 'r2' },
+
+          /*
+           * Unused while the R2 library is active, but left in place: remove
+           * them and Decap fails config validation, which requires one of
+           * media_folder or media_library and gives a cryptic error when the
+           * external library has not finished registering.
+           */
           media_folder: 'src/assets/products',
           public_folder: '../../assets/products',
 
@@ -159,7 +217,7 @@
                   label_singular: 'Photo',
                   widget: 'list',
                   field: { name: 'image', label: 'Photo', widget: 'image' },
-                  hint: 'The first photo is used on the product card and when the page is shared on WhatsApp or social media.',
+                  hint: 'The first photo is used on the product card and when the page is shared on WhatsApp or social media. Upload the original at full size - the website makes its own smaller copies.',
                 },
                 {
                   name: 'featured',
@@ -310,12 +368,185 @@
         },
       };
 
+      /** Where Decap keeps the signed-in user, and where the picker reads the token from. */
+      const AUTH_KEY = 'decap-cms-user';
+
+      /*
+       * Photo picker backed by the R2 bucket.
+       *
+       * Decap's own media library commits uploads into the git repository.
+       * That is right for small things but wrong for product photography:
+       * these are full-resolution camera files, and every one would be in the
+       * history of every clone forever. So product photos go to R2 instead,
+       * and this replaces the picker for that one field.
+       *
+       * Registered as a custom media library, which means Decap hands us a
+       * `handleInsert` callback and we own the UI. Whatever we pass back is
+       * what gets written into the markdown -- a full URL, because Decap also
+       * uses that value directly as the <img> src when previewing the photo.
+       *
+       * Uploads are authorised with the GitHub token this panel already holds:
+       * the endpoint asks GitHub whether that token can write to the repo. No
+       * second credential, and nothing to configure here.
+       */
+      const R2 = (() => {
+        const el = (tag, attrs = {}, kids = []) => {
+          const node = document.createElement(tag);
+          for (const [k, v] of Object.entries(attrs)) {
+            if (k === 'class') node.className = v;
+            else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
+            else node.setAttribute(k, v);
+          }
+          for (const kid of [].concat(kids)) {
+            node.append(kid instanceof Node ? kid : document.createTextNode(kid));
+          }
+          return node;
+        };
+
+        const token = () => {
+          try {
+            return JSON.parse(localStorage.getItem(AUTH_KEY) || '{}').token || '';
+          } catch {
+            return '';
+          }
+        };
+
+        const api = async (options = {}) => {
+          const response = await fetch('/api/media' + (options.query || ''), {
+            method: options.method || 'GET',
+            headers: { Authorization: 'Bearer ' + token() },
+            body: options.body,
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || 'Request failed.');
+          return data;
+        };
+
+        let root = null;
+        let insert = null;
+
+        const close = () => {
+          if (root) root.remove();
+          root = null;
+        };
+
+        const render = (files, error) => {
+          close();
+
+          const grid = el('div', { class: 'grid' });
+          for (const file of files) {
+            const figure = el('figure', {}, [
+              el('button', {
+                class: 'pick',
+                type: 'button',
+                title: 'Use this photo',
+                onclick: () => {
+                  const chosen = file.url;
+                  close();
+                  if (insert) insert(chosen);
+                },
+              }, [el('img', { src: file.url, alt: '', loading: 'lazy' })]),
+              el('figcaption', {}, file.name),
+              el('button', {
+                class: 'del',
+                type: 'button',
+                title: 'Delete from the bucket',
+                onclick: async (event) => {
+                  event.stopPropagation();
+                  if (!confirm('Delete ' + file.name + '? Any product still using it will lose its photo.')) return;
+                  try {
+                    await api({ method: 'DELETE', query: '?key=' + encodeURIComponent(file.key) });
+                    load();
+                  } catch (problem) {
+                    render(files, problem.message);
+                  }
+                },
+              }, 'Delete'),
+            ]);
+            grid.append(figure);
+          }
+
+          const picker = el('input', { type: 'file', accept: 'image/*', hidden: 'hidden' });
+          const uploadButton = el('button', { class: 'btn', type: 'button', onclick: () => picker.click() }, 'Upload photo');
+
+          picker.addEventListener('change', async () => {
+            const file = picker.files && picker.files[0];
+            if (!file) return;
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'Uploading...';
+            try {
+              const form = new FormData();
+              form.append('file', file);
+              const saved = await api({ method: 'POST', body: form });
+              close();
+              if (insert) insert(saved.url);
+            } catch (problem) {
+              render(files, problem.message);
+            }
+          });
+
+          root = el('div', { id: 'r2', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Choose a photo' }, [
+            el('div', { class: 'panel' }, [
+              el('header', {}, [
+                el('h2', {}, 'Product photos'),
+                uploadButton,
+                el('button', { class: 'btn ghost', type: 'button', onclick: close }, 'Cancel'),
+              ]),
+              ...(error ? [el('p', { class: 'err', role: 'alert' }, error)] : []),
+              el('div', { class: 'body' }, [
+                files.length
+                  ? grid
+                  : el('p', { class: 'note' }, 'No photos in the bucket yet. Upload the first one.'),
+              ]),
+              picker,
+            ]),
+          ]);
+
+          root.addEventListener('click', (event) => {
+            if (event.target === root) close();
+          });
+          document.addEventListener('keydown', function escape(event) {
+            if (event.key === 'Escape') {
+              close();
+              document.removeEventListener('keydown', escape);
+            }
+          });
+
+          document.body.append(root);
+        };
+
+        const load = async () => {
+          try {
+            const { files } = await api();
+            render(files);
+          } catch (problem) {
+            render([], problem.message);
+          }
+        };
+
+        return {
+          name: 'r2',
+          init: ({ handleInsert }) => ({
+            show: () => {
+              insert = handleInsert;
+              render([], null);
+              load();
+            },
+            hide: close,
+            onClearControl: () => {},
+            onRemoveControl: () => {},
+            enableStandalone: () => false,
+          }),
+        };
+      })();
+
+      window.CMS.registerMediaLibrary(R2);
+
       /*
        * Decap reads the signed-in user from this localStorage key when it
        * starts. Populating it before init() means the CMS comes up already
        * authenticated and never renders its own "Login with GitHub" screen.
        */
-      const AUTH_KEY = 'decap-cms-user';
       const screen = document.getElementById('signin');
       const form = document.getElementById('signin-form');
       const errorBox = document.getElementById('signin-error');

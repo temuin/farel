@@ -6,7 +6,7 @@ sport: Football
 slug: kelme-piped-track-jacket
 description: Navy track jacket with contrast white piping and the Kelme paw logo at the chest.
 images:
-  - ../../assets/products/kelme-piped-track-jacket.jpg
+  - https://media.amaliautama.co.id/images/kelme-piped-track-jacket.jpg
 ---
 
 A full-zip track jacket in navy with contrast white piping across the seams, finished with the

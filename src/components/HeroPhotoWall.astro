@@ -1,6 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import type { Product } from '../lib/products';
+import ProductImage from './ProductImage.astro';
 
 /**
  * Decorative backdrop. Purely visual — the hero copy carries the meaning, so
@@ -48,7 +48,7 @@ const columns = Array.from({ length: COLUMN_COUNT }, (_, index) =>
               <ul class="marquee__stack">
                 {photos.map((photo) => (
                   <li class="aspect-square overflow-hidden rounded-2xl bg-neutral-800">
-                    <Image
+                    <ProductImage
                       src={photo}
                       alt=""
                       widths={[300, 600]}

@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-striped-polo-shirt
 description: Fine-stripe performance polo with a three-button placket, suited for staff and club uniforms.
 images:
-  - ../../assets/products/adidas-polo-striped-blue.jpeg
+  - https://media.amaliautama.co.id/images/adidas-polo-striped-blue.jpeg
 ---
 
 A fine-stripe polo built in a lightweight performance knit, with a three-button placket and ribbed

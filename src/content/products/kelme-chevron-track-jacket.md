@@ -6,7 +6,7 @@ sport: Football
 slug: kelme-chevron-track-jacket
 description: Navy track jacket with a chevron panel design and Kelme branding at the chest.
 images:
-  - ../../assets/products/kelme-chevron-track-jacket.jpg
+  - https://media.amaliautama.co.id/images/kelme-chevron-track-jacket.jpg
 ---
 
 A full-zip track jacket in navy with a bold chevron panel running across the front, finished with

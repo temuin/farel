@@ -6,7 +6,7 @@ sport: Running
 slug: adidas-lightweight-running-shoes
 description: Low-profile running shoes with a supportive overlay, built for speed sessions.
 images:
-  - ../../assets/products/adidas-shoes-running-lightweight-navy.jpeg
+  - https://media.amaliautama.co.id/images/adidas-shoes-running-lightweight-navy.jpeg
 ---
 
 A low-profile running shoe with a supportive overlay across the midfoot and a snug, secure lacing

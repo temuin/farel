@@ -6,7 +6,7 @@ sport: Football
 slug: kelme-performance-polo-shirt
 description: Mint-green performance polo with a contrast collar trim and Kelme paw logo.
 images:
-  - ../../assets/products/kelme-performance-polo-shirt.jpg
+  - https://media.amaliautama.co.id/images/kelme-performance-polo-shirt.jpg
 ---
 
 A performance polo in mint green with a contrast dark trim at the collar and shoulder seams,

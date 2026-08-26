@@ -7,7 +7,7 @@ slug: adidas-manchester-united-home-jersey
 featured: true
 description: Manchester United home jersey in red with a polo-style collar and club crest.
 images:
-  - ../../assets/products/adidas-manchester-united-home-jersey.jpeg
+  - https://media.amaliautama.co.id/images/adidas-manchester-united-home-jersey.jpeg
 ---
 
 The Manchester United home jersey, in red with a polo-style collar and contrast shoulder stripes.

@@ -6,7 +6,7 @@ sport: Football
 slug: adidas-pullover-hoodie
 description: Fleece pullover hoodie with a kangaroo pocket, built for team travel and off-season wear.
 images:
-  - ../../assets/products/adidas-hoodie-pullover-grey.jpeg
+  - https://media.amaliautama.co.id/images/adidas-hoodie-pullover-grey.jpeg
 ---
 
 A fleece pullover hoodie with a lined hood, kangaroo pocket and ribbed cuffs. A regular part of a

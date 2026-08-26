@@ -6,7 +6,7 @@ sport: Football
 slug: adidas-tapered-jogger-pants
 description: Tapered fleece joggers with ribbed cuffs, built for warm-up and travel.
 images:
-  - ../../assets/products/adidas-joggers-tapered-grey.jpeg
+  - https://media.amaliautama.co.id/images/adidas-joggers-tapered-grey.jpeg
 ---
 
 Tapered fleece joggers with an elasticated waist and ribbed cuffs. A regular choice for pre-match

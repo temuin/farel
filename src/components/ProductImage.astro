@@ -1,0 +1,66 @@
+---
+import { Image, inferRemoteSize } from 'astro:assets';
+
+/**
+ * A product photo, which lives in the R2 bucket rather than in the repository.
+ *
+ * Everything about the output is identical to a local image: Astro downloads
+ * the original at build time, generates the WebP variants named in `widths`,
+ * and writes them into /_astro/. Visitors are served those static files and
+ * never contact R2. The only difference is where the source came from.
+ *
+ * Sizing is the reason this wrapper exists. Astro knows the dimensions of a
+ * local import, but for a remote URL it has to be told. Leaving it to infer
+ * them is not enough on its own: it then treats the intrinsic size as the
+ * rendered size, so `src` falls back to the untouched original -- megabytes,
+ * against a camera file -- and width/height are declared as 5334x7997, which
+ * reserves a wildly wrong box and makes the page jump as photos arrive.
+ *
+ * So we probe the original once with inferRemoteSize (which streams only the
+ * header bytes, not the file), then state the width and height we actually
+ * want rendered. The browser gets a correct aspect ratio to reserve space
+ * with, and the fallback is the same size as the largest variant it would
+ * have picked from the srcset anyway.
+ *
+ * The host must also be allow-listed in astro.config.mjs under
+ * image.remotePatterns, or the build refuses to fetch it.
+ */
+interface Props {
+  /** Absolute URL of the original in the bucket. */
+  src: string;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  loading?: 'eager' | 'lazy';
+  decoding?: 'sync' | 'async' | 'auto';
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  widths,
+  sizes,
+  loading = 'lazy',
+  decoding,
+  class: className,
+} = Astro.props;
+
+const { width: originalWidth, height: originalHeight } = await inferRemoteSize(src);
+
+// Never upscale: a photo smaller than the largest requested width keeps its own.
+const width = Math.min(Math.max(...widths), originalWidth);
+const height = Math.round((width * originalHeight) / originalWidth);
+---
+
+<Image
+  src={src}
+  width={width}
+  height={height}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  loading={loading}
+  decoding={decoding}
+  class={className}
+/>

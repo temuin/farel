@@ -7,7 +7,7 @@ slug: adidas-arsenal-home-jersey
 featured: true
 description: Arsenal home jersey in red and white with raglan sleeves and club crest.
 images:
-  - ../../assets/products/adidas-arsenal-home-jersey.jpeg
+  - https://media.amaliautama.co.id/images/adidas-arsenal-home-jersey.jpeg
 ---
 
 The Arsenal home jersey, in red with contrast white raglan sleeves and a textured chevron pattern

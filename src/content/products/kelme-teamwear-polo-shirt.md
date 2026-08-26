@@ -7,7 +7,7 @@ slug: kelme-teamwear-polo-shirt
 featured: true
 description: White teamwear polo with navy colourblock sleeves and a printed Kelme graphic.
 images:
-  - ../../assets/products/kelme-teamwear-polo-shirt.jpg
+  - https://media.amaliautama.co.id/images/kelme-teamwear-polo-shirt.jpg
 ---
 
 A teamwear polo in white with navy colourblock panels across the shoulders and sleeves, finished

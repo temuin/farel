@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-samba-kids-sneakers
 description: Kids' Samba sneakers in a glitter and leather finish, for retail and gifting orders.
 images:
-  - ../../assets/products/adidas-sneakers-samba-kids-red.jpeg
+  - https://media.amaliautama.co.id/images/adidas-sneakers-samba-kids-red.jpeg
 ---
 
 A kids' sizing of the classic Samba silhouette, finished in glitter suede and leather with contrast

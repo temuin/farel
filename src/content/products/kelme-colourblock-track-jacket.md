@@ -7,7 +7,7 @@ slug: kelme-colourblock-track-jacket
 featured: true
 description: Navy and light-blue colourblock track jacket with a full front zip and Kelme branding.
 images:
-  - ../../assets/products/kelme-colourblock-track-jacket.jpg
+  - https://media.amaliautama.co.id/images/kelme-colourblock-track-jacket.jpg
 ---
 
 A full-zip track jacket in navy with light-blue and cream colourblock panels, piped in a contrast

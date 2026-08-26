@@ -6,7 +6,7 @@ sport: Football
 slug: adidas-3-stripe-pique-polo
 description: Classic pique polo with signature shoulder stripes, built for team and staff orders.
 images:
-  - ../../assets/products/adidas-polo-pique-3stripe-green.jpeg
+  - https://media.amaliautama.co.id/images/adidas-polo-pique-3stripe-green.jpeg
 ---
 
 A classic pique polo with the signature three stripes running down each shoulder. Breathable

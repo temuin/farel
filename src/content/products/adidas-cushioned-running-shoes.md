@@ -6,7 +6,7 @@ sport: Running
 slug: adidas-cushioned-running-shoes
 description: High-cushion running shoes with a lightweight knit upper, for road training.
 images:
-  - ../../assets/products/adidas-shoes-running-cushioned.jpeg
+  - https://media.amaliautama.co.id/images/adidas-shoes-running-cushioned.jpeg
 ---
 
 A high-cushion running shoe with a lightweight knit upper and a wide midsole for stable,

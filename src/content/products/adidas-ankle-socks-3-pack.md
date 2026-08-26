@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-ankle-socks-3-pack
 description: Cushioned ankle socks sold in a three-pack of black, white and grey.
 images:
-  - ../../assets/products/adidas-socks-ankle-3pack.jpeg
+  - https://media.amaliautama.co.id/images/adidas-socks-ankle-3pack.jpeg
 ---
 
 Cushioned ankle socks in a breathable knit, sold as a three-pack covering black, white and grey. A

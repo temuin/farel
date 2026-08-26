@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-floral-logo-cap
 description: White cap with a floral-embroidered logo and an adjustable strap.
 images:
-  - ../../assets/products/adidas-cap-floral-logo-white.jpeg
+  - https://media.amaliautama.co.id/images/adidas-cap-floral-logo-white.jpeg
 ---
 
 A structured six-panel cap in white cotton twill, with a floral-embroidered logo at the front and

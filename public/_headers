@@ -23,7 +23,7 @@
 /admin/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://raw.githubusercontent.com https://avatars.githubusercontent.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://unpkg.com; frame-src 'self' blob:; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://media.amaliautama.co.id https://raw.githubusercontent.com https://avatars.githubusercontent.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://unpkg.com; frame-src 'self' blob:; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
 
 # NOTE: there is deliberately no /api/* block here. Cloudflare Pages applies
 # this file to STATIC ASSETS ONLY -- a Function builds its own Response and it

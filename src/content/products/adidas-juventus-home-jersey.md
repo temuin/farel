@@ -7,7 +7,7 @@ slug: adidas-juventus-home-jersey
 featured: true
 description: Juventus home jersey in the club's classic black and white stripes, with club crest.
 images:
-  - ../../assets/products/adidas-juventus-home-jersey.jpeg
+  - https://media.amaliautama.co.id/images/adidas-juventus-home-jersey.jpeg
 ---
 
 The Juventus home jersey, in the club's classic black and white vertical stripes with a fading

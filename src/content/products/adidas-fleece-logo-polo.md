@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-fleece-logo-polo
 description: Brushed fleece polo with a bold logo band across the chest, oversized fit.
 images:
-  - ../../assets/products/adidas-polo-fleece-logo-grey.jpeg
+  - https://media.amaliautama.co.id/images/adidas-polo-fleece-logo-grey.jpeg
 ---
 
 A brushed fleece polo with a bold logo band running across the chest and down the sleeve stripes.

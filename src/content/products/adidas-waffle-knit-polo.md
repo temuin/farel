@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-waffle-knit-polo
 description: Textured knit polo with a striped hem, cropped for a modern fit.
 images:
-  - ../../assets/products/adidas-polo-knit-sage.jpeg
+  - https://media.amaliautama.co.id/images/adidas-polo-knit-sage.jpeg
 ---
 
 A textured knit polo with a soft brushed handle and a striped rib at the hem. The cropped length

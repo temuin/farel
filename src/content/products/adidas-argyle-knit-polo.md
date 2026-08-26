@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-argyle-knit-polo
 description: Argyle-pattern knit polo with contrast side stripes, for off-pitch and clubhouse wear.
 images:
-  - ../../assets/products/adidas-polo-argyle-burgundy.jpeg
+  - https://media.amaliautama.co.id/images/adidas-polo-argyle-burgundy.jpeg
 ---
 
 A knitted polo in an argyle pattern, with contrast side stripes running down the sleeve and a woven

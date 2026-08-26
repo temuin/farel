@@ -6,7 +6,7 @@ sport: Basketball
 slug: adidas-basketball-shorts
 description: Lightweight basketball shorts with a large logo hit and striped hem trim.
 images:
-  - ../../assets/products/adidas-shorts-basketball-blue.jpeg
+  - https://media.amaliautama.co.id/images/adidas-shorts-basketball-blue.jpeg
 ---
 
 Loose-fit basketball shorts in a lightweight mesh, with a large logo hit at the leg and a striped

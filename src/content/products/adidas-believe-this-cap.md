@@ -6,7 +6,7 @@ sport: Lifestyle
 slug: adidas-believe-this-cap
 description: Structured cap in brown twill with embroidered branding and an adjustable strap.
 images:
-  - ../../assets/products/adidas-cap-believe-this-brown.jpeg
+  - https://media.amaliautama.co.id/images/adidas-cap-believe-this-brown.jpeg
 ---
 
 A structured six-panel cap in brown cotton twill, with embroidered branding at the front and side.
