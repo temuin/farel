@@ -11,6 +11,7 @@ import packingPhoto from '../assets/about/packing-quality-check.jpeg';
 import { CATEGORIES, BRANDS } from '../config/catalog';
 import { getProducts } from '../lib/products';
 import { site } from '../config/site';
+import { videoUrl } from '../config/site';
 
 const products = await getProducts();
 const yearsActive = new Date().getFullYear() - site.foundedYear;
@@ -151,7 +152,7 @@ const values = [
         <div class="aspect-square overflow-hidden rounded-2xl bg-black">
           <video
             class="h-full w-full object-cover"
-            src="/videos/dispatch-delivery.mp4"
+            src={videoUrl("dispatch-delivery.mp4")}
             poster="/videos/dispatch-delivery-poster.jpg"
             aria-label="Orders being packed, labelled and dispatched from the Amalia Utama warehouse"
             autoplay

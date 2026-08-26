@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Button from '../../components/Button.astro';
@@ -25,9 +25,28 @@ const { name, brand, category, images, description } = product.data;
 const { Content } = await render(product);
 
 const [coverImage, ...secondaryImages] = images;
+
+/*
+ * Social preview card. This has to be a generated derivative, never
+ * coverImage.src: that property is the URL of the untouched upload, so
+ * referencing it makes Astro emit the full-size original into the build. The
+ * product photos are 18-28 MB camera files, which put the build over
+ * Cloudflare's 25 MB per-file limit and, long before that, past what WhatsApp
+ * and Facebook will fetch for a link preview -- so the card silently failed to
+ * render anyway. 1200x630 is the size those platforms actually want, and JPEG
+ * because WhatsApp previews still handle it more reliably than WebP.
+ */
+const ogImage = await getImage({
+  src: coverImage,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpeg',
+  quality: 78,
+});
 ---
 
-<BaseLayout title={name} description={description} image={coverImage.src}>
+<BaseLayout title={name} description={description} image={ogImage.src}>
   <div class="shell py-10 sm:py-14">
     <nav aria-label="Breadcrumb" class="text-sm text-zinc-500 dark:text-neutral-400">
       <ol class="flex flex-wrap items-center gap-2">

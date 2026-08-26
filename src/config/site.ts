@@ -59,3 +59,23 @@ export const navLinks = [
   { href: '/collections', label: 'Collections' },
   { href: '/contact', label: 'Contact' },
 ] as const;
+
+/**
+ * Where the video files are served from.
+ *
+ * Videos are the one asset class that does not belong in the repository: they
+ * are tens of megabytes each, Astro cannot optimise them the way it does
+ * images, and Cloudflare Pages rejects any single file over 25 MB. They live
+ * in an R2 bucket instead.
+ *
+ * Set MEDIA_BASE_URL at build time to the bucket's public host, with no
+ * trailing slash. Left unset, paths stay site-relative, so a checkout that
+ * still has files in public/videos/ keeps working locally.
+ *
+ * Poster images deliberately stay in the repository -- they are a few hundred
+ * kilobytes, and they are what renders before a video loads.
+ */
+const mediaBase = (process.env.MEDIA_BASE_URL ?? '').replace(/\/+$/, '');
+
+/** Builds the URL for a video file, e.g. videoUrl('running-post.mp4'). */
+export const videoUrl = (file: string) => `${mediaBase}/videos/${file}`;

@@ -15,6 +15,7 @@ import adidasGolfPhoto from '../assets/field/adidas-golf.png';
 import { BRAND_PROFILES } from '../config/catalog';
 import { getBrandPreviews, getProducts } from '../lib/products';
 import { site } from '../config/site';
+import { videoUrl } from '../config/site';
 
 const previews = await getBrandPreviews();
 const products = await getProducts();
@@ -175,7 +176,7 @@ const highlights = [
         <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
           <video
             class="h-full w-full object-cover"
-            src="/videos/delivery-handover.mp4"
+            src={videoUrl("delivery-handover.mp4")}
             poster="/videos/delivery-handover-poster.jpg"
             aria-label="Adidas gear on the terrain, supplied through Amalia Utama"
             autoplay
@@ -197,7 +198,7 @@ const highlights = [
         <div class="aspect-[9/16] overflow-hidden rounded-2xl bg-black">
           <video
             class="h-full w-full object-cover"
-            src="/videos/schneider-electric-testimonial.mp4"
+            src={videoUrl("schneider-electric-testimonial.mp4")}
             poster="/videos/schneider-electric-testimonial-poster.jpg"
             aria-label="Client testimonial from Schneider Electric Indonesia on choosing Adidas corporate wear through Amalia Utama"
             controls
@@ -208,7 +209,7 @@ const highlights = [
         <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
           <video
             class="h-full w-full object-cover"
-            src="/videos/running-post.mp4"
+            src={videoUrl("running-post.mp4")}
             poster="/videos/running-post-poster.jpg"
             aria-label="Runners wearing Adidas gear supplied through Amalia Utama"
             autoplay

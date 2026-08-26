@@ -28,3 +28,9 @@ pnpm-debug.log*
 
 # local-only Claude Code permissions (machine-specific, not for sharing)
 .claude/settings.local.json
+
+# Video files live in the R2 bucket, not the repository -- they are tens of MB
+# each and Cloudflare Pages rejects any single file over 25 MB. Poster images
+# stay tracked. Set MEDIA_BASE_URL to the bucket host at build time.
+public/videos/*.mp4
+media-upload/
