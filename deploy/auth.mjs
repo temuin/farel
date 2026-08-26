@@ -28,7 +28,22 @@
 
 const STATE_COOKIE = 'decap_oauth_state';
 const PROVIDER = 'github';
-const PBKDF2_ITERATIONS = 210000;
+/*
+ * Cloudflare Workers refuses PBKDF2 above 100,000 iterations outright --
+ * "iteration counts above 100000 are not supported" -- so this is a hard
+ * ceiling, not a tuning choice. Node has no such limit, which is exactly what
+ * made this painful to spot: a hash minted at 210,000 verifies perfectly with
+ * scripts/hash-password.mjs and then fails on the deployed site.
+ *
+ * Below OWASP's current PBKDF2-SHA256 guidance, and worth being clear-eyed
+ * about. What carries the weight instead: the hash is a Cloudflare secret
+ * rather than a row in a database, so there is no realistic path to obtaining
+ * it for offline attack; the password is machine-generated with far more
+ * entropy than iteration count can compensate for either way; and online
+ * guessing is bounded by the edge rate-limit rule, not by hashing cost.
+ */
+const PBKDF2_ITERATIONS = 100000;
+const MAX_SUPPORTED_ITERATIONS = 100000;
 
 /** Lockout after this many failures, per username, until the window passes. */
 const MAX_ATTEMPTS = 8;
@@ -139,13 +154,28 @@ function timingSafeEqual(a, b) {
 export async function verifyPassword(password, encoded) {
   const [scheme, iterations, saltB64, hashB64] = String(encoded).split('$');
   if (scheme !== 'pbkdf2' || !iterations || !saltB64 || !hashB64) return false;
+
+  let expected;
+  let salt;
   try {
-    const expected = fromBase64(hashB64);
-    const actual = await derive(password, fromBase64(saltB64), Number(iterations));
-    return timingSafeEqual(actual, expected);
+    expected = fromBase64(hashB64);
+    salt = fromBase64(saltB64);
   } catch {
+    // Unreadable base64 is a bad stored value; nothing to compare against.
     return false;
   }
+
+  /*
+   * Deliberately not wrapped in try/catch.
+   *
+   * It used to be, and a failure to derive at all came back as `false` -- the
+   * same answer as a wrong password. On Cloudflare that turned a refusal to
+   * run the KDF into "Wrong username or password", so a correct password was
+   * rejected with a message insisting the password was the problem. A runtime
+   * that cannot perform the comparison has to say so, not guess.
+   */
+  const actual = await derive(password, salt, Number(iterations));
+  return timingSafeEqual(actual, expected);
 }
 
 /** CMS_USERS is `user:hash` pairs, comma or newline separated. */
@@ -439,11 +469,30 @@ export async function handleAuthPost(request, env) {
    * deployment rather than a bad guess, and because it says nothing about which
    * usernames exist, it gives an attacker nothing either.
    */
-  if (![...users.values()].some(looksLikeHash)) {
+  const usable = [...users.values()].filter(looksLikeHash);
+  if (usable.length === 0) {
     return fail(
       'Sign-in is misconfigured: CMS_USERS contains no usable password hash. ' +
-        'It must look like username:pbkdf2$210000$<salt>$<hash> — check the ' +
+        'It must look like username:pbkdf2$100000$<salt>$<hash> — check the ' +
         'whole line was pasted, including every $ section, and redeploy.',
+    );
+  }
+
+  /*
+   * Judged across the whole of CMS_USERS rather than the entry for whoever is
+   * signing in. Keyed on one user it would answer "does this account exist",
+   * which is precisely what the identical wrong-user and wrong-password
+   * messages exist to avoid.
+   */
+  const tooManyIterations = usable.every(
+    (hash) => Number(hash.split('$')[1]) > MAX_SUPPORTED_ITERATIONS,
+  );
+  if (tooManyIterations) {
+    return fail(
+      `Sign-in is misconfigured: these password hashes were generated with more ` +
+        `than ${MAX_SUPPORTED_ITERATIONS} PBKDF2 iterations, which this host refuses ` +
+        `to compute. Regenerate with scripts/hash-password.mjs, update CMS_USERS, ` +
+        `and redeploy.`,
     );
   }
 
@@ -474,7 +523,20 @@ export async function handleAuthPost(request, env) {
   // Run the derivation even for an unknown user so a wrong username and a
   // wrong password take the same amount of time.
   const candidate = stored ?? `pbkdf2$${PBKDF2_ITERATIONS}$${toBase64(new Uint8Array(16))}$${toBase64(new Uint8Array(32))}`;
-  const ok = (await verifyPassword(password, candidate)) && Boolean(stored);
+  let ok = false;
+  try {
+    ok = (await verifyPassword(password, candidate)) && Boolean(stored);
+  } catch (problem) {
+    /*
+     * The derivation itself failed -- the host would not run the KDF. Never a
+     * statement about the password, so it must not be reported as one.
+     */
+    return fail(
+      `Sign-in cannot be completed on this host: ${problem.message}. ` +
+        `This is a server configuration problem, not a wrong password.`,
+      username,
+    );
+  }
 
   if (!ok) {
     recordFailure(username);

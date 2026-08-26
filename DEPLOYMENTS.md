@@ -72,8 +72,14 @@ the current registrar — only DNS is delegated.
 node scripts/hash-password.mjs admin
 ```
 
-Prints the `admin:pbkdf2$...` line for `CMS_USERS`. The password itself is
-never stored, so record it in a password manager at the same time.
+Prints the `admin:pbkdf2$100000$...` line for `CMS_USERS`. The password itself
+is never stored, so record it in a password manager at the same time.
+
+The iteration count is 100,000 because Cloudflare Workers refuses PBKDF2 above
+that and returns an error rather than a slow answer. Node has no such limit, so
+a hash minted at a higher count verifies perfectly on your machine and then
+fails on the deployed site. If you ever see sign-in rejecting a password you
+know is right, check the number after `pbkdf2$` first.
 
 Then, signed in as **temuin**, create a **fine-grained** PAT:
 
