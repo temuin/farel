@@ -413,8 +413,11 @@
                           name: 'whatsappNumber',
                           label: 'WhatsApp number',
                           widget: 'string',
-                          hint: 'Digits only, including country code, e.g. 6281234567890. No +, spaces or dashes.',
-                          pattern: ['^[0-9]{8,15}$', 'Digits only, 8–15 characters'],
+                          hint: 'Start with the country code 62, not a leading 0. So 0878-8101-8017 is entered as 6287881018017. Digits only, no + or dashes.',
+                          pattern: [
+                            '^62[0-9]{7,13}$',
+                            'Must start with 62 (not 0) and be digits only — e.g. 6287881018017',
+                          ],
                         },
                         {
                           name: 'phoneDisplay',
