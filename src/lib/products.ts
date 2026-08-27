@@ -47,11 +47,19 @@ export function getUsedCategories(products: Product[]): Category[] {
   return CATEGORIES.filter((category) => used.has(category));
 }
 
-/** Derived rather than authored, so frontmatter stays a plain list of paths. */
+/**
+ * Derived rather than authored, so frontmatter stays a plain list of paths.
+ *
+ * Naming the brand and category rather than saying "product photo" is what
+ * makes the text worth having: it describes the image to a screen reader, and
+ * it is the only text Google Images has to go on for a catalogue that never
+ * writes out "Kelme football jersey" in prose. The index is dropped from the
+ * first image so the main photo does not read as one of a numbered set.
+ */
 export function imageAlt(product: Product, index: number): string {
-  return index === 0
-    ? `${product.data.name} product photo`
-    : `${product.data.name} product photo ${index + 1}`;
+  const { name, brand, category } = product.data;
+  const base = `${name} — ${brand} ${category.toLowerCase()}`;
+  return index === 0 ? base : `${base}, view ${index + 1}`;
 }
 
 /**

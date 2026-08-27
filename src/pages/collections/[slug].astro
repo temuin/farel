@@ -5,7 +5,8 @@ import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Button from '../../components/Button.astro';
 import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
-import { getProducts, imageAlt, type Product } from '../../lib/products';
+import { getProducts, imageAlt, productUrl, type Product } from '../../lib/products';
+import { breadcrumbs, product as productSchema } from '../../lib/schema';
 import { productEnquiryUrl } from '../../lib/whatsapp';
 import RemoteImage from '../../components/RemoteImage.astro';
 
@@ -46,9 +47,30 @@ const ogImage = await getImage({
   format: 'jpeg',
   quality: 78,
 });
+
+const path = productUrl(product);
+
+/*
+ * The breadcrumb list mirrors the nav rendered below it, so a result in Google
+ * shows the same trail a visitor sees. The Product node carries the brand,
+ * which is the useful part: it is what lets a search for "Kelme track jacket"
+ * connect this page to both the brand and the company supplying it.
+ *
+ * The OG derivative is reused as the Product image rather than the originals
+ * in the bucket, for the same reason it exists at all -- those are 18-28 MB
+ * camera files, and nothing that fetches structured data wants one.
+ */
+const schema = [
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'Collections', path: '/collections' },
+    { name, path },
+  ]),
+  productSchema({ name, description, brand, category, images: [ogImage.src], path }),
+];
 ---
 
-<BaseLayout title={name} description={description} image={ogImage.src}>
+<BaseLayout title={name} description={description} image={ogImage.src} schema={schema}>
   <div class="shell py-10 sm:py-14">
     <nav aria-label="Breadcrumb" class="text-sm text-zinc-500 dark:text-neutral-400">
       <ol class="flex flex-wrap items-center gap-2">

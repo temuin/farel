@@ -242,8 +242,11 @@
                   name: 'description',
                   label: 'Short description',
                   widget: 'text',
-                  hint: 'One line. Shown on the product card and used as the page description in Google results. Max 200 characters.',
-                  pattern: ['^.{1,200}$', 'Keep this to 200 characters or fewer'],
+                  hint: 'One or two lines describing the item — colour, material, cut, what it is for. This is the grey text under the link in Google results, and it is what persuades someone to click, so write it for a person rather than pasting the article code. Between 50 and 200 characters.',
+                  pattern: [
+                    '^[\s\S]{50,200}$',
+                    'Between 50 and 200 characters. A product code on its own is not enough — Google shows this text under the search result.',
+                  ],
                 },
                 {
                   name: 'images',
@@ -715,7 +718,21 @@
                       name: 'legalName',
                       label: 'Legal entity name',
                       widget: 'string',
-                      hint: 'The registered name, used in the footer copyright.',
+                      hint: 'The registered name, e.g. PT Amalia Utama. Used in the footer copyright, the home page title, and to tell Google which company this site belongs to. Match it to the name on the company registration exactly.',
+                    },
+                    {
+                      name: 'alternateNames',
+                      label: 'Also known as',
+                      widget: 'list',
+                      required: false,
+                      hint: 'Other names people search for the company by. These are not shown anywhere on the page; they go into the hidden company information Google reads, so it recognises this site whichever name someone types.',
+                    },
+                    {
+                      name: 'socialProfiles',
+                      label: 'Official profiles elsewhere',
+                      widget: 'list',
+                      required: false,
+                      hint: 'Full web addresses of the company profiles you own — Instagram, LinkedIn, YouTube, a marketplace store. Start each with https://. These are how Google confirms this website belongs to the same company as those profiles, so add every one you have, and never add a page you do not control.',
                     },
                     {
                       name: 'tagline',

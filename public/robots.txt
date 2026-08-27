@@ -5,3 +5,12 @@ Allow: /
 # X-Robots-Tag: noindex, so this is belt and braces for crawlers that read it.
 Disallow: /admin
 Disallow: /api/
+
+# Written by @astrojs/sitemap at build time. The index is what to submit in
+# Google Search Console; it points at the sitemap holding the actual URLs.
+#
+# This has to be an absolute URL -- a path is ignored by every crawler that
+# reads the directive. It also means the line names the production domain even
+# on a preview deploy, which is correct: a preview should never advertise its
+# own URLs for indexing.
+Sitemap: https://amaliautama.co.id/sitemap-index.xml

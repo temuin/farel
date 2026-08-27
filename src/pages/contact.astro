@@ -6,6 +6,7 @@ import SectionHeading from '../components/SectionHeading.astro';
 import WhatsAppIcon from '../components/WhatsAppIcon.astro';
 import { addressLine, additionalPhones, contact, mapEmbedUrl, site } from '../config/site';
 import { generalEnquiryUrl } from '../lib/whatsapp';
+import { breadcrumbs, ORGANIZATION_ID } from '../lib/schema';
 
 const details = [
   {
@@ -30,11 +31,30 @@ const details = [
   { label: 'Address', value: addressLine },
   { label: 'Opening hours', value: contact.openingHours },
 ];
+
+/*
+ * The address, phone and hours rendered below are already in the Organization
+ * node on every page, so they are not repeated here. What this adds is that
+ * *this* URL is the company's contact page -- the page Google links to from a
+ * knowledge panel.
+ */
+const schema = [
+  {
+    '@type': 'ContactPage',
+    name: `Contact ${site.legalName}`,
+    mainEntity: { '@id': ORGANIZATION_ID },
+  },
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'Contact', path: '/contact' },
+  ]),
+];
 ---
 
 <BaseLayout
   title="Contact"
-  description={`Get in touch with ${site.name} on WhatsApp, by email or at our Jakarta office for Kelme and Adidas team orders.`}
+  description={`Get in touch with ${site.legalName} on WhatsApp, by email or at our Bekasi office for Kelme and Adidas team orders.`}
+  schema={schema}
 >
   <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
     <div class="shell py-16 sm:py-20">

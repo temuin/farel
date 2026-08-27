@@ -1,8 +1,11 @@
 ---
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import logoIcon from '../assets/brand/logo-icon.png';
 import { site } from '../config/site';
+import { buildGraph } from '../lib/schema';
 
 interface Props {
   /** Without the site name — the layout appends it. */
@@ -10,17 +13,55 @@ interface Props {
   description: string;
   /** Site-relative or absolute URL for social previews. */
   image?: string;
+  /**
+   * Set false when the title already names the company, so the home page does
+   * not read "… | Amalia Utama" after already having said so.
+   */
+  appendSiteName?: boolean;
+  /** Keeps a page out of search results — used by the 404 page. */
+  noindex?: boolean;
+  /**
+   * Extra JSON-LD nodes describing this page specifically, e.g. the Product on
+   * a detail page. The Organization and WebSite nodes are added for every page
+   * and should not be repeated here.
+   */
+  schema?: readonly Record<string, unknown>[];
 }
 
-const { title, description, image = '/og-default.png' } = Astro.props;
+const {
+  title,
+  description,
+  image = '/og-default.png',
+  appendSiteName = true,
+  noindex = false,
+  schema = [],
+} = Astro.props;
 
-const pageTitle = `${title} | ${site.name}`;
+const pageTitle = appendSiteName ? `${title} | ${site.name}` : title;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
 const socialImage = new URL(image, Astro.site ?? site.url);
+
+/*
+ * Google wants a real logo file for the Organization markup, not a favicon.
+ * The source is a 107 KB PNG in src/assets, so it goes through the same
+ * pipeline as every other image rather than being linked at full size.
+ */
+const logo = await getImage({ src: logoIcon, width: 512, format: 'png' });
+const jsonLd = buildGraph(logo.src, schema);
+
+/*
+ * Defaults are index,follow — stating them costs one line and removes any
+ * doubt. The max-* directives are the useful part: without them Google caps
+ * image previews to a thumbnail and snippets to its own default length, which
+ * for a catalogue means product photos do not show at full size in results.
+ */
+const robots = noindex
+  ? 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-pt-20">
+<html lang={site.language} class="scroll-pt-20">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,9 +80,11 @@ const socialImage = new URL(image, Astro.site ?? site.url);
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.language.replace('-', '_')} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -51,6 +94,9 @@ const socialImage = new URL(image, Astro.site ?? site.url);
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+
+    {/* Machine-readable identity. See src/lib/schema.ts for what and why. */}
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
   </head>
   <body class="flex min-h-screen flex-col">
     <a

@@ -33,6 +33,14 @@ const backdropState = (active: boolean) =>
     : 'pointer-events-none opacity-0 scale-[0.98] translate-y-1';
 
 /*
+ * The registered name leads the title, because the query this page most needs
+ * to win is the company's own name -- and on that search Google is choosing
+ * between domains for one entity rather than judging the copy. The layout is
+ * told not to append the site name, which the title has already said.
+ */
+const pageTitle = `${site.legalName} — Kelme & Adidas Team Sportswear Distributor`;
+
+/*
  * Wording and media on this page come from src/data/home.json, edited under
  * Site content -> Home page. The brand toggle, collection previews, client
  * marquee and testimonials render themselves from the catalogue and their own
@@ -40,7 +48,7 @@ const backdropState = (active: boolean) =>
  */
 ---
 
-<BaseLayout title="Kelme & Adidas Team Sportswear Distributor" description={site.description}>
+<BaseLayout title={pageTitle} appendSiteName={false} description={site.description}>
   {/* Viewport minus the sticky header, so it fills exactly one screen. The
       trailing 1px is the header's bottom border. */}
   <section

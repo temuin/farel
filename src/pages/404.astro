@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+
+/*
+ * Why this page exists at all.
+ *
+ * With no 404.html in the build, Cloudflare Pages answered every unknown URL
+ * with the home page and an HTTP 200. To a crawler that is not "page missing",
+ * it is "here is another copy of the home page" -- an unlimited supply of
+ * them, one per mistyped or stale link, each spending crawl budget that should
+ * have gone to the catalogue. Astro turns this file into dist/404.html, which
+ * Pages serves with a real 404 status.
+ *
+ * `noindex` is belt and braces: a correct 404 already keeps the page out of
+ * the index, but the header costs nothing and covers the case where a host
+ * serves this file at some other address.
+ */
+---
+
+<BaseLayout
+  title="Page not found"
+  description="That page does not exist. Browse the Kelme and Adidas catalogue or get in touch."
+  noindex
+>
+  <section class="shell flex min-h-[60vh] flex-col justify-center py-20">
+    <SectionHeading
+      as="h1"
+      align="center"
+      eyebrow="Error 404"
+      title="We could not find that page"
+      description="The link may be out of date, or the address mistyped. The catalogue and our contact details are both a click away."
+    />
+
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button href="/collections">Browse the catalogue</Button>
+      <Button href="/" variant="secondary">Back to home</Button>
+      <Button href="/contact" variant="secondary">Contact us</Button>
+    </div>
+  </section>
+</BaseLayout>

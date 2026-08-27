@@ -3,17 +3,35 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CollectionFilter from '../../components/CollectionFilter.astro';
 import ProductGrid from '../../components/ProductGrid.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
-import { getProducts, getUsedBrands, getUsedCategories } from '../../lib/products';
+import { getProducts, getUsedBrands, getUsedCategories, productUrl } from '../../lib/products';
+import { breadcrumbs, itemList } from '../../lib/schema';
 import { SPORTS } from '../../config/catalog';
 
 const products = await getProducts();
 const brands = getUsedBrands(products);
 const categories = getUsedCategories(products);
+
+/*
+ * The grid below is filtered client-side, so every product is in the markup
+ * whatever the filter says -- which makes an ItemList of all of them an honest
+ * description of the page rather than a snapshot of one filter state.
+ */
+const schema = [
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'Collections', path: '/collections' },
+  ]),
+  itemList({
+    name: 'Kelme and Adidas catalogue',
+    items: products.map((entry) => ({ name: entry.data.name, path: productUrl(entry) })),
+  }),
+];
 ---
 
 <BaseLayout
   title="Collections"
   description="Browse the full Kelme and Adidas catalogue — apparel, footwear and accessories for clubs, schools and retailers in Indonesia."
+  schema={schema}
 >
   <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
     <div class="shell py-16 sm:py-20">

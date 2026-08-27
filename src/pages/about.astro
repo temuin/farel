@@ -6,6 +6,7 @@ import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import RemoteImage from '../components/RemoteImage.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import { site } from '../config/site';
+import { breadcrumbs, ORGANIZATION_ID } from '../lib/schema';
 import {
   aboutStats,
   brands,
@@ -28,11 +29,29 @@ import {
  * the grid, so a half-filled page still reads as deliberate while the client
  * is gathering photography.
  */
+
+/*
+ * `mainEntity` is the point of typing this page: it says the company profile
+ * Google should read is the same Organization node every other page declares,
+ * rather than a second, unrelated company that happens to share a name.
+ */
+const schema = [
+  {
+    '@type': 'AboutPage',
+    name: `About ${site.legalName}`,
+    mainEntity: { '@id': ORGANIZATION_ID },
+  },
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+  ]),
+];
 ---
 
 <BaseLayout
   title="About"
   description={`Company profile for ${site.legalName}, an authorised Indonesian distributor of Kelme and Adidas team sportswear.`}
+  schema={schema}
 >
   <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
     <div class="shell grid gap-10 py-16 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-16">

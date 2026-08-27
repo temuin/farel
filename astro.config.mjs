@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
@@ -41,6 +42,23 @@ export default defineConfig({
    */
   site: process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? 'https://example.com',
   output: 'static',
+
+  /*
+   * Search engines need a list of the site's URLs; without one they are left to
+   * discover pages by following links, which is slow for a catalogue that grows
+   * a page per product. The integration writes /sitemap-index.xml plus the
+   * sitemap it points at, built from the pages Astro actually emitted, so it can
+   * never list a URL that does not exist. public/robots.txt names the index.
+   *
+   * /admin is a hand-written file in public/ rather than a page, so it is not in
+   * the sitemap to begin with; the filter is here so that stays true if the
+   * panel ever becomes a real route.
+   */
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/admin'),
+    }),
+  ],
 
   image: {
     /*

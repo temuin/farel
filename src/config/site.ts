@@ -14,12 +14,57 @@ import settings from '../data/settings.json';
 export const site = {
   legalName: settings.legalName,
   name: settings.name,
+  /**
+   * Other names the company is known and searched by.
+   *
+   * Search engines match entities on exact strings, and the short name in the
+   * header is not the one people type. Listing the registered form here puts
+   * it in the structured data without forcing it into every visible heading.
+   */
+  alternateNames: (settings.alternateNames ?? []).filter(
+    (entry) => entry.trim() && entry.trim() !== settings.name,
+  ),
   tagline: settings.tagline,
   description: settings.description,
   foundedYear: settings.foundedYear,
-  /** Absolute origin, no trailing slash. Overridden at build time by SITE_URL. */
-  url: 'https://example.com',
+  /** BCP 47 tag for the language the pages are written in. */
+  language: 'en-ID',
+  /**
+   * Absolute origin, no trailing slash.
+   *
+   * Reads the same two variables, in the same order, as `site` in
+   * astro.config.mjs — deliberately, so this value and the one behind
+   * `Astro.site` cannot disagree. They must not: `Astro.site` builds the
+   * canonical URL while this builds the identifiers in the structured data,
+   * and if those point at different origins the markup tells Google the
+   * company's website is somewhere other than the page it is reading.
+   *
+   * This was a literal until it started being used for more than a fallback,
+   * which meant the structured data confidently published example.com.
+   */
+  url: process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? 'https://example.com',
 };
+
+/**
+ * Profiles that already belong to this company elsewhere — Instagram,
+ * LinkedIn, a marketplace storefront.
+ *
+ * These become `sameAs` in the structured data, which is what connects this
+ * domain to the company Google already knows about from those profiles.
+ * Blank rows are dropped so a half-filled CMS list cannot emit an empty URL,
+ * and anything that is not a real absolute URL is dropped too: a malformed
+ * entry would invalidate the whole markup block, not just its own line.
+ */
+export const socialProfiles: readonly string[] = (settings.socialProfiles ?? [])
+  .map((url) => url.trim())
+  .filter((url) => {
+    if (!url) return false;
+    try {
+      return new URL(url).protocol.startsWith('http');
+    } catch {
+      return false;
+    }
+  });
 
 export interface PhoneContact {
   /** Who this number reaches, e.g. "Sales" or "Corporate orders". */
