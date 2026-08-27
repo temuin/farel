@@ -8,7 +8,9 @@
     "title": "Inside our operation",
     "video": "https://media.amaliautama.co.id/videos/dispatch-delivery.mp4",
     "description": "Where your order actually comes from — the warehouse, the packing bench and dispatch.",
-    "imageOneAlt": "Stacked and labelled stock on warehouse shelving"
+    "imageOneAlt": "Stacked and labelled stock on warehouse shelving",
+    "imageOneFocus": "Centre",
+    "imageTwoFocus": "Centre"
   },
   "brands": {
     "eyebrow": "Partner brands",
@@ -20,7 +22,8 @@
     "quote": "Our focus is growing together across sectors, teams, and every level of collaboration.",
     "name": "",
     "role": "Chief Executive Officer",
-    "photo": "https://media.amaliautama.co.id/images/img-20260823-wa0006-1-jpg.jpg"
+    "photo": "https://media.amaliautama.co.id/images/img-20260823-wa0006-1-jpg.jpg",
+    "photoFocus": "Centre"
   },
   "statement": {
     "heading": "Official distributor statement",
@@ -54,7 +57,8 @@
     "heading": "Our story",
     "body": "Built on Trust. Driven by Performance.\n\nSince 2010, PT Amalia Utama has grown from an apparel supplier into a trusted corporate and institutional distribution partner, serving organizations across Indonesia with authentic sportswear and branded apparel.\n\nToday, we support corporations, government institutions, educational organizations, sports communities, and other large institutions with complete apparel solutions, from product selection and customization, to procurement and nationwide delivery.\n\nAs an authorized B2B partner and distributor of Adidas Indonesia, we bring global brand standards and performance apparel to the corporate and institutional market. Our portfolio also includes other trusted performance and lifestyle brands, giving organizations greater flexibility to express their identity.\nWe believe corporate apparel is more than what people wear. It reflects how an organization presents itself, builds team identity, and connects with its people.\n\nWith a focus on authentic products, reliable execution, responsive service, and long-term relationships, we have supported more than 500 organizations and equipped over 50,000 team members.\nFrom individual team orders to nationwide corporate programs, PT Amalia Utama delivers apparel solutions built around performance, identity, and partnership.\n\nFrom sportswear to corporate identity. From products to partnerships.",
     "image": "https://media.amaliautama.co.id/images/whatsapp-image-2026-08-27-at-11-27-18.jpg",
-    "imageAlt": "Inside the Amalia Utama warehouse"
+    "imageAlt": "Inside the Amalia Utama warehouse",
+    "imageFocus": "Lower"
   },
   "statsTitle": "Success stories: organisations we have served",
   "hero": {
@@ -62,7 +66,8 @@
     "title": "About Amalia Utama",
     "description": "Established in 2010, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.",
     "image": "https://media.amaliautama.co.id/images/storefront.jpg",
-    "imageAlt": "The Amalia Utama team at our Adidas storefront display"
+    "imageAlt": "The Amalia Utama team at our Adidas storefront display",
+    "imageFocus": "Centre"
   },
   "stats": [
     {

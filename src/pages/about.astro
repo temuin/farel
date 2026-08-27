@@ -79,6 +79,7 @@ import {
             <RemoteImage
               src={hero.image}
               alt={hero.imageAlt}
+              focus={hero.imageFocus}
               widths={[400, 800]}
               sizes="(min-width: 1024px) 40vw, 90vw"
               loading="eager"
@@ -108,6 +109,7 @@ import {
                 <RemoteImage
                   src={ceo.photo}
                   alt={ceo.name ? `${ceo.name}, ${ceo.role}` : ceo.role}
+                  focus={ceo.photoFocus}
                   widths={[224, 448]}
                   sizes="224px"
                   class="h-full w-full object-cover"
@@ -148,6 +150,7 @@ import {
             <RemoteImage
               src={story.image}
               alt={story.imageAlt}
+              focus={story.imageFocus}
               widths={[400, 800]}
               sizes="(min-width: 1024px) 40vw, 90vw"
               class="h-full w-full object-cover"
@@ -194,6 +197,7 @@ import {
               <RemoteImage
                 src={operation.imageOne}
                 alt={operation.imageOneAlt}
+                focus={operation.imageOneFocus}
                 widths={[300, 600]}
                 sizes="(min-width: 640px) 34vw, 90vw"
                 class="h-full w-full object-cover"
@@ -209,6 +213,7 @@ import {
               <RemoteImage
                 src={operation.imageTwo}
                 alt={operation.imageTwoAlt}
+                focus={operation.imageTwoFocus}
                 widths={[300, 600]}
                 sizes="(min-width: 640px) 34vw, 90vw"
                 class="h-full w-full object-cover"

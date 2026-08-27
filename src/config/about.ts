@@ -14,6 +14,10 @@
  * `clean()` and the page skips the block rather than rendering an empty frame.
  */
 import data from '../data/about.json';
+import type { CropFocus } from '../components/RemoteImage.astro';
+
+/** Falls back to the middle, which is what `cover` would have done anyway. */
+const focus = (value: string | undefined): CropFocus => (value as CropFocus) || 'Centre';
 
 /** Blank and whitespace-only both mean "not set" coming out of the CMS. */
 const clean = (value: string | undefined): string | undefined =>
@@ -37,6 +41,7 @@ export const hero = {
   description: data.hero.description,
   image: clean(data.hero.image),
   imageAlt: data.hero.imageAlt,
+  imageFocus: focus(data.hero.imageFocus),
 };
 
 export const statsTitle: string = data.statsTitle;
@@ -50,6 +55,7 @@ export const ceo = clean(data.ceo?.quote)
       name: clean(data.ceo.name),
       role: data.ceo.role,
       photo: clean(data.ceo.photo),
+      photoFocus: focus(data.ceo.photoFocus),
     }
   : undefined;
 
@@ -70,6 +76,7 @@ export const story = {
   paragraphs: paragraphsOf(data.story.body),
   image: clean(data.story.image),
   imageAlt: data.story.imageAlt,
+  imageFocus: focus(data.story.imageFocus),
 };
 
 export const statement = {
@@ -85,8 +92,10 @@ export const operation = {
   description: data.operation.description,
   imageOne: clean(data.operation.imageOne),
   imageOneAlt: data.operation.imageOneAlt,
+  imageOneFocus: focus(data.operation.imageOneFocus),
   imageTwo: clean(data.operation.imageTwo),
   imageTwoAlt: data.operation.imageTwoAlt,
+  imageTwoFocus: focus(data.operation.imageTwoFocus),
   /** Absolute URL in the bucket, chosen through the panel's video picker. */
   video: clean(data.operation.video),
   videoAlt: data.operation.videoAlt,

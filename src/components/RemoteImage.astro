@@ -26,6 +26,26 @@ import { Image, inferRemoteSize } from 'astro:assets';
  * The host must also be allow-listed in astro.config.mjs under
  * image.remotePatterns, or the build refuses to fetch it.
  */
+/**
+ * Where the crop is anchored when the photo and its frame are different
+ * shapes -- which, with portrait photography in square and landscape frames,
+ * is most of the time. `cover` keeps the middle by default, and the middle is
+ * frequently the least interesting part: a tall shot of an office wall
+ * centres on the ceiling.
+ *
+ * Spelled out rather than built from a value, because Tailwind only sees
+ * class names that appear literally in the source.
+ */
+export const CROP_FOCUS = {
+  Top: 'object-top',
+  Upper: 'object-[center_25%]',
+  Centre: 'object-center',
+  Lower: 'object-[center_75%]',
+  Bottom: 'object-bottom',
+} as const;
+
+export type CropFocus = keyof typeof CROP_FOCUS;
+
 interface Props {
   /** Absolute URL of the original in the bucket. */
   src: string;
@@ -34,6 +54,8 @@ interface Props {
   sizes: string;
   loading?: 'eager' | 'lazy';
   decoding?: 'sync' | 'async' | 'auto';
+  /** Which part of the photo to keep when the frame crops it. */
+  focus?: CropFocus;
   class?: string;
 }
 
@@ -44,8 +66,11 @@ const {
   sizes,
   loading = 'lazy',
   decoding,
+  focus = 'Centre',
   class: className,
 } = Astro.props;
+
+const focusClass = CROP_FOCUS[focus] ?? CROP_FOCUS.Centre;
 
 const { width: originalWidth, height: originalHeight } = await inferRemoteSize(src);
 
@@ -63,5 +88,5 @@ const height = Math.round((width * originalHeight) / originalWidth);
   sizes={sizes}
   loading={loading}
   decoding={decoding}
-  class={className}
+  class:list={[className, focusClass]}
 />

@@ -474,6 +474,16 @@
                           widget: 'string',
                           hint: 'Describes the photo for screen readers and search engines.',
                         },
+                        {
+                          name: 'imageFocus',
+                          label: 'Crop focus',
+                          widget: 'select',
+                          options: ['Top', 'Upper', 'Centre', 'Lower', 'Bottom'],
+                          default: 'Centre',
+                          required: false,
+                          hint: 'Which part of the photo to keep when it does not match the frame shape. A tall photo in a wide frame often centres on the ceiling — try Lower or Bottom.',
+                        },
+
                       ],
                     },
                     {
@@ -522,6 +532,16 @@
                           required: false,
                           hint: 'Optional portrait. A roughly square photo works best.',
                         },
+                        {
+                          name: 'photoFocus',
+                          label: 'Crop focus',
+                          widget: 'select',
+                          options: ['Top', 'Upper', 'Centre', 'Lower', 'Bottom'],
+                          default: 'Centre',
+                          required: false,
+                          hint: 'Which part of the photo to keep when it does not match the frame shape. A tall photo in a wide frame often centres on the ceiling — try Lower or Bottom.',
+                        },
+
                       ],
                     },
                     {
@@ -544,6 +564,16 @@
                           hint: 'Wide landscape shape. Leave blank to show a placeholder.',
                         },
                         { name: 'imageAlt', label: 'Photo description', widget: 'string' },
+                        {
+                          name: 'imageFocus',
+                          label: 'Crop focus',
+                          widget: 'select',
+                          options: ['Top', 'Upper', 'Centre', 'Lower', 'Bottom'],
+                          default: 'Centre',
+                          required: false,
+                          hint: 'Which part of the photo to keep when it does not match the frame shape. A tall photo in a wide frame often centres on the ceiling — try Lower or Bottom.',
+                        },
+
                       ],
                     },
                     {
@@ -590,6 +620,16 @@
                         },
                         { name: 'imageOneAlt', label: 'First photo description', widget: 'string' },
                         {
+                          name: 'imageOneFocus',
+                          label: 'Crop focus',
+                          widget: 'select',
+                          options: ['Top', 'Upper', 'Centre', 'Lower', 'Bottom'],
+                          default: 'Centre',
+                          required: false,
+                          hint: 'Which part of the photo to keep when it does not match the frame shape. A tall photo in a wide frame often centres on the ceiling — try Lower or Bottom.',
+                        },
+
+                        {
                           name: 'imageTwo',
                           label: 'Second photo',
                           widget: 'image',
@@ -597,6 +637,16 @@
                           hint: 'Square shape works best.',
                         },
                         { name: 'imageTwoAlt', label: 'Second photo description', widget: 'string' },
+                        {
+                          name: 'imageTwoFocus',
+                          label: 'Crop focus',
+                          widget: 'select',
+                          options: ['Top', 'Upper', 'Centre', 'Lower', 'Bottom'],
+                          default: 'Centre',
+                          required: false,
+                          hint: 'Which part of the photo to keep when it does not match the frame shape. A tall photo in a wide frame often centres on the ceiling — try Lower or Bottom.',
+                        },
+
                         {
                           name: 'video',
                           label: 'Video',
