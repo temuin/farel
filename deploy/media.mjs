@@ -159,6 +159,26 @@ export async function handleMedia(request, env) {
     const kind = url.searchParams.get('kind') === 'video' ? 'video' : 'image';
     const prefix = PREFIX[kind];
     const listed = await bucket.list({ prefix, limit: 1000 });
+    /*
+     * Which thumbnails exist is settled here against the bucket, not left for
+     * the browser to discover by trying one and handling the failure.
+     *
+     * Letting it fail in the browser looked cheaper until the misses started
+     * being cached: a request for a thumbnail that does not exist yet gets a
+     * 404 held at the edge for four hours, so the tile keeps falling back to
+     * the multi-megabyte original long after the thumbnail was created. A head
+     * against R2 from inside the same network costs almost nothing and is
+     * always current.
+     */
+    const thumbs =
+      kind === 'image'
+        ? new Set(
+            (await bucket.list({ prefix: PREFIX.thumb, limit: 1000 })).objects.map((object) =>
+              object.key.slice(PREFIX.thumb.length),
+            ),
+          )
+        : new Set();
+
     const files = listed.objects
       .map((object) => {
         const name = object.key.slice(prefix.length);
@@ -166,13 +186,7 @@ export async function handleMedia(request, env) {
           key: object.key,
           name,
           url: publicUrl(object.key),
-          /*
-           * Offered by convention rather than looked up: checking each key
-           * would be an extra round trip per file. The picker falls back to
-           * the original if a thumbnail turns out not to exist, which is what
-           * happens for anything uploaded before thumbnails existed.
-           */
-          thumbUrl: kind === 'image' ? publicUrl(`${PREFIX.thumb}${name}`) : undefined,
+          thumbUrl: thumbs.has(name) ? publicUrl(`${PREFIX.thumb}${name}`) : undefined,
           size: object.size,
           uploaded: object.uploaded,
         };

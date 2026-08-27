@@ -56,13 +56,15 @@ let failed = 0;
 let savedBytes = 0;
 
 for (const file of files) {
-  // A HEAD is far cheaper than regenerating, and most runs are re-runs.
-  if (!force) {
-    const existing = await fetch(file.thumbUrl, { method: 'HEAD' });
-    if (existing.ok) {
-      skipped += 1;
-      continue;
-    }
+  /*
+   * The listing already says whether a thumbnail exists, resolved against the
+   * bucket itself. An earlier version probed the public URL instead, which
+   * meant every miss left a 404 cached at the edge for four hours -- so the
+   * thumbnails were created and then hidden behind their own cached absence.
+   */
+  if (!force && file.thumbUrl) {
+    skipped += 1;
+    continue;
   }
 
   try {
