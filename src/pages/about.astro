@@ -91,13 +91,20 @@ import {
         <div class="shell py-14 sm:py-16">
           <div class="flex flex-col gap-8 sm:flex-row sm:items-center">
             {ceo.photo && (
-              <img
-                src={ceo.photo}
-                alt={ceo.name ? `${ceo.name}, ${ceo.role}` : ceo.role}
-                loading="lazy"
-                decoding="async"
-                class="h-48 w-48 shrink-0 rounded-2xl object-cover sm:h-56 sm:w-56"
-              />
+              /*
+               * Through the optimiser rather than a plain <img>: this is a
+               * photo somebody uploads from a phone, so the original is likely
+               * to be a megabyte or two for a box rendered at 224px.
+               */
+              <div class="h-48 w-48 shrink-0 overflow-hidden rounded-2xl sm:h-56 sm:w-56">
+                <RemoteImage
+                  src={ceo.photo}
+                  alt={ceo.name ? `${ceo.name}, ${ceo.role}` : ceo.role}
+                  widths={[224, 448]}
+                  sizes="224px"
+                  class="h-full w-full object-cover"
+                />
+              </div>
             )}
             <div>
               <h2 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
