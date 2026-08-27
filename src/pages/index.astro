@@ -163,19 +163,19 @@ const highlights = [
         Photos from the field
       </p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="aspect-square overflow-hidden rounded-2xl">
+        <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
           <Image
             src={teamWearingKitPhoto}
             alt="Team members wearing Kelme polo shirts supplied through Amalia Utama"
             widths={[300, 600]}
             sizes="(min-width: 640px) 25vw, 90vw"
             loading="lazy"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
           />
         </div>
         <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
           <video
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
             src={videoUrl("delivery-handover.mp4")}
             poster="/videos/delivery-handover-poster.jpg"
             aria-label="Adidas gear on the terrain, supplied through Amalia Utama"
@@ -192,12 +192,12 @@ const highlights = [
             widths={[300, 600]}
             sizes="(min-width: 640px) 25vw, 90vw"
             loading="lazy"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
           />
         </div>
         <div class="aspect-[9/16] overflow-hidden rounded-2xl bg-black">
           <video
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
             src={videoUrl("schneider-electric-testimonial.mp4")}
             poster="/videos/schneider-electric-testimonial-poster.jpg"
             aria-label="Client testimonial from Schneider Electric Indonesia on choosing Adidas corporate wear through Amalia Utama"
@@ -208,7 +208,7 @@ const highlights = [
         </div>
         <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
           <video
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
             src={videoUrl("running-post.mp4")}
             poster="/videos/running-post-poster.jpg"
             aria-label="Runners wearing Adidas gear supplied through Amalia Utama"
@@ -225,7 +225,7 @@ const highlights = [
             widths={[300, 600]}
             sizes="(min-width: 640px) 25vw, 90vw"
             loading="lazy"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
           />
         </div>
       </div>

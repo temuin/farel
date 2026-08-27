@@ -67,7 +67,7 @@ const ogImage = await getImage({
             widths={[600, 1000]}
             sizes="(min-width: 1024px) 560px, 92vw"
             loading="eager"
-            class="h-full w-full object-cover"
+            class="h-full w-full object-contain"
           />
         </div>
 
@@ -81,7 +81,7 @@ const ogImage = await getImage({
                     alt={imageAlt(product, index + 1)}
                     widths={[200, 400]}
                     sizes="(min-width: 1024px) 180px, 30vw"
-                    class="h-full w-full object-cover"
+                    class="h-full w-full object-contain"
                   />
                 </li>
               ))}

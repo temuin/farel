@@ -65,7 +65,7 @@ import {
         </dl>
       </div>
 
-      <div class="aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-[4/5]">
+      <div class="aspect-[4/3] overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800 lg:aspect-[4/5]">
         {
           hero.image ? (
             <RemoteImage
@@ -74,10 +74,10 @@ import {
               widths={[400, 800]}
               sizes="(min-width: 1024px) 40vw, 90vw"
               loading="eager"
-              class="h-full w-full object-cover"
+              class="h-auto w-full"
             />
           ) : (
-            <MediaPlaceholder label="Company photo" class="h-full w-full" />
+            <MediaPlaceholder label="Company photo" class="aspect-[4/5] w-full" />
           )
         }
       </div>
@@ -96,13 +96,13 @@ import {
                * photo somebody uploads from a phone, so the original is likely
                * to be a megabyte or two for a box rendered at 224px.
                */
-              <div class="h-48 w-48 shrink-0 overflow-hidden rounded-2xl sm:h-56 sm:w-56">
+              <div class="h-48 w-48 shrink-0 overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800 sm:h-56 sm:w-56">
                 <RemoteImage
                   src={ceo.photo}
                   alt={ceo.name ? `${ceo.name}, ${ceo.role}` : ceo.role}
                   widths={[224, 448]}
                   sizes="224px"
-                  class="h-full w-full object-cover"
+                  class="h-auto w-full"
                 />
               </div>
             )}
@@ -134,7 +134,7 @@ import {
     </div>
 
     <div class="flex flex-col gap-6">
-      <div class="aspect-video overflow-hidden rounded-2xl">
+      <div class="overflow-hidden rounded-2xl">
         {
           story.image ? (
             <RemoteImage
@@ -142,10 +142,10 @@ import {
               alt={story.imageAlt}
               widths={[400, 800]}
               sizes="(min-width: 1024px) 40vw, 90vw"
-              class="h-full w-full object-cover"
+              class="h-auto w-full"
             />
           ) : (
-            <MediaPlaceholder label="Warehouse or office interior" class="h-full w-full" />
+            <MediaPlaceholder label="Warehouse or office interior" class="aspect-video w-full" />
           )
         }
       </div>
@@ -180,7 +180,7 @@ import {
         description={operation.description}
       />
       <div class="mt-10 grid gap-6 sm:grid-cols-3">
-        <div class="aspect-square overflow-hidden rounded-2xl">
+        <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
           {
             operation.imageOne ? (
               <RemoteImage
@@ -188,14 +188,14 @@ import {
                 alt={operation.imageOneAlt}
                 widths={[300, 600]}
                 sizes="(min-width: 640px) 34vw, 90vw"
-                class="h-full w-full object-cover"
+                class="h-full w-full object-contain"
               />
             ) : (
               <MediaPlaceholder label="Operations photo" class="h-full w-full" />
             )
           }
         </div>
-        <div class="aspect-square overflow-hidden rounded-2xl">
+        <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
           {
             operation.imageTwo ? (
               <RemoteImage
@@ -203,7 +203,7 @@ import {
                 alt={operation.imageTwoAlt}
                 widths={[300, 600]}
                 sizes="(min-width: 640px) 34vw, 90vw"
-                class="h-full w-full object-cover"
+                class="h-full w-full object-contain"
               />
             ) : (
               <MediaPlaceholder label="Operations photo" class="h-full w-full" />
@@ -214,7 +214,7 @@ import {
           {
             operation.video ? (
               <video
-                class="h-full w-full object-cover"
+                class="h-full w-full object-contain"
                 src={operation.video}
                 poster="/videos/dispatch-delivery-poster.jpg"
                 aria-label={operation.videoAlt}
