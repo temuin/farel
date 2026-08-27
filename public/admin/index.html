@@ -313,6 +313,64 @@
                   ],
                 },
                 {
+                  name: 'about',
+                  label: 'About page',
+                  file: 'src/data/about.json',
+                  description:
+                    'The figures and the CEO quote on the About page. Wording, numbers and the photo can all be changed here without a developer.',
+                  fields: [
+                    {
+                      name: 'statsTitle',
+                      label: 'Heading above the figures',
+                      widget: 'string',
+                      hint: 'e.g. Kisah Sukses: Organisasi yang Telah Kami Layani',
+                    },
+                    {
+                      name: 'stats',
+                      label: 'Figures',
+                      label_singular: 'Figure',
+                      widget: 'list',
+                      summary: '{{fields.value}} - {{fields.label}}',
+                      hint: 'Shown down the left of the About page. Drag to reorder.',
+                      fields: [
+                        {
+                          name: 'value',
+                          label: 'The number',
+                          widget: 'string',
+                          hint: 'Shown large, e.g. 500+ or 98% or 15 Tahun.',
+                        },
+                        { name: 'label', label: 'Short title', widget: 'string' },
+                        { name: 'body', label: 'Description', widget: 'text' },
+                      ],
+                    },
+                    {
+                      name: 'ceo',
+                      label: 'CEO quote',
+                      widget: 'object',
+                      hint: 'Leave the quote empty to hide this panel entirely.',
+                      fields: [
+                        { name: 'heading', label: 'Panel heading', widget: 'string' },
+                        { name: 'quote', label: 'Quote', widget: 'text', required: false },
+                        {
+                          name: 'name',
+                          label: 'Name',
+                          widget: 'string',
+                          required: false,
+                          hint: 'Optional. Leave blank to show only the job title.',
+                        },
+                        { name: 'role', label: 'Job title', widget: 'string' },
+                        {
+                          name: 'photo',
+                          label: 'Photo',
+                          widget: 'image',
+                          required: false,
+                          hint: 'Optional portrait. A roughly square photo works best. Leave blank for text only.',
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
                   name: 'settings',
                   label: 'Company details',
                   file: 'src/data/settings.json',

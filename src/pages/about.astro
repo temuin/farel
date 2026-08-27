@@ -8,20 +8,19 @@ import SectionHeading from '../components/SectionHeading.astro';
 import storefrontPhoto from '../assets/about/storefront.jpeg';
 import warehousePhoto from '../assets/about/warehouse-shelving.jpeg';
 import packingPhoto from '../assets/about/packing-quality-check.jpeg';
-import { CATEGORIES, BRANDS } from '../config/catalog';
-import { getProducts } from '../lib/products';
 import { site } from '../config/site';
 import { videoUrl } from '../config/site';
+import { aboutStats, ceo, statsTitle } from '../config/about';
 
-const products = await getProducts();
+/** Still derived, because the "Our story" prose reads better with a live number. */
 const yearsActive = new Date().getFullYear() - site.foundedYear;
 
-const stats = [
-  { value: `${yearsActive}+`, label: 'Years in business' },
-  { value: String(BRANDS.length), label: 'Authorised brands' },
-  { value: String(CATEGORIES.length), label: 'Product categories' },
-  { value: String(products.length), label: 'Products in catalogue' },
-];
+/*
+ * The figures on this page used to be derived from the catalogue -- years
+ * since foundedYear, number of brands, number of products. They are now the
+ * client's own commercial claims, which nothing in the repository can compute,
+ * so they come from src/data/about.json and are edited in the admin panel.
+ */
 
 const values = [
   {
@@ -53,13 +52,20 @@ const values = [
           description={`Established in ${site.foundedYear}, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.`}
         />
 
-        <dl class="mt-10 grid grid-cols-2 gap-x-6 gap-y-8">
+        <h2 class="mt-10 text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
+          {statsTitle}
+        </h2>
+
+        <dl class="mt-6 divide-y divide-neutral-200 dark:divide-neutral-800">
           {
-            stats.map((stat) => (
-              <div>
-                <dt class="text-3xl font-bold tracking-tight text-accent-600 dark:text-accent-500">{stat.value}</dt>
-                <dd class="mt-1 text-xs font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
-                  {stat.label}
+            aboutStats.map((stat) => (
+              <div class="grid grid-cols-[auto_1fr] gap-x-5 py-5 first:pt-0 last:pb-0">
+                <dt class="text-2xl font-bold tracking-tight text-accent-600 tabular-nums sm:text-3xl dark:text-accent-500">
+                  {stat.value}
+                </dt>
+                <dd>
+                  <p class="text-base font-semibold text-neutral-900 dark:text-white">{stat.label}</p>
+                  <p class="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{stat.body}</p>
                 </dd>
               </div>
             ))
@@ -79,6 +85,45 @@ const values = [
       </div>
     </div>
   </section>
+
+  {
+    /*
+     * Rendered only when a quote has been entered, so the page never shows an
+     * empty framed panel while the client is still settling on the wording.
+     * The portrait is likewise optional -- without one the quote simply runs
+     * full width rather than leaving a grey placeholder.
+     */
+    ceo && (
+      <section class="border-b border-neutral-200 dark:border-neutral-800">
+        <div class="shell py-14 sm:py-16">
+          <div class="flex flex-col gap-8 sm:flex-row sm:items-center">
+            {ceo.photo && (
+              <img
+                src={ceo.photo}
+                alt={ceo.name ? `${ceo.name}, ${ceo.role}` : ceo.role}
+                loading="lazy"
+                decoding="async"
+                class="h-48 w-48 shrink-0 rounded-2xl object-cover sm:h-56 sm:w-56"
+              />
+            )}
+            <div>
+              <h2 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                {ceo.heading}
+              </h2>
+              <blockquote class="mt-4 max-w-2xl text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">
+                &ldquo;{ceo.quote}&rdquo;
+              </blockquote>
+              <p class="mt-4 text-sm font-semibold text-neutral-900 dark:text-white">
+                {ceo.name && <span>{ceo.name}</span>}
+                {ceo.name && <span aria-hidden="true" class="mx-2 text-neutral-300 dark:text-neutral-700">/</span>}
+                <span class="font-medium text-neutral-500 dark:text-neutral-400">{ceo.role}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="shell grid gap-12 py-16 sm:py-20 lg:grid-cols-2">
     <div class="space-y-5 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
