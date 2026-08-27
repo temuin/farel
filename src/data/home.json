@@ -1,0 +1,97 @@
+{
+  "hero": {
+    "title": "Elevate Your Team with Branded Apparel from a Partner You Can Trust.",
+    "body": "Your people are an extension of your brand. Make every appearance count with premium corporate apparel and teamwear from Adidas and Kelme, delivered through a trusted B2B distribution partner. Amalia Utama provides reliable, end-to-end apparel solutions designed to strengthen your corporate identity and bring your team together.",
+    "primaryLabel": "Request a quote",
+    "primaryHref": "/contact",
+    "secondaryLabel": "Browse the catalogue",
+    "secondaryHref": "/collections"
+  },
+  "highlights": [
+    {
+      "value": "Two brands",
+      "label": "Kelme and Adidas under one supplier"
+    },
+    {
+      "value": "Full size runs",
+      "label": "Youth through adult sizing held in stock"
+    },
+    {
+      "value": "Team orders",
+      "label": "Crest, number and sponsor application"
+    },
+    {
+      "value": "Nationwide",
+      "label": "Shipping across Indonesia"
+    }
+  ],
+  "collections": {
+    "eyebrow": "Collections",
+    "title": "A look at what we carry",
+    "description": "Switch between brands to preview the range. The full catalogue lives in Collections.",
+    "buttonLabel": "See all products",
+    "buttonHref": "/collections"
+  },
+  "trusted": {
+    "eyebrow": "Trusted by",
+    "title": "Used by large organisations",
+    "description": "From multinationals and government agencies to sports clubs, teams across Indonesia order their apparel through us."
+  },
+  "stories": {
+    "eyebrow": "Client stories",
+    "title": "What teams say about working with us"
+  },
+  "gallery": {
+    "heading": "Photos from the field",
+    "tiles": [
+      {
+        "shape": "Square",
+        "image": "https://media.amaliautama.co.id/images/team-wearing-kit.jpg",
+        "video": "",
+        "alt": "Team members wearing Kelme polo shirts supplied through Amalia Utama",
+        "playback": "Loop silently"
+      },
+      {
+        "shape": "Portrait",
+        "image": "",
+        "video": "https://media.amaliautama.co.id/videos/delivery-handover.mp4",
+        "alt": "Adidas gear on the terrain, supplied through Amalia Utama",
+        "playback": "Loop silently"
+      },
+      {
+        "shape": "Portrait",
+        "image": "https://media.amaliautama.co.id/images/matchday-action-shot.png",
+        "video": "",
+        "alt": "Runners wearing Adidas gear supplied through Amalia Utama",
+        "playback": "Loop silently"
+      },
+      {
+        "shape": "Tall",
+        "image": "",
+        "video": "https://media.amaliautama.co.id/videos/schneider-electric-testimonial.mp4",
+        "alt": "Client testimonial from Schneider Electric Indonesia on choosing Adidas corporate wear through Amalia Utama",
+        "playback": "Play on click"
+      },
+      {
+        "shape": "Portrait",
+        "image": "",
+        "video": "https://media.amaliautama.co.id/videos/running-post.mp4",
+        "alt": "Runners wearing Adidas gear supplied through Amalia Utama",
+        "playback": "Loop silently"
+      },
+      {
+        "shape": "Portrait",
+        "image": "https://media.amaliautama.co.id/images/adidas-golf.png",
+        "video": "",
+        "alt": "Adidas golf apparel supplied through Amalia Utama",
+        "playback": "Loop silently"
+      }
+    ]
+  },
+  "closing": {
+    "title": "Planning kit for the coming season?",
+    "body": "Send us your sizes and quantities and we will come back with a quote and current stock.",
+    "buttonLabel": "Get in touch",
+    "buttonHref": "/contact"
+  }
+}

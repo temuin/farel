@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BrandShowcase from '../components/BrandShowcase.astro';
 import Button from '../components/Button.astro';
@@ -7,15 +6,22 @@ import ClientMarquee from '../components/ClientMarquee.astro';
 import CollectionPreview from '../components/CollectionPreview.astro';
 import HeroPhotoWall from '../components/HeroPhotoWall.astro';
 import LogoMarqueeBackdrop from '../components/LogoMarqueeBackdrop.astro';
+import RemoteImage from '../components/RemoteImage.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Testimonials from '../components/Testimonials.astro';
-import teamWearingKitPhoto from '../assets/field/team-wearing-kit.jpg';
-import matchdayActionPhoto from '../assets/field/matchday-action-shot.png';
-import adidasGolfPhoto from '../assets/field/adidas-golf.png';
 import { BRAND_PROFILES } from '../config/catalog';
 import { getBrandPreviews, getProducts } from '../lib/products';
 import { site } from '../config/site';
-import { videoUrl } from '../config/site';
+import {
+  TILE_ASPECT,
+  closing,
+  collections,
+  gallery,
+  hero,
+  highlights,
+  stories,
+  trusted,
+} from '../config/home';
 
 const previews = await getBrandPreviews();
 const products = await getProducts();
@@ -26,12 +32,12 @@ const backdropState = (active: boolean) =>
     ? 'opacity-100 scale-100 translate-y-0'
     : 'pointer-events-none opacity-0 scale-[0.98] translate-y-1';
 
-const highlights = [
-  { value: 'Two brands', label: 'Kelme and Adidas under one supplier' },
-  { value: 'Full size runs', label: 'Youth through adult sizing held in stock' },
-  { value: 'Team orders', label: 'Crest, number and sponsor application' },
-  { value: 'Nationwide', label: 'Shipping across Indonesia' },
-];
+/*
+ * Wording and media on this page come from src/data/home.json, edited under
+ * Site content -> Home page. The brand toggle, collection previews, client
+ * marquee and testimonials render themselves from the catalogue and their own
+ * data, so they are not duplicated as fields.
+ */
 ---
 
 <BaseLayout title="Kelme & Adidas Team Sportswear Distributor" description={site.description}>
@@ -54,17 +60,14 @@ const highlights = [
         <h1
           class="mt-5 text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
         >
-          Elevate Your Team with Branded Apparel from a Partner You Can Trust.
+          {hero.title}
         </h1>
-        <p class="mt-6 max-w-xl text-lg leading-relaxed text-neutral-300">
-          Your people are an extension of your brand. Make every appearance count with premium
-          corporate apparel and teamwear from Adidas and Kelme, delivered through a trusted B2B
-          distribution partner. Amalia Utama provides reliable, end-to-end apparel solutions
-          designed to strengthen your corporate identity and bring your team together.
-        </p>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-neutral-300">{hero.body}</p>
         <div class="mt-10 flex flex-wrap gap-3">
-          <Button href="/contact">Request a quote</Button>
-          <Button href="/collections" variant="inverted">Browse the catalogue</Button>
+          {hero.primaryLabel && <Button href={hero.primaryHref}>{hero.primaryLabel}</Button>}
+          {hero.secondaryLabel && (
+            <Button href={hero.secondaryHref} variant="inverted">{hero.secondaryLabel}</Button>
+          )}
         </div>
       </div>
     </div>
@@ -126,11 +129,13 @@ const highlights = [
   <section class="shell pb-16 sm:pb-20">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <SectionHeading
-        eyebrow="Collections"
-        title="A look at what we carry"
-        description="Switch between brands to preview the range. The full catalogue lives in Collections."
+        eyebrow={collections.eyebrow}
+        title={collections.title}
+        description={collections.description}
       />
-      <Button href="/collections" variant="secondary">See all products</Button>
+      {collections.buttonLabel && (
+        <Button href={collections.buttonHref} variant="secondary">{collections.buttonLabel}</Button>
+      )}
     </div>
 
     <div class="mt-10">
@@ -141,9 +146,9 @@ const highlights = [
   <section class="border-t border-neutral-200 py-16 sm:py-20 dark:border-neutral-800">
     <div class="shell">
       <SectionHeading
-        eyebrow="Trusted by"
-        title="Used by large organisations"
-        description="From multinationals and government agencies to sports clubs, teams across Indonesia order their apparel through us."
+        eyebrow={trusted.eyebrow}
+        title={trusted.title}
+        description={trusted.description}
         align="center"
       />
     </div>
@@ -152,7 +157,7 @@ const highlights = [
     </div>
 
     <div class="shell mt-16">
-      <SectionHeading eyebrow="Client stories" title="What teams say about working with us" align="center" />
+      <SectionHeading eyebrow={stories.eyebrow} title={stories.title} align="center" />
       <div class="mt-10">
         <Testimonials />
       </div>
@@ -160,74 +165,59 @@ const highlights = [
 
     <div class="shell mt-16">
       <p class="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase dark:text-neutral-400">
-        Photos from the field
+        {gallery.heading}
       </p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="aspect-square overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
-          <Image
-            src={teamWearingKitPhoto}
-            alt="Team members wearing Kelme polo shirts supplied through Amalia Utama"
-            widths={[300, 600]}
-            sizes="(min-width: 640px) 25vw, 90vw"
-            loading="lazy"
-            class="h-full w-full object-contain"
-          />
-        </div>
-        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
-          <video
-            class="h-full w-full object-contain"
-            src={videoUrl("delivery-handover.mp4")}
-            poster="/videos/delivery-handover-poster.jpg"
-            aria-label="Adidas gear on the terrain, supplied through Amalia Utama"
-            autoplay
-            muted
-            loop
-            playsinline
-          />
-        </div>
-        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
-          <Image
-            src={matchdayActionPhoto}
-            alt="Runners wearing Adidas gear supplied through Amalia Utama"
-            widths={[300, 600]}
-            sizes="(min-width: 640px) 25vw, 90vw"
-            loading="lazy"
-            class="h-full w-full object-contain"
-          />
-        </div>
-        <div class="aspect-[9/16] overflow-hidden rounded-2xl bg-black">
-          <video
-            class="h-full w-full object-contain"
-            src={videoUrl("schneider-electric-testimonial.mp4")}
-            poster="/videos/schneider-electric-testimonial-poster.jpg"
-            aria-label="Client testimonial from Schneider Electric Indonesia on choosing Adidas corporate wear through Amalia Utama"
-            controls
-            preload="metadata"
-            playsinline
-          />
-        </div>
-        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-black">
-          <video
-            class="h-full w-full object-contain"
-            src={videoUrl("running-post.mp4")}
-            poster="/videos/running-post-poster.jpg"
-            aria-label="Runners wearing Adidas gear supplied through Amalia Utama"
-            autoplay
-            muted
-            loop
-            playsinline
-          />
-        </div>
-        <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
-          <Image
-            src={adidasGolfPhoto}
-            alt="Adidas golf apparel supplied through Amalia Utama"
-            widths={[300, 600]}
-            sizes="(min-width: 640px) 25vw, 90vw"
-            loading="lazy"
-            class="h-full w-full object-contain"
-          />
-        </div>
+        {
+          /*
+           * One list covering both photos and clips. A tile renders whichever
+           * it has, video first, so switching a photo for a clip is a matter
+           * of filling in one field rather than moving the tile somewhere
+           * else. Shape is chosen per tile because the grid deliberately
+           * mixes square, portrait and tall.
+           */
+          gallery.tiles.map((tile) => (
+            <div
+              class:list={[
+                TILE_ASPECT[tile.shape],
+                'overflow-hidden rounded-2xl',
+                tile.video ? 'bg-black' : 'bg-neutral-100 dark:bg-neutral-800',
+              ]}
+            >
+              {tile.video ? (
+                tile.loops ? (
+                  <video
+                    class="h-full w-full object-contain"
+                    src={tile.video}
+                    aria-label={tile.alt}
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                  />
+                ) : (
+                  /* preload="metadata" so a long clip costs a poster frame, not the file. */
+                  <video
+                    class="h-full w-full object-contain"
+                    src={tile.video}
+                    aria-label={tile.alt}
+                    controls
+                    preload="metadata"
+                    playsinline
+                  />
+                )
+              ) : (
+                <RemoteImage
+                  src={tile.image!}
+                  alt={tile.alt}
+                  widths={[300, 600]}
+                  sizes="(min-width: 640px) 25vw, 90vw"
+                  class="h-full w-full object-contain"
+                />
+              )}
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -236,13 +226,13 @@ const highlights = [
     <div class="shell flex flex-wrap items-center justify-between gap-8 py-16">
       <div>
         <h2 class="text-2xl font-bold tracking-tight text-balance text-white sm:text-3xl">
-          Planning kit for the coming season?
+          {closing.title}
         </h2>
-        <p class="mt-3 max-w-xl text-base leading-relaxed text-neutral-400">
-          Send us your sizes and quantities and we will come back with a quote and current stock.
-        </p>
+        <p class="mt-3 max-w-xl text-base leading-relaxed text-neutral-400">{closing.body}</p>
       </div>
-      <Button href="/contact" variant="inverted">Get in touch</Button>
+      {closing.buttonLabel && (
+        <Button href={closing.buttonHref} variant="inverted">{closing.buttonLabel}</Button>
+      )}
     </div>
   </section>
 </BaseLayout>
