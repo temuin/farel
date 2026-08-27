@@ -1,49 +1,48 @@
 /**
- * Editable content for the About page, stored in `src/data/about.json` and
- * managed through the Decap panel at /admin under Site content -> About page.
+ * Everything on the About page, stored in `src/data/about.json` and managed
+ * through the Decap panel at /admin under Site content -> About page.
  *
- * These figures are the client's own marketing claims rather than anything the
- * site can derive, which is exactly why they live in a data file: they change
- * on the client's schedule, not on a release, and changing them should never
- * need a developer.
+ * The whole page is content rather than code: every heading, paragraph, figure
+ * and image can be changed by the client without a release. What stays in code
+ * is the layout -- how many columns, where things sit, what a card looks like --
+ * because that is design, not copy, and handing it over is how a page gets
+ * broken by accident.
+ *
+ * Images are absolute URLs in the media bucket, uploaded through the same
+ * picker as product photography. Optional ones are blank strings when unset,
+ * which is how Decap represents an empty field, so every read goes through
+ * `clean()` and the page skips the block rather than rendering an empty frame.
  */
 import data from '../data/about.json';
 
+/** Blank and whitespace-only both mean "not set" coming out of the CMS. */
+const clean = (value: string | undefined): string | undefined =>
+  value?.trim() ? value.trim() : undefined;
+
 export interface AboutStat {
-  /** The headline figure, e.g. "500+". Shown large. */
   readonly value: string;
-  /** Short name for the figure, e.g. "Klien Korporasi". */
   readonly label: string;
-  /** Sentence or two of supporting detail. */
   readonly body: string;
 }
 
-export interface CeoWord {
-  readonly heading: string;
-  readonly quote: string;
-  /** Optional: the panel renders the role alone when no name is given. */
-  readonly name?: string;
-  readonly role: string;
-  /** Absolute URL in the media bucket. Blank hides the portrait. */
-  readonly photo?: string;
+export interface HowWeWorkItem {
+  readonly title: string;
+  readonly body: string;
 }
 
-/** Blank strings are how the CMS represents "not set", so treat them as absent. */
-const clean = (value: string | undefined) => (value?.trim() ? value.trim() : undefined);
+export const hero = {
+  eyebrow: data.hero.eyebrow,
+  title: data.hero.title,
+  description: data.hero.description,
+  image: clean(data.hero.image),
+  imageAlt: data.hero.imageAlt,
+};
 
 export const statsTitle: string = data.statsTitle;
 
-export const aboutStats: readonly AboutStat[] = data.stats.map((stat) => ({
-  value: stat.value,
-  label: stat.label,
-  body: stat.body,
-}));
+export const aboutStats: readonly AboutStat[] = data.stats;
 
-/**
- * The quote panel is skipped entirely when there is no quote, so the section
- * never renders as an empty frame while the client is still deciding on copy.
- */
-export const ceo: CeoWord | undefined = clean(data.ceo?.quote)
+export const ceo = clean(data.ceo?.quote)
   ? {
       heading: data.ceo.heading,
       quote: data.ceo.quote.trim(),
@@ -52,3 +51,53 @@ export const ceo: CeoWord | undefined = clean(data.ceo?.quote)
       photo: clean(data.ceo.photo),
     }
   : undefined;
+
+/**
+ * Prose is stored as markdown so the client can write however many paragraphs
+ * they want. Only paragraph breaks are honoured — the text is rendered as
+ * separate <p> elements rather than run through a markdown parser, which keeps
+ * the typography consistent and means a stray character cannot inject markup.
+ */
+export const paragraphsOf = (body: string): string[] =>
+  body
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+export const story = {
+  heading: data.story.heading,
+  paragraphs: paragraphsOf(data.story.body),
+  image: clean(data.story.image),
+  imageAlt: data.story.imageAlt,
+};
+
+export const statement = {
+  heading: data.statement.heading,
+  paragraphs: paragraphsOf(data.statement.body),
+  buttonLabel: clean(data.statement.buttonLabel),
+  buttonHref: data.statement.buttonHref,
+};
+
+export const operation = {
+  eyebrow: data.operation.eyebrow,
+  title: data.operation.title,
+  description: data.operation.description,
+  imageOne: clean(data.operation.imageOne),
+  imageOneAlt: data.operation.imageOneAlt,
+  imageTwo: clean(data.operation.imageTwo),
+  imageTwoAlt: data.operation.imageTwoAlt,
+  /** Filename within the bucket's videos/ folder, not a full URL. */
+  videoFile: clean(data.operation.videoFile),
+  videoAlt: data.operation.videoAlt,
+};
+
+export const howWeWork = {
+  heading: data.howWeWork.heading,
+  items: data.howWeWork.items as readonly HowWeWorkItem[],
+};
+
+export const brands = {
+  eyebrow: data.brands.eyebrow,
+  title: data.brands.title,
+  description: data.brands.description,
+};

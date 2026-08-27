@@ -1,4 +1,11 @@
 {
+  "hero": {
+    "eyebrow": "Company profile",
+    "title": "About Amalia Utama",
+    "description": "Established in 2010, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.",
+    "image": "https://media.amaliautama.co.id/images/storefront.jpg",
+    "imageAlt": "The Amalia Utama team at our Adidas storefront display"
+  },
   "statsTitle": "Kisah Sukses: Organisasi yang Telah Kami Layani",
   "stats": [
     {
@@ -28,5 +35,50 @@
     "name": "",
     "role": "Chief Executive Officer",
     "photo": "https://media.amaliautama.co.id/images/img-20260823-wa0006-1-jpg.jpg"
+  },
+  "story": {
+    "heading": "Our story",
+    "body": "Amalia Utama started as a small team-kit supplier and has grown into a national distributor for two performance sportswear brands. What began with local club orders now covers school programmes, futsal venues, sports retailers and corporate teams throughout the archipelago.\n\nOur focus has not changed: keep genuine product in stock, quote quickly, and get kit delivered before the season starts. Most of our customers come back each year, which means we plan our stock around real team calendars rather than seasonal guesswork.",
+    "image": "",
+    "imageAlt": "Inside the Amalia Utama warehouse"
+  },
+  "statement": {
+    "heading": "Official distributor statement",
+    "body": "Amalia Utama is an authorised distributor of Kelme and Adidas products for the Indonesian market. All goods we supply are genuine, sourced through official channels, and covered by the manufacturers' standard warranty terms.",
+    "buttonLabel": "Talk to our team",
+    "buttonHref": "/contact"
+  },
+  "operation": {
+    "eyebrow": "Behind the scenes",
+    "title": "Inside our operation",
+    "description": "Where your order actually comes from — the warehouse, the packing bench and dispatch.",
+    "imageOne": "https://media.amaliautama.co.id/images/warehouse-shelving.jpg",
+    "imageOneAlt": "Stacked and labelled stock on warehouse shelving",
+    "imageTwo": "https://media.amaliautama.co.id/images/packing-quality-check.jpg",
+    "imageTwoAlt": "Staff packing and quality-checking an order before dispatch",
+    "videoFile": "dispatch-delivery.mp4",
+    "videoAlt": "Orders being packed, labelled and dispatched from the Amalia Utama warehouse"
+  },
+  "howWeWork": {
+    "heading": "How we work",
+    "items": [
+      {
+        "title": "Authorised supply only",
+        "body": "Every item we carry is sourced through the brands' official distribution channels, with documentation available on request."
+      },
+      {
+        "title": "Stock held locally",
+        "body": "Core lines are warehoused in Indonesia, so standard team orders ship without waiting on an overseas production run."
+      },
+      {
+        "title": "Built for team orders",
+        "body": "Full size runs from youth to adult, plus crest, number and sponsor application handled in-house."
+      }
+    ]
+  },
+  "brands": {
+    "eyebrow": "Partner brands",
+    "title": "The brands we represent",
+    "description": "Both labels are supplied under the same terms, with a single account manager for your orders."
   }
 }

@@ -1,41 +1,33 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BrandStrip from '../components/BrandStrip.astro';
 import Button from '../components/Button.astro';
 import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+import RemoteImage from '../components/RemoteImage.astro';
 import SectionHeading from '../components/SectionHeading.astro';
-import storefrontPhoto from '../assets/about/storefront.jpeg';
-import warehousePhoto from '../assets/about/warehouse-shelving.jpeg';
-import packingPhoto from '../assets/about/packing-quality-check.jpeg';
-import { site } from '../config/site';
-import { videoUrl } from '../config/site';
-import { aboutStats, ceo, statsTitle } from '../config/about';
-
-/** Still derived, because the "Our story" prose reads better with a live number. */
-const yearsActive = new Date().getFullYear() - site.foundedYear;
+import { site, videoUrl } from '../config/site';
+import {
+  aboutStats,
+  brands,
+  ceo,
+  hero,
+  howWeWork,
+  operation,
+  statement,
+  statsTitle,
+  story,
+} from '../config/about';
 
 /*
- * The figures on this page used to be derived from the catalogue -- years
- * since foundedYear, number of brands, number of products. They are now the
- * client's own commercial claims, which nothing in the repository can compute,
- * so they come from src/data/about.json and are edited in the admin panel.
+ * Every string and image below comes from src/data/about.json, edited in the
+ * admin panel under Site content -> About page. Nothing on this page needs a
+ * developer to change. What stays here is the layout, which is design rather
+ * than content and would be easy to break by accident if it were editable.
+ *
+ * Optional images fall back to a labelled placeholder rather than collapsing
+ * the grid, so a half-filled page still reads as deliberate while the client
+ * is gathering photography.
  */
-
-const values = [
-  {
-    title: 'Authorised supply only',
-    body: 'Every item we carry is sourced through the brands’ official distribution channels, with documentation available on request.',
-  },
-  {
-    title: 'Stock held locally',
-    body: 'Core lines are warehoused in Indonesia, so standard team orders ship without waiting on an overseas production run.',
-  },
-  {
-    title: 'Built for team orders',
-    body: 'Full size runs from youth to adult, plus crest, number and sponsor application handled in-house.',
-  },
-];
 ---
 
 <BaseLayout
@@ -47,9 +39,9 @@ const values = [
       <div>
         <SectionHeading
           as="h1"
-          eyebrow="Company profile"
-          title={`About ${site.name}`}
-          description={`Established in ${site.foundedYear}, we distribute Kelme and Adidas team sportswear to clubs, schools and retailers across Indonesia.`}
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          description={hero.description}
         />
 
         <h2 class="mt-10 text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
@@ -74,25 +66,26 @@ const values = [
       </div>
 
       <div class="aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-[4/5]">
-        <Image
-          src={storefrontPhoto}
-          alt={`The ${site.name} team at our Adidas storefront display`}
-          widths={[400, 800]}
-          sizes="(min-width: 1024px) 40vw, 90vw"
-          loading="eager"
-          class="h-full w-full object-cover"
-        />
+        {
+          hero.image ? (
+            <RemoteImage
+              src={hero.image}
+              alt={hero.imageAlt}
+              widths={[400, 800]}
+              sizes="(min-width: 1024px) 40vw, 90vw"
+              loading="eager"
+              class="h-full w-full object-cover"
+            />
+          ) : (
+            <MediaPlaceholder label="Company photo" class="h-full w-full" />
+          )
+        }
       </div>
     </div>
   </section>
 
   {
-    /*
-     * Rendered only when a quote has been entered, so the page never shows an
-     * empty framed panel while the client is still settling on the wording.
-     * The portrait is likewise optional -- without one the quote simply runs
-     * full width rather than leaving a grey placeholder.
-     */
+    /* Skipped entirely when no quote is set, rather than framing empty space. */
     ceo && (
       <section class="border-b border-neutral-200 dark:border-neutral-800">
         <div class="shell py-14 sm:py-16">
@@ -127,41 +120,47 @@ const values = [
 
   <section class="shell grid gap-12 py-16 sm:py-20 lg:grid-cols-2">
     <div class="space-y-5 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
-      <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Our story</h2>
-      <p>
-        {site.legalName} started as a small team-kit supplier and has spent the last {yearsActive}
-        years growing into a national distributor for two performance sportswear brands. What began
-        with local club orders now covers school programmes, futsal venues, sports retailers and
-        corporate teams throughout the archipelago.
-      </p>
-      <p>
-        Our focus has not changed: keep genuine product in stock, quote quickly, and get kit
-        delivered before the season starts. Most of our customers come back each year, which means
-        we plan our stock around real team calendars rather than seasonal guesswork.
-      </p>
-      <p>
-        This is placeholder copy. Replace it with the company&rsquo;s own history, milestones and
-        positioning before launch.
-      </p>
+      <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+        {story.heading}
+      </h2>
+      {story.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     </div>
 
     <div class="flex flex-col gap-6">
-      <MediaPlaceholder label="Warehouse or office interior" class="aspect-video" />
+      <div class="aspect-video overflow-hidden rounded-2xl">
+        {
+          story.image ? (
+            <RemoteImage
+              src={story.image}
+              alt={story.imageAlt}
+              widths={[400, 800]}
+              sizes="(min-width: 1024px) 40vw, 90vw"
+              class="h-full w-full object-cover"
+            />
+          ) : (
+            <MediaPlaceholder label="Warehouse or office interior" class="h-full w-full" />
+          )
+        }
+      </div>
 
       <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-8 dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">Official distributor statement</h2>
-        <p class="mt-4 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
-          {site.legalName} is an authorised distributor of Kelme and Adidas products for the
-          Indonesian market. All goods we supply are genuine, sourced through official channels, and
-          covered by the manufacturers&rsquo; standard warranty terms.
-        </p>
-        <p class="mt-4 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
-          Placeholder wording. Confirm the exact distributor status, territory and any wording
-          required by each brand before publishing.
-        </p>
-        <div class="mt-8">
-          <Button href="/contact">Talk to our team</Button>
-        </div>
+        <h2 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
+          {statement.heading}
+        </h2>
+        {
+          statement.paragraphs.map((paragraph) => (
+            <p class="mt-4 text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
+              {paragraph}
+            </p>
+          ))
+        }
+        {
+          statement.buttonLabel && (
+            <div class="mt-8">
+              <Button href={statement.buttonHref}>{statement.buttonLabel}</Button>
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
@@ -169,58 +168,76 @@ const values = [
   <section class="border-y border-neutral-200 bg-neutral-50 py-16 sm:py-20 dark:border-neutral-800 dark:bg-neutral-900">
     <div class="shell">
       <SectionHeading
-        eyebrow="Behind the scenes"
-        title="Inside our operation"
-        description="Where your order actually comes from — the warehouse, the packing bench and dispatch."
+        eyebrow={operation.eyebrow}
+        title={operation.title}
+        description={operation.description}
       />
       <div class="mt-10 grid gap-6 sm:grid-cols-3">
         <div class="aspect-square overflow-hidden rounded-2xl">
-          <Image
-            src={warehousePhoto}
-            alt="Stacked and labelled stock on warehouse shelving"
-            widths={[300, 600]}
-            sizes="(min-width: 640px) 34vw, 90vw"
-            loading="lazy"
-            class="h-full w-full object-cover"
-          />
+          {
+            operation.imageOne ? (
+              <RemoteImage
+                src={operation.imageOne}
+                alt={operation.imageOneAlt}
+                widths={[300, 600]}
+                sizes="(min-width: 640px) 34vw, 90vw"
+                class="h-full w-full object-cover"
+              />
+            ) : (
+              <MediaPlaceholder label="Operations photo" class="h-full w-full" />
+            )
+          }
         </div>
         <div class="aspect-square overflow-hidden rounded-2xl">
-          <Image
-            src={packingPhoto}
-            alt="Staff packing and quality-checking an order before dispatch"
-            widths={[300, 600]}
-            sizes="(min-width: 640px) 34vw, 90vw"
-            loading="lazy"
-            class="h-full w-full object-cover"
-          />
+          {
+            operation.imageTwo ? (
+              <RemoteImage
+                src={operation.imageTwo}
+                alt={operation.imageTwoAlt}
+                widths={[300, 600]}
+                sizes="(min-width: 640px) 34vw, 90vw"
+                class="h-full w-full object-cover"
+              />
+            ) : (
+              <MediaPlaceholder label="Operations photo" class="h-full w-full" />
+            )
+          }
         </div>
         <div class="aspect-square overflow-hidden rounded-2xl bg-black">
-          <video
-            class="h-full w-full object-cover"
-            src={videoUrl("dispatch-delivery.mp4")}
-            poster="/videos/dispatch-delivery-poster.jpg"
-            aria-label="Orders being packed, labelled and dispatched from the Amalia Utama warehouse"
-            autoplay
-            muted
-            loop
-            playsinline
-          />
+          {
+            operation.videoFile ? (
+              <video
+                class="h-full w-full object-cover"
+                src={videoUrl(operation.videoFile)}
+                poster="/videos/dispatch-delivery-poster.jpg"
+                aria-label={operation.videoAlt}
+                autoplay
+                muted
+                loop
+                playsinline
+              />
+            ) : (
+              <MediaPlaceholder label="Operations video" class="h-full w-full" />
+            )
+          }
         </div>
       </div>
     </div>
   </section>
 
   <section class="shell py-16 sm:py-20">
-    <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">How we work</h2>
+    <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+      {howWeWork.heading}
+    </h2>
     <ul class="mt-8 grid gap-6 sm:grid-cols-3">
       {
-        values.map((value, index) => (
+        howWeWork.items.map((item, index) => (
           <li class="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
             <span class="flex h-8 w-8 items-center justify-center rounded-full bg-accent-50 text-sm font-bold text-accent-600 dark:bg-accent-500/10 dark:text-accent-500">
               {String(index + 1).padStart(2, '0')}
             </span>
-            <h3 class="mt-4 text-base font-semibold text-neutral-900 dark:text-white">{value.title}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{value.body}</p>
+            <h3 class="mt-4 text-base font-semibold text-neutral-900 dark:text-white">{item.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{item.body}</p>
           </li>
         ))
       }
@@ -229,9 +246,9 @@ const values = [
 
   <section class="shell pb-4">
     <SectionHeading
-      eyebrow="Partner brands"
-      title="The brands we represent"
-      description="Both labels are supplied under the same terms, with a single account manager for your orders."
+      eyebrow={brands.eyebrow}
+      title={brands.title}
+      description={brands.description}
     />
     <div class="mt-12">
       <BrandStrip detailed />

@@ -1,6 +1,6 @@
 ---
 import { imageAlt, productUrl, type Product } from '../lib/products';
-import ProductImage from './ProductImage.astro';
+import RemoteImage from './RemoteImage.astro';
 
 interface Props {
   product: Product;
@@ -17,7 +17,7 @@ const { name, brand, category, images, description } = product.data;
   class="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-colors hover:border-neutral-900 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-100"
 >
   <div class="aspect-square overflow-hidden bg-neutral-100 dark:bg-neutral-800">
-    <ProductImage
+    <RemoteImage
       src={images[0]}
       alt={imageAlt(product, 0)}
       widths={[300, 600]}

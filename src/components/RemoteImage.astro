@@ -2,7 +2,8 @@
 import { Image, inferRemoteSize } from 'astro:assets';
 
 /**
- * A product photo, which lives in the R2 bucket rather than in the repository.
+ * Any image that lives in the R2 bucket rather than in the repository --
+ * product photography, the About page's hero and gallery, the CEO portrait.
  *
  * Everything about the output is identical to a local image: Astro downloads
  * the original at build time, generates the WebP variants named in `widths`,

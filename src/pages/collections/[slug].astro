@@ -7,7 +7,7 @@ import Button from '../../components/Button.astro';
 import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
 import { getProducts, imageAlt, type Product } from '../../lib/products';
 import { productEnquiryUrl } from '../../lib/whatsapp';
-import ProductImage from '../../components/ProductImage.astro';
+import RemoteImage from '../../components/RemoteImage.astro';
 
 export const getStaticPaths = (async () => {
   const products = await getProducts();
@@ -61,7 +61,7 @@ const ogImage = await getImage({
     <div class="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
       <div class="space-y-4">
         <div class="aspect-square overflow-hidden rounded-2xl bg-zinc-100 dark:bg-neutral-800">
-          <ProductImage
+          <RemoteImage
             src={coverImage}
             alt={imageAlt(product, 0)}
             widths={[600, 1000]}
@@ -76,7 +76,7 @@ const ogImage = await getImage({
             <ul class="grid grid-cols-3 gap-4">
               {secondaryImages.map((image, index) => (
                 <li class="aspect-square overflow-hidden rounded-xl bg-zinc-100 dark:bg-neutral-800">
-                  <ProductImage
+                  <RemoteImage
                     src={image}
                     alt={imageAlt(product, index + 1)}
                     widths={[200, 400]}
