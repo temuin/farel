@@ -759,6 +759,40 @@
                           hint: 'How it should look on the page, e.g. +62 812-3456-7890',
                         },
                         {
+                          name: 'additionalPhones',
+                          label: 'Other numbers',
+                          label_singular: 'Number',
+                          widget: 'list',
+                          required: false,
+                          summary: '{{fields.label}} - {{fields.phoneDisplay}}',
+                          hint: 'Extra WhatsApp or phone contacts, shown on the Contact page and in the footer under the main number. The main number above stays the one behind the WhatsApp button and the product enquiry links.',
+                          fields: [
+                            {
+                              name: 'label',
+                              label: 'Who this reaches',
+                              widget: 'string',
+                              required: false,
+                              hint: 'e.g. Sales, Corporate orders, Jakarta office. Leave blank for none.',
+                            },
+                            {
+                              name: 'whatsappNumber',
+                              label: 'WhatsApp number',
+                              widget: 'string',
+                              hint: 'Start with the country code 62, not a leading 0. So 0812-3456-7890 is entered as 6281234567890.',
+                              pattern: [
+                                '^62[0-9]{7,13}$',
+                                'Must start with 62 (not 0) and be digits only — e.g. 6287881018017',
+                              ],
+                            },
+                            {
+                              name: 'phoneDisplay',
+                              label: 'Number as displayed',
+                              widget: 'string',
+                              hint: 'How it should read on the page, e.g. +62 812-3456-7890',
+                            },
+                          ],
+                        },
+                        {
                           name: 'email',
                           label: 'Email (general / marketing)',
                           widget: 'string',

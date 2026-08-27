@@ -4,11 +4,21 @@ import Button from '../components/Button.astro';
 import ContactForm from '../components/ContactForm.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import WhatsAppIcon from '../components/WhatsAppIcon.astro';
-import { addressLine, contact, mapEmbedUrl, site } from '../config/site';
+import { addressLine, additionalPhones, contact, mapEmbedUrl, site } from '../config/site';
 import { generalEnquiryUrl } from '../lib/whatsapp';
 
 const details = [
   { label: 'WhatsApp / phone', value: contact.phoneDisplay, href: `tel:+${contact.whatsappNumber}` },
+  /*
+   * Extra numbers sit directly under the main one so the phone details read
+   * as a group. Each keeps its own label, since "which number do I call" is
+   * the whole reason for having more than one.
+   */
+  ...additionalPhones.map((phone) => ({
+    label: phone.label ?? 'WhatsApp / phone',
+    value: phone.phoneDisplay,
+    href: `tel:+${phone.whatsappNumber}`,
+  })),
   { label: 'Email (marketing)', value: contact.email, href: `mailto:${contact.email}` },
   ...(contact.adminEmail
     ? [{ label: 'Email (admin)', value: contact.adminEmail, href: `mailto:${contact.adminEmail}` }]

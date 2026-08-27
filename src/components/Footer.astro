@@ -1,6 +1,6 @@
 ---
 import { BRANDS, BRAND_PROFILES } from '../config/catalog';
-import { addressLine, contact, navLinks, site } from '../config/site';
+import { addressLine, contact, navLinks, site, additionalPhones } from '../config/site';
 import Logo from './Logo.astro';
 
 const year = new Date().getFullYear();
@@ -47,6 +47,16 @@ const year = new Date().getFullYear();
             {contact.phoneDisplay}
           </a>
         </p>
+        {
+          additionalPhones.map((phone) => (
+            <p>
+              <a href={`tel:+${phone.whatsappNumber}`} class="transition-colors hover:text-white">
+                {phone.phoneDisplay}
+              </a>
+              {phone.label && <span class="ml-2 text-neutral-500">{phone.label}</span>}
+            </p>
+          ))
+        }
         <p>
           <a href={`mailto:${contact.email}`} class="transition-colors hover:text-white">
             {contact.email}

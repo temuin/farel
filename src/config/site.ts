@@ -21,6 +21,43 @@ export const site = {
   url: 'https://example.com',
 };
 
+export interface PhoneContact {
+  /** Who this number reaches, e.g. "Sales" or "Corporate orders". */
+  readonly label?: string;
+  /** International format, digits only — this is what wa.me expects. */
+  readonly whatsappNumber: string;
+  /** How the number should read on the page, e.g. +62 852-8781-9415. */
+  readonly phoneDisplay: string;
+}
+
+/**
+ * Extra numbers beyond the main one.
+ *
+ * The primary stays a single value rather than becoming the first item in a
+ * list, because plenty of things need exactly one: the WhatsApp button in the
+ * header, the enquiry link on every product, the number in the footer. Those
+ * should not have to pick a favourite from a list that might be empty.
+ *
+ * Entries with no number are dropped rather than rendered blank — a half-
+ * filled row in the CMS should not become a dead link on the contact page.
+ */
+interface RawPhone {
+  label?: string;
+  whatsappNumber?: string;
+  phoneDisplay?: string;
+}
+
+export const additionalPhones: readonly PhoneContact[] = (
+  /* Typed explicitly: an empty list in the JSON infers as never[]. */
+  (settings.contact.additionalPhones ?? []) as RawPhone[]
+)
+  .map((entry) => ({
+    label: entry.label?.trim() || undefined,
+    whatsappNumber: entry.whatsappNumber?.trim() ?? '',
+    phoneDisplay: entry.phoneDisplay?.trim() || entry.whatsappNumber?.trim() || '',
+  }))
+  .filter((entry) => entry.whatsappNumber);
+
 export const contact = {
   /** International format, digits only — this is what wa.me expects. */
   whatsappNumber: settings.contact.whatsappNumber,
