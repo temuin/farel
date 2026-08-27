@@ -51,8 +51,17 @@ const VIDEO_TYPES = new Map([
   ['video/webm', 'webm'],
 ]);
 
-/** Images and video live under separate prefixes so each picker lists only its own. */
-const PREFIX = { image: 'images/', video: 'videos/' };
+/**
+ * Images and video live under separate prefixes so each picker lists only its
+ * own, and every image carries a small companion under thumbs/.
+ *
+ * The thumbnails exist because the picker grid was otherwise loading the
+ * originals: ~171 MB of camera files fetched to draw a wall of 150px tiles,
+ * every time somebody opened it. They are produced in the browser before
+ * upload rather than here -- a Worker has no image library, and the file is
+ * already in memory on the client at that moment.
+ */
+const PREFIX = { image: 'images/', video: 'videos/', thumb: 'thumbs/' };
 
 /** Which kind of media a request is dealing with, from the file itself. */
 const kindOf = (mimeType) => {
@@ -151,13 +160,23 @@ export async function handleMedia(request, env) {
     const prefix = PREFIX[kind];
     const listed = await bucket.list({ prefix, limit: 1000 });
     const files = listed.objects
-      .map((object) => ({
-        key: object.key,
-        name: object.key.slice(prefix.length),
-        url: publicUrl(object.key),
-        size: object.size,
-        uploaded: object.uploaded,
-      }))
+      .map((object) => {
+        const name = object.key.slice(prefix.length);
+        return {
+          key: object.key,
+          name,
+          url: publicUrl(object.key),
+          /*
+           * Offered by convention rather than looked up: checking each key
+           * would be an extra round trip per file. The picker falls back to
+           * the original if a thumbnail turns out not to exist, which is what
+           * happens for anything uploaded before thumbnails existed.
+           */
+          thumbUrl: kind === 'image' ? publicUrl(`${PREFIX.thumb}${name}`) : undefined,
+          size: object.size,
+          uploaded: object.uploaded,
+        };
+      })
       .sort((a, b) => String(b.uploaded).localeCompare(String(a.uploaded)));
     return json({ kind, files });
   }
@@ -169,6 +188,31 @@ export async function handleMedia(request, env) {
       form = await request.formData();
     } catch {
       return json({ error: 'Could not read the upload.' }, 400);
+    }
+
+    /*
+     * Attach a thumbnail to an image that is already here, without touching
+     * the original. Used by scripts/backfill-thumbnails.mjs for photos that
+     * predate thumbnails; re-posting the original to carry one would trip the
+     * collision-suffix rule below and quietly duplicate every file instead.
+     */
+    const thumbFor = url.searchParams.get('thumbFor');
+    if (thumbFor) {
+      const only = form.get('thumb');
+      if (!only || typeof only === 'string') {
+        return json({ error: 'No thumbnail was attached.' }, 400);
+      }
+      if (thumbFor.includes('/') || thumbFor.includes('..')) {
+        return json({ error: 'Invalid thumbnail target.' }, 400);
+      }
+      if (!(await bucket.head(`${PREFIX.image}${thumbFor}`))) {
+        return json({ error: `No image called ${thumbFor} to attach a thumbnail to.` }, 404);
+      }
+      const thumbKey = `${PREFIX.thumb}${thumbFor}`;
+      await bucket.put(thumbKey, only.stream(), {
+        httpMetadata: { contentType: only.type || 'image/webp', cacheControl: 'public, max-age=3600' },
+      });
+      return json({ thumb: thumbKey, url: publicUrl(thumbKey), size: only.size });
     }
 
     const file = form.get('file');
@@ -211,6 +255,21 @@ export async function handleMedia(request, env) {
       key = `${prefix}${stem}-${n}.${extension}`;
     }
 
+    /*
+     * Optional companion, sent by the picker in the same request so the pair
+     * cannot half-succeed. Named to match the original exactly, which is what
+     * lets listings derive the URL without a lookup.
+     */
+    const thumb = form.get('thumb');
+    if (kind === 'image' && thumb && typeof thumb !== 'string') {
+      await bucket.put(`${PREFIX.thumb}${key.slice(prefix.length)}`, thumb.stream(), {
+        httpMetadata: {
+          contentType: thumb.type || 'image/webp',
+          cacheControl: 'public, max-age=3600',
+        },
+      });
+    }
+
     await bucket.put(key, file.stream(), {
       httpMetadata: {
         contentType: file.type,
@@ -244,6 +303,13 @@ export async function handleMedia(request, env) {
       return json({ error: 'Refusing to delete outside the media prefixes.' }, 400);
     }
     await bucket.delete(key);
+
+    // An image's thumbnail is an implementation detail of the picker, so it
+    // goes with the original rather than lingering as an orphan.
+    if (key.startsWith(PREFIX.image)) {
+      await bucket.delete(`${PREFIX.thumb}${key.slice(PREFIX.image.length)}`);
+    }
+
     return json({ deleted: key });
   }
 

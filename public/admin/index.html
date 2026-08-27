@@ -653,6 +653,36 @@
           return data;
         };
 
+        /*
+         * Shrinks a chosen photo to a grid-sized copy before it is uploaded.
+         *
+         * Done here rather than server-side because a Worker has no image
+         * library, and the file is already decoded in this tab anyway. 400px
+         * covers a 190px tile at 2x. Returns null on anything it cannot draw,
+         * and the upload simply proceeds without a companion.
+         */
+        const THUMB_MAX = 400;
+
+        const makeThumb = (file) =>
+          new Promise((resolve) => {
+            const url = URL.createObjectURL(file);
+            const image = new Image();
+            image.onload = () => {
+              URL.revokeObjectURL(url);
+              const scale = Math.min(1, THUMB_MAX / Math.max(image.width, image.height));
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, Math.round(image.width * scale));
+              canvas.height = Math.max(1, Math.round(image.height * scale));
+              canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob((blob) => resolve(blob), 'image/webp', 0.72);
+            };
+            image.onerror = () => {
+              URL.revokeObjectURL(url);
+              resolve(null);
+            };
+            image.src = url;
+          });
+
         let root = null;
         let insert = null;
         /*
@@ -707,7 +737,19 @@
                  */
                 kind === 'video'
                   ? el('video', { src: file.url, preload: 'metadata', muted: 'muted', playsinline: 'playsinline' })
-                  : el('img', { src: file.url, alt: '', loading: 'lazy' }),
+                  : el('img', {
+                      src: file.thumbUrl || file.url,
+                      alt: '',
+                      loading: 'lazy',
+                      /*
+                       * Anything uploaded before thumbnails existed has none,
+                       * so a missing one quietly falls back to the original
+                       * rather than showing a broken tile.
+                       */
+                      onerror: (event) => {
+                        if (event.target.src !== file.url) event.target.src = file.url;
+                      },
+                    }),
               ]),
               el('figcaption', {}, file.name),
               el('button', {
@@ -745,6 +787,10 @@
             try {
               const form = new FormData();
               form.append('file', file);
+              if (kind === 'image') {
+                const thumb = await makeThumb(file);
+                if (thumb) form.append('thumb', thumb, 'thumb.webp');
+              }
               const saved = await api({ method: 'POST', body: form });
               close();
               if (insert) insert(saved.url);
