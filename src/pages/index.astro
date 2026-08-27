@@ -187,7 +187,7 @@ const backdropState = (active: boolean) =>
               {tile.video ? (
                 tile.loops ? (
                   <video
-                    class="h-full w-full object-contain"
+                    class="h-full w-full object-cover"
                     src={tile.video}
                     aria-label={tile.alt}
                     autoplay
@@ -198,7 +198,7 @@ const backdropState = (active: boolean) =>
                 ) : (
                   /* preload="metadata" so a long clip costs a poster frame, not the file. */
                   <video
-                    class="h-full w-full object-contain"
+                    class="h-full w-full object-cover"
                     src={tile.video}
                     aria-label={tile.alt}
                     controls
@@ -212,7 +212,7 @@ const backdropState = (active: boolean) =>
                   alt={tile.alt}
                   widths={[300, 600]}
                   sizes="(min-width: 640px) 25vw, 90vw"
-                  class="h-full w-full object-contain"
+                  class="h-full w-full object-cover"
                 />
               )}
             </div>

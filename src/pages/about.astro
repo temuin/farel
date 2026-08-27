@@ -82,10 +82,10 @@ import {
               widths={[400, 800]}
               sizes="(min-width: 1024px) 40vw, 90vw"
               loading="eager"
-              class="h-auto w-full"
+              class="h-full w-full object-cover"
             />
           ) : (
-            <MediaPlaceholder label="Company photo" class="aspect-[4/5] w-full" />
+            <MediaPlaceholder label="Company photo" class="h-full w-full" />
           )
         }
       </div>
@@ -110,7 +110,7 @@ import {
                   alt={ceo.name ? `${ceo.name}, ${ceo.role}` : ceo.role}
                   widths={[224, 448]}
                   sizes="224px"
-                  class="h-auto w-full"
+                  class="h-full w-full object-cover"
                 />
               </div>
             )}
@@ -142,7 +142,7 @@ import {
     </div>
 
     <div class="flex flex-col gap-6">
-      <div class="overflow-hidden rounded-2xl">
+      <div class="aspect-video overflow-hidden rounded-2xl">
         {
           story.image ? (
             <RemoteImage
@@ -150,10 +150,10 @@ import {
               alt={story.imageAlt}
               widths={[400, 800]}
               sizes="(min-width: 1024px) 40vw, 90vw"
-              class="h-auto w-full"
+              class="h-full w-full object-cover"
             />
           ) : (
-            <MediaPlaceholder label="Warehouse or office interior" class="aspect-video w-full" />
+            <MediaPlaceholder label="Warehouse or office interior" class="h-full w-full" />
           )
         }
       </div>
@@ -196,7 +196,7 @@ import {
                 alt={operation.imageOneAlt}
                 widths={[300, 600]}
                 sizes="(min-width: 640px) 34vw, 90vw"
-                class="h-full w-full object-contain"
+                class="h-full w-full object-cover"
               />
             ) : (
               <MediaPlaceholder label="Operations photo" class="h-full w-full" />
@@ -211,7 +211,7 @@ import {
                 alt={operation.imageTwoAlt}
                 widths={[300, 600]}
                 sizes="(min-width: 640px) 34vw, 90vw"
-                class="h-full w-full object-contain"
+                class="h-full w-full object-cover"
               />
             ) : (
               <MediaPlaceholder label="Operations photo" class="h-full w-full" />
@@ -222,7 +222,7 @@ import {
           {
             operation.video ? (
               <video
-                class="h-full w-full object-contain"
+                class="h-full w-full object-cover"
                 src={operation.video}
                 poster="/videos/dispatch-delivery-poster.jpg"
                 aria-label={operation.videoAlt}

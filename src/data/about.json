@@ -56,7 +56,7 @@
     "image": "https://media.amaliautama.co.id/images/whatsapp-image-2026-08-27-at-11-27-18.jpg",
     "imageAlt": "Inside the Amalia Utama warehouse"
   },
-  "statsTitle": "Kisah Sukses: Organisasi yang Telah Kami Layani",
+  "statsTitle": "Success stories: organisations we have served",
   "hero": {
     "eyebrow": "Company profile",
     "title": "About Amalia Utama",
@@ -67,23 +67,23 @@
   "stats": [
     {
       "value": "500+",
-      "label": "Klien Korporasi",
-      "body": "Dipercaya oleh berbagai organisasi terkemuka di sektor teknologi, keuangan, manufaktur, logistik, hingga pemerintahan di seluruh Indonesia dan Asia Tenggara."
+      "label": "Corporate clients",
+      "body": "Trusted by leading organisations across technology, finance, manufacturing, logistics and government, throughout Indonesia and South East Asia."
     },
     {
       "value": "50K+",
-      "label": "Anggota Tim Terlayani",
-      "body": "Mulai dari startup hingga perusahaan Fortune 500, kami menyediakan solusi seragam yang menyatukan tim dan memperkuat identitas organisasi."
+      "label": "Team members outfitted",
+      "body": "From startups to Fortune 500 companies, we supply uniform programmes that bring teams together and strengthen organisational identity."
     },
     {
       "value": "98%",
-      "label": "Tingkat Kepuasan Klien",
-      "body": "Komitmen kami terhadap kualitas, layanan, dan keandalan menghasilkan tingkat kepuasan tertinggi di industri serta kemitraan jangka panjang."
+      "label": "Client satisfaction",
+      "body": "Our commitment to quality, service and reliability earns the highest satisfaction rate in the industry, and partnerships that last."
     },
     {
-      "value": "15 Tahun",
-      "label": "Pengalaman B2B",
-      "body": "Keahlian mendalam dalam program seragam korporasi, pengadaan dalam jumlah besar, serta layanan kustomisasi untuk kebutuhan organisasi yang kompleks."
+      "value": "15 Years",
+      "label": "B2B experience",
+      "body": "Deep expertise in corporate uniform programmes, high-volume procurement and customisation for complex organisational requirements."
     }
   ]
 }
