@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/check-admin-html.mjs && astro check && astro build",
+    "build": "node scripts/check-lockfile.mjs && node scripts/check-admin-html.mjs && astro check && astro build",
     "preview": "astro preview",
-    "check": "node scripts/check-admin-html.mjs && astro check",
+    "check": "node scripts/check-lockfile.mjs && node scripts/check-admin-html.mjs && astro check",
     "astro": "astro"
   },
   "dependencies": {
