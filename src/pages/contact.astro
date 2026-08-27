@@ -8,7 +8,11 @@ import { addressLine, additionalPhones, contact, mapEmbedUrl, site } from '../co
 import { generalEnquiryUrl } from '../lib/whatsapp';
 
 const details = [
-  { label: 'WhatsApp / phone', value: contact.phoneDisplay, href: `tel:+${contact.whatsappNumber}` },
+  {
+    label: contact.phoneLabel ?? 'WhatsApp / phone',
+    value: contact.phoneDisplay,
+    href: `tel:+${contact.whatsappNumber}`,
+  },
   /*
    * Extra numbers sit directly under the main one so the phone details read
    * as a group. Each keeps its own label, since "which number do I call" is

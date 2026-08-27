@@ -46,6 +46,7 @@ const year = new Date().getFullYear();
           <a href={`tel:+${contact.whatsappNumber}`} class="transition-colors hover:text-white">
             {contact.phoneDisplay}
           </a>
+          {contact.phoneLabel && <span class="ml-2 text-neutral-500">{contact.phoneLabel}</span>}
         </p>
         {
           additionalPhones.map((phone) => (

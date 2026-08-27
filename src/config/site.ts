@@ -59,6 +59,14 @@ export const additionalPhones: readonly PhoneContact[] = (
   .filter((entry) => entry.whatsappNumber);
 
 export const contact = {
+  /**
+   * Who the main number reaches, e.g. "Customer Service".
+   *
+   * Optional, and falls back to a generic heading. The extra numbers each
+   * carry one, so leaving the main one unlabelled made it look like the odd
+   * one out -- and it is usually the number that most needs naming.
+   */
+  phoneLabel: settings.contact.phoneLabel?.trim() || undefined,
   /** International format, digits only — this is what wa.me expects. */
   whatsappNumber: settings.contact.whatsappNumber,
   phoneDisplay: settings.contact.phoneDisplay,
