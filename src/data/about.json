@@ -1,16 +1,16 @@
 {
   "operation": {
+    "imageTwoFocus": "Centre",
     "eyebrow": "Behind the scenes",
     "imageOne": "https://media.amaliautama.co.id/images/warehouse-shelving.jpg",
+    "imageOneFocus": "Centre",
     "videoAlt": "Orders being packed, labelled and dispatched from the Amalia Utama warehouse",
     "imageTwo": "https://media.amaliautama.co.id/images/packing-quality-check.jpg",
     "imageTwoAlt": "Staff packing and quality-checking an order before dispatch",
     "title": "Inside our operation",
     "video": "https://media.amaliautama.co.id/videos/dispatch-delivery.mp4",
     "description": "Where your order actually comes from — the warehouse, the packing bench and dispatch.",
-    "imageOneAlt": "Stacked and labelled stock on warehouse shelving",
-    "imageOneFocus": "Centre",
-    "imageTwoFocus": "Centre"
+    "imageOneAlt": "Stacked and labelled stock on warehouse shelving"
   },
   "brands": {
     "eyebrow": "Partner brands",
@@ -78,7 +78,7 @@
     {
       "value": "50K+",
       "label": "Team members outfitted",
-      "body": "From startups to Fortune 500 companies, we supply uniform programmes that bring teams together and strengthen organisational identity."
+      "body": "From startups to big corporate, we supply uniform programmes that bring teams together and strengthen organisational identity."
     },
     {
       "value": "98%",
