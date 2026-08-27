@@ -86,8 +86,8 @@ export const operation = {
   imageOneAlt: data.operation.imageOneAlt,
   imageTwo: clean(data.operation.imageTwo),
   imageTwoAlt: data.operation.imageTwoAlt,
-  /** Filename within the bucket's videos/ folder, not a full URL. */
-  videoFile: clean(data.operation.videoFile),
+  /** Absolute URL in the bucket, chosen through the panel's video picker. */
+  video: clean(data.operation.video),
   videoAlt: data.operation.videoAlt,
 };
 

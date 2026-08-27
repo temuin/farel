@@ -30,13 +30,36 @@
  */
 const MAX_UPLOAD_BYTES = 60 * 1024 * 1024;
 
-/** Only formats Astro's image pipeline can actually process. */
-const ALLOWED = new Map([
+/** Formats Astro's image pipeline can actually process. */
+const IMAGE_TYPES = new Map([
   ['image/jpeg', 'jpg'],
   ['image/png', 'png'],
   ['image/webp', 'webp'],
   ['image/avif', 'avif'],
 ]);
+
+/*
+ * Video is served straight from the bucket to the browser -- nothing resizes
+ * or transcodes it -- so the only formats worth accepting are the ones every
+ * browser can actually play. QuickTime .mov is deliberately absent: phones
+ * produce it constantly and Safari plays it, but Chrome and Firefox often
+ * will not, so accepting it would mean silently shipping a video that plays
+ * for whoever uploaded it and nobody else.
+ */
+const VIDEO_TYPES = new Map([
+  ['video/mp4', 'mp4'],
+  ['video/webm', 'webm'],
+]);
+
+/** Images and video live under separate prefixes so each picker lists only its own. */
+const PREFIX = { image: 'images/', video: 'videos/' };
+
+/** Which kind of media a request is dealing with, from the file itself. */
+const kindOf = (mimeType) => {
+  if (IMAGE_TYPES.has(mimeType)) return 'image';
+  if (VIDEO_TYPES.has(mimeType)) return 'video';
+  return null;
+};
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -122,17 +145,21 @@ export async function handleMedia(request, env) {
 
   // ---- list -------------------------------------------------------------
   if (request.method === 'GET') {
-    const listed = await bucket.list({ prefix: 'images/', limit: 1000 });
+    // Defaults to images: the picker asks for video explicitly, so an older
+    // cached copy of the panel keeps behaving exactly as it did.
+    const kind = url.searchParams.get('kind') === 'video' ? 'video' : 'image';
+    const prefix = PREFIX[kind];
+    const listed = await bucket.list({ prefix, limit: 1000 });
     const files = listed.objects
       .map((object) => ({
         key: object.key,
-        name: object.key.replace(/^images\//, ''),
+        name: object.key.slice(prefix.length),
         url: publicUrl(object.key),
         size: object.size,
         uploaded: object.uploaded,
       }))
       .sort((a, b) => String(b.uploaded).localeCompare(String(a.uploaded)));
-    return json({ files });
+    return json({ kind, files });
   }
 
   // ---- upload -----------------------------------------------------------
@@ -156,18 +183,32 @@ export async function handleMedia(request, env) {
       );
     }
 
-    const extension = ALLOWED.get(file.type);
-    if (!extension) {
-      return json({ error: 'Photos must be JPEG, PNG, WebP or AVIF.' }, 415);
+    /*
+     * The destination follows from the file's own type rather than anything
+     * the client says, so a picker cannot be talked into writing a video into
+     * the image prefix or vice versa.
+     */
+    const kind = kindOf(file.type);
+    if (!kind) {
+      return json(
+        {
+          error:
+            'Unsupported file type. Photos must be JPEG, PNG, WebP or AVIF; video must be MP4 or WebM. ' +
+            'iPhone .mov files need converting to MP4 first — most browsers cannot play QuickTime.',
+        },
+        415,
+      );
     }
+    const extension = (kind === 'image' ? IMAGE_TYPES : VIDEO_TYPES).get(file.type);
+    const prefix = PREFIX[kind];
 
     // Suffix on collision rather than overwrite: two products may legitimately
     // be photographed as "front.jpg", and silently replacing the first one
     // would change a live page nobody was editing.
-    const stem = toKey(file.name || 'photo');
-    let key = `images/${stem}.${extension}`;
+    const stem = toKey(file.name || kind);
+    let key = `${prefix}${stem}.${extension}`;
     for (let n = 2; await bucket.head(key); n += 1) {
-      key = `images/${stem}-${n}.${extension}`;
+      key = `${prefix}${stem}-${n}.${extension}`;
     }
 
     await bucket.put(key, file.stream(), {
@@ -193,14 +234,14 @@ export async function handleMedia(request, env) {
       },
     });
 
-    return json({ key, name: key.replace(/^images\//, ''), url: publicUrl(key), size: file.size });
+    return json({ kind, key, name: key.slice(prefix.length), url: publicUrl(key), size: file.size });
   }
 
   // ---- delete -----------------------------------------------------------
   if (request.method === 'DELETE') {
     const key = url.searchParams.get('key') ?? '';
-    if (!key.startsWith('images/')) {
-      return json({ error: 'Refusing to delete outside the images prefix.' }, 400);
+    if (!Object.values(PREFIX).some((prefix) => key.startsWith(prefix))) {
+      return json({ error: 'Refusing to delete outside the media prefixes.' }, 400);
     }
     await bucket.delete(key);
     return json({ deleted: key });

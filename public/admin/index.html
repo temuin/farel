@@ -48,7 +48,7 @@
       #r2 figure { margin: 0; border: 1px solid #e2e2e2; border-radius: 10px; overflow: hidden;
         background: #fafafa; position: relative; }
       #r2 figure button.pick { display: block; width: 100%; border: 0; padding: 0; background: none; cursor: pointer; }
-      #r2 figure img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: #eee; }
+      #r2 figure img, #r2 figure video { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: #eee; }
       #r2 figure:hover { border-color: #095d3e; }
       #r2 figure:focus-within { outline: 2px solid #095d3e; outline-offset: 1px; }
       #r2 figcaption { padding: 7px 9px; font-size: 11px; color: #555; word-break: break-all; text-align: left; }
@@ -464,11 +464,11 @@
                         },
                         { name: 'imageTwoAlt', label: 'Second photo description', widget: 'string' },
                         {
-                          name: 'videoFile',
-                          label: 'Video file name',
-                          widget: 'string',
+                          name: 'video',
+                          label: 'Video',
+                          widget: 'file',
                           required: false,
-                          hint: 'File name inside the videos folder of the media bucket, e.g. dispatch-delivery.mp4. Videos are uploaded to the bucket directly, not through this panel. Leave blank to show a placeholder.',
+                          hint: 'MP4 or WebM. Upload from your computer or pick one already uploaded. iPhone .mov files need converting to MP4 first. Leave blank to show a placeholder.',
                         },
                         { name: 'videoAlt', label: 'Video description', widget: 'string' },
                       ],
@@ -655,6 +655,28 @@
 
         let root = null;
         let insert = null;
+        /*
+         * 'image' or 'video'. Decap tells us which by passing forImage on the
+         * image widget and omitting it on the file widget, so one picker can
+         * serve both fields while listing only the relevant half of the bucket
+         * and refusing an upload of the wrong sort.
+         */
+        let kind = 'image';
+
+        const KINDS = {
+          image: {
+            title: 'Product photos',
+            accept: 'image/*',
+            uploadLabel: 'Upload photo',
+            empty: 'No photos in the bucket yet. Upload the first one.',
+          },
+          video: {
+            title: 'Videos',
+            accept: 'video/mp4,video/webm',
+            uploadLabel: 'Upload video',
+            empty: 'No videos in the bucket yet. Upload an MP4 or WebM.',
+          },
+        };
 
         const close = () => {
           if (root) root.remove();
@@ -670,13 +692,23 @@
               el('button', {
                 class: 'pick',
                 type: 'button',
-                title: 'Use this photo',
+                title: kind === 'video' ? 'Use this video' : 'Use this photo',
                 onclick: () => {
                   const chosen = file.url;
                   close();
                   if (insert) insert(chosen);
                 },
-              }, [el('img', { src: file.url, alt: '', loading: 'lazy' })]),
+              }, [
+                /*
+                 * preload="metadata" so a video tile shows its first frame
+                 * without pulling the whole file. There are only a handful of
+                 * videos and they are tens of megabytes each, so downloading
+                 * them just to draw a grid would be indefensible.
+                 */
+                kind === 'video'
+                  ? el('video', { src: file.url, preload: 'metadata', muted: 'muted', playsinline: 'playsinline' })
+                  : el('img', { src: file.url, alt: '', loading: 'lazy' }),
+              ]),
               el('figcaption', {}, file.name),
               el('button', {
                 class: 'del',
@@ -702,8 +734,8 @@
             grid.append(figure);
           }
 
-          const picker = el('input', { type: 'file', accept: 'image/*', hidden: 'hidden' });
-          const uploadButton = el('button', { class: 'btn', type: 'button', onclick: () => picker.click() }, 'Upload photo');
+          const picker = el('input', { type: 'file', accept: KINDS[kind].accept, hidden: 'hidden' });
+          const uploadButton = el('button', { class: 'btn', type: 'button', onclick: () => picker.click() }, KINDS[kind].uploadLabel);
 
           picker.addEventListener('change', async () => {
             const file = picker.files && picker.files[0];
@@ -724,7 +756,7 @@
           root = el('div', { id: 'r2', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Choose a photo' }, [
             el('div', { class: 'panel' }, [
               el('header', {}, [
-                el('h2', {}, 'Product photos'),
+                el('h2', {}, KINDS[kind].title),
                 uploadButton,
                 el('button', { class: 'btn ghost', type: 'button', onclick: close }, 'Cancel'),
               ]),
@@ -732,7 +764,7 @@
               el('div', { class: 'body' }, [
                 files.length
                   ? grid
-                  : el('p', { class: 'note' }, 'No photos in the bucket yet. Upload the first one.'),
+                  : el('p', { class: 'note' }, KINDS[kind].empty),
               ]),
               picker,
             ]),
@@ -753,7 +785,7 @@
 
         const load = async () => {
           try {
-            const { files } = await api();
+            const { files } = await api({ query: '?kind=' + kind });
             render(files);
           } catch (problem) {
             render([], problem.message);
@@ -763,7 +795,17 @@
         return {
           name: 'r2',
           init: ({ handleInsert }) => ({
-            show: () => {
+            show: (options) => {
+              /*
+               * Decap renames the flag on its way out: internally the field
+               * carries `forImage`, but what reaches an external library is
+               * `imagesOnly`. Reading the internal name here silently made
+               * every field open the photo picker, including the video one.
+               *
+               * True for the image widget, absent for the file widget, so the
+               * falsy branch is video.
+               */
+              kind = options && options.imagesOnly ? 'image' : 'video';
               insert = handleInsert;
               render([], null);
               load();
