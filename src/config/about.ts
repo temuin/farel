@@ -27,7 +27,8 @@ export interface AboutStat {
 
 export interface HowWeWorkItem {
   readonly title: string;
-  readonly body: string;
+  /** Optional: the steps read as a sequence and often need no elaboration. */
+  readonly body?: string;
 }
 
 export const hero = {
@@ -93,7 +94,11 @@ export const operation = {
 
 export const howWeWork = {
   heading: data.howWeWork.heading,
-  items: data.howWeWork.items as readonly HowWeWorkItem[],
+  intro: clean(data.howWeWork.intro),
+  items: (data.howWeWork.items as HowWeWorkItem[]).map((item) => ({
+    title: item.title,
+    body: clean(item.body),
+  })),
 };
 
 export const brands = {

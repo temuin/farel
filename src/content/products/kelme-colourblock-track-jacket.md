@@ -3,7 +3,6 @@ name: Kelme Colourblock Track Jacket
 brand: Kelme
 category: Apparel
 sport: Football
-slug: kelme-colourblock-track-jacket
 featured: true
 description: Navy and light-blue colourblock track jacket with a full front zip and Kelme branding.
 images:

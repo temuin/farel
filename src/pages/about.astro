@@ -51,8 +51,16 @@ import {
         <dl class="mt-6 divide-y divide-neutral-200 dark:divide-neutral-800">
           {
             aboutStats.map((stat) => (
-              <div class="grid grid-cols-[auto_1fr] gap-x-5 py-5 first:pt-0 last:pb-0">
-                <dt class="text-2xl font-bold tracking-tight text-accent-600 tabular-nums sm:text-3xl dark:text-accent-500">
+              /*
+               * The figure column is a fixed width rather than sized to its
+               * contents. With `auto` the widest entry set the column, so
+               * "15 Tahun" pushed every label across and left "98%" stranded
+               * in a wide empty gutter. A fixed column lines all four labels
+               * up at the same place and lets a long figure wrap onto a
+               * second line, which is how it reads in the source artwork.
+               */
+              <div class="grid grid-cols-[4.5rem_1fr] gap-x-5 py-5 first:pt-0 sm:grid-cols-[6rem_1fr] last:pb-0">
+                <dt class="text-2xl leading-tight font-bold tracking-tight text-accent-600 tabular-nums sm:text-3xl dark:text-accent-500">
                   {stat.value}
                 </dt>
                 <dd>
@@ -236,7 +244,15 @@ import {
     <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
       {howWeWork.heading}
     </h2>
-    <ul class="mt-8 grid gap-6 sm:grid-cols-3">
+    {
+      howWeWork.intro && (
+        <p class="mt-4 max-w-3xl text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
+          {howWeWork.intro}
+        </p>
+      )
+    }
+    {/* Four steps, so four columns at the widest size rather than three. */}
+    <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {
         howWeWork.items.map((item, index) => (
           <li class="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
@@ -244,7 +260,9 @@ import {
               {String(index + 1).padStart(2, '0')}
             </span>
             <h3 class="mt-4 text-base font-semibold text-neutral-900 dark:text-white">{item.title}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{item.body}</p>
+            {item.body && (
+              <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{item.body}</p>
+            )}
           </li>
         ))
       }

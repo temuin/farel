@@ -3,8 +3,6 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { BRANDS, CATEGORIES, SPORTS } from './config/catalog';
 
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
 const products = defineCollection({
   loader: glob({ base: './src/content/products', pattern: '**/*.md' }),
   schema: () =>
@@ -30,10 +28,6 @@ const products = defineCollection({
       images: z.array(z.url()).min(1),
       /** Also used as the meta description on detail pages. */
       description: z.string().min(1).max(200),
-      /** URL segment under /collections/. Keep it matching the filename. */
-      slug: z
-        .string()
-        .regex(SLUG_PATTERN, 'Slug must be lowercase words separated by single hyphens'),
       /** Sorts the product first within its brand's landing page preview. */
       featured: z.boolean().default(false),
     }),

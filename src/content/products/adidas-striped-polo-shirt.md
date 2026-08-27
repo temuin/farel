@@ -3,7 +3,6 @@ name: Adidas Striped Polo Shirt
 brand: Adidas
 category: Apparel
 sport: Lifestyle
-slug: adidas-striped-polo-shirt
 description: Fine-stripe performance polo with a three-button placket, suited for staff and club uniforms.
 images:
   - https://media.amaliautama.co.id/images/adidas-polo-striped-blue.jpeg

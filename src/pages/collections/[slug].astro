@@ -12,7 +12,7 @@ import RemoteImage from '../../components/RemoteImage.astro';
 export const getStaticPaths = (async () => {
   const products = await getProducts();
   return products.map((product) => ({
-    params: { slug: product.data.slug },
+    params: { slug: product.id },
     props: { product },
   }));
 }) satisfies GetStaticPaths;

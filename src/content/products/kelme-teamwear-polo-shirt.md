@@ -3,7 +3,6 @@ name: Kelme Teamwear Polo Shirt
 brand: Kelme
 category: Apparel
 sport: Football
-slug: kelme-teamwear-polo-shirt
 featured: true
 description: White teamwear polo with navy colourblock sleeves and a printed Kelme graphic.
 images:

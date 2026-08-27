@@ -3,7 +3,6 @@ name: Kelme Teamwear Long-Sleeve Top
 brand: Kelme
 category: Apparel
 sport: Football
-slug: kelme-teamwear-long-sleeve-top
 description: Cream long-sleeve teamwear top with maroon colourblock panels and a printed graphic.
 images:
   - https://media.amaliautama.co.id/images/kelme-teamwear-long-sleeve-top.jpg

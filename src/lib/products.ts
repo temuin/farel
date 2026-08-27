@@ -54,6 +54,13 @@ export function imageAlt(product: Product, index: number): string {
     : `${product.data.name} product photo ${index + 1}`;
 }
 
+/**
+ * The URL segment is the file name, which Decap derives from the product name.
+ *
+ * It used to be a separate field somebody had to fill in by hand, which meant
+ * a required box with no obvious answer -- and a chance to type something that
+ * did not match the file and quietly break the page.
+ */
 export function productUrl(product: Product): string {
-  return `/collections/${product.data.slug}`;
+  return `/collections/${product.id}`;
 }

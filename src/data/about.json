@@ -29,19 +29,24 @@
     "buttonHref": "/contact"
   },
   "howWeWork": {
-    "heading": "How we work",
+    "heading": "From Identity to Execution",
+    "intro": "Every organization has unique needs. Amalia Utama Corporate Solutions offers the flexibility to select and customize products to meet specific requirements, supported by a structured, professional, and seamless process from product selection through delivery.",
     "items": [
       {
-        "title": "Authorised supply only",
-        "body": "Every item we carry is sourced through the brands' official distribution channels, with documentation available on request."
+        "title": "Brief & Needs Assessment",
+        "body": ""
       },
       {
-        "title": "Stock held locally",
-        "body": "Core lines are warehoused in Indonesia, so standard team orders ship without waiting on an overseas production run."
+        "title": "Product Selection (Adidas Line)",
+        "body": ""
       },
       {
-        "title": "Built for team orders",
-        "body": "Full size runs from youth to adult, plus crest, number and sponsor application handled in-house."
+        "title": "Customization & Approval",
+        "body": ""
+      },
+      {
+        "title": "Delivery & After Sales Support",
+        "body": ""
       }
     ]
   },

@@ -3,7 +3,6 @@ name: Kelme Piped Track Jacket
 brand: Kelme
 category: Apparel
 sport: Lifestyle
-slug: kelme-piped-track-jacket
 description: Navy track jacket with contrast white piping and the Kelme's paw
   logo at the chest.
 images:
