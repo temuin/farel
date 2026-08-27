@@ -8,7 +8,13 @@
   "contact": {
     "whatsappNumber": "6285287819415",
     "phoneDisplay": "+62 852-8781-9415",
-    "additionalPhones": [],
+    "additionalPhones": [
+      {
+        "label": "Marketing",
+        "whatsappNumber": "6281224429821",
+        "phoneDisplay": "+62 812-2442-9821"
+      }
+    ],
     "email": "marketing@amaliautama.com",
     "adminEmail": "admin@amaliautama.com",
     "openingHours": "Monday – Friday, 09.00 – 17.00 WIB",
