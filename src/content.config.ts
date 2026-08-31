@@ -3,6 +3,24 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { BRANDS, CATEGORIES, SPORTS } from './config/catalog';
 
+/**
+ * A field the CMS lets staff leave blank.
+ *
+ * `z.optional()` permits `undefined` and nothing else, but that is not what
+ * Decap writes. Leaving an optional select empty puts a literal `sport: null`
+ * in the frontmatter, and some widgets write an empty string — so the build
+ * rejected a file the CMS had been perfectly happy to save, and the person who
+ * saved it saw a red deploy rather than a form error.
+ *
+ * That is the same fault as the old 200-character description cap, in a second
+ * place: a rule enforced where the person it affects cannot act on it. The
+ * standing rule for this schema is that the build must accept everything
+ * /admin accepts, so every field marked `required: false` in the CMS goes
+ * through here. scripts/check-admin-html.mjs enforces that pairing.
+ */
+const blankable = (schema: z.ZodTypeAny) =>
+  z.preprocess((value) => (value === null || value === '' ? undefined : value), schema.optional());
+
 const products = defineCollection({
   loader: glob({ base: './src/content/products', pattern: '**/*.md' }),
   schema: () =>
@@ -12,7 +30,7 @@ const products = defineCollection({
       category: z.enum(CATEGORIES),
       /** Second-level Collections filter, revealed once a category is picked.
        * Omitted for items that aren't tied to one sport (caps, socks, lifestyle sneakers). */
-      sport: z.enum(SPORTS).optional(),
+      sport: blankable(z.enum(SPORTS)),
       /**
        * Absolute URLs of the originals in the R2 bucket. These are full
        * resolution: Astro downloads them at build time and generates the
@@ -43,8 +61,13 @@ const products = defineCollection({
        * description, which is worse than a long one.
        */
       description: z.string().min(1),
-      /** Sorts the product first within its brand's landing page preview. */
-      featured: z.boolean().default(false),
+      /**
+       * Sorts the product first within its brand's landing page preview.
+       *
+       * `.default()` would not have been enough: it fills in for `undefined`
+       * only, so a `featured: null` from the CMS would still have failed.
+       */
+      featured: blankable(z.boolean()).transform((set) => set ?? false),
     }),
 });
 

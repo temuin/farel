@@ -118,7 +118,9 @@ for (const name of ['BRANDS', 'CATEGORIES', 'SPORTS']) {
  * how `sport` was being deleted from all 30 products by any edit.
  */
 const schema = readFileSync('src/content.config.ts', 'utf8');
-const schemaFields = [...schema.matchAll(/^\s{6}([a-zA-Z]+):\s*z\./gm)].map((m) => m[1]);
+const schemaFields = [...schema.matchAll(/^\s{6}([a-zA-Z]+):\s*(?:z\.|blankable\()/gm)].map(
+  (m) => m[1],
+);
 const productsBlock = html.slice(
   html.indexOf("name: 'products'"),
   html.indexOf("name: 'content'"),
@@ -129,6 +131,34 @@ for (const field of schemaFields) {
     problems.push(
       `The content schema defines "${field}" but the CMS has no widget for it. ` +
         `Decap writes only its configured fields, so editing an entry would delete it.`,
+    );
+  }
+}
+
+/*
+ * The build must accept everything /admin accepts.
+ *
+ * A field the CMS marks `required: false` can reach the schema as `null` -- an
+ * empty select writes a literal `sport: null` -- and `z.optional()` rejects
+ * that, because it permits `undefined` and nothing else. The CMS saves happily
+ * and the deploy then fails, which is the worst possible place to find out.
+ * `blankable()` in the schema absorbs those values, so every optional CMS
+ * field must be paired with it.
+ */
+const optionalInCms = new Set(
+  [...productsBlock.matchAll(/name: '([a-zA-Z]+)'[\s\S]{0,400}?required: false/g)].map(
+    (m) => m[1],
+  ),
+);
+for (const field of optionalInCms) {
+  if (!schemaFields.includes(field)) continue; // e.g. `body`, which is not frontmatter.
+  const declared =
+    schema.split('\n').find((line) => line.trimStart().startsWith(`${field}:`)) ?? '';
+  if (!declared.includes('blankable(')) {
+    problems.push(
+      `"${field}" is optional in the CMS but its schema entry does not use blankable(). ` +
+        `Decap writes null for an empty optional field and z.optional() rejects null, ` +
+        `so leaving it blank would fail the build instead of the form.`,
     );
   }
 }
