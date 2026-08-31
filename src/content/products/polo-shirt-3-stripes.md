@@ -2,6 +2,7 @@
 name: POLO SHIRT 3-STRIPES
 brand: Adidas
 category: Apparel
+sport: null
 description: >-
   A MOISTURE-WICKING POLO SHIRT MADE WITH RECYCLED MATERIALS.
 
