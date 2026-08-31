@@ -455,8 +455,34 @@ export async function handleAuthPost(request, env) {
         })
       : loginPage(env, { error: message, username });
 
+  /*
+   * Configuration faults are the operator's problem, not the visitor's.
+   *
+   * These messages used to name CMS_USERS, the hash format, the iteration
+   * count and scripts/hash-password.mjs, on a page anyone on the internet can
+   * load. That handed a stranger a map of how sign-in works and what to break,
+   * and it told the one person who could act on it nothing they could act on
+   * *there* -- the fix is always in the Pages dashboard, never in the form.
+   *
+   * So the diagnosis goes to the log, where `wrangler pages deployment tail`
+   * or the dashboard's live logs will show it, and the browser gets one clean
+   * sentence. Nothing is lost: the detail is still written down, in the place
+   * the person fixing it is already looking.
+   */
+  const misconfigured = (diagnostic, username) => {
+    console.error(`[auth] misconfigured: ${diagnostic}`);
+    return fail(
+      'Sign-in is temporarily unavailable. Please contact the site administrator.',
+      username,
+    );
+  };
+
   if (users.size === 0 || !token) {
-    return fail('Sign-in is not configured on the server.');
+    return misconfigured(
+      !token
+        ? 'CMS_GITHUB_TOKEN is not set on this environment.'
+        : 'CMS_USERS is not set on this environment.',
+    );
   }
 
   /*
@@ -471,10 +497,10 @@ export async function handleAuthPost(request, env) {
    */
   const usable = [...users.values()].filter(looksLikeHash);
   if (usable.length === 0) {
-    return fail(
-      'Sign-in is misconfigured: CMS_USERS contains no usable password hash. ' +
-        'It must look like username:pbkdf2$100000$<salt>$<hash> — check the ' +
-        'whole line was pasted, including every $ section, and redeploy.',
+    return misconfigured(
+      'CMS_USERS contains no usable password hash. Each entry must look like ' +
+        'username:pbkdf2$100000$<salt>$<hash> — check the whole line was pasted, ' +
+        'including every $ section, and redeploy.',
     );
   }
 
@@ -488,11 +514,11 @@ export async function handleAuthPost(request, env) {
     (hash) => Number(hash.split('$')[1]) > MAX_SUPPORTED_ITERATIONS,
   );
   if (tooManyIterations) {
-    return fail(
-      `Sign-in is misconfigured: these password hashes were generated with more ` +
-        `than ${MAX_SUPPORTED_ITERATIONS} PBKDF2 iterations, which this host refuses ` +
-        `to compute. Regenerate with scripts/hash-password.mjs, update CMS_USERS, ` +
-        `and redeploy.`,
+    return misconfigured(
+      `every hash in CMS_USERS was generated with more than ${MAX_SUPPORTED_ITERATIONS} ` +
+        `PBKDF2 iterations, which this host refuses to compute. Regenerate with ` +
+        `scripts/hash-password.mjs, update CMS_USERS on THIS environment ` +
+        `(production and preview hold separate values), and redeploy.`,
     );
   }
 
@@ -531,11 +557,7 @@ export async function handleAuthPost(request, env) {
      * The derivation itself failed -- the host would not run the KDF. Never a
      * statement about the password, so it must not be reported as one.
      */
-    return fail(
-      `Sign-in cannot be completed on this host: ${problem.message}. ` +
-        `This is a server configuration problem, not a wrong password.`,
-      username,
-    );
+    return misconfigured(`the host refused to run the key derivation: ${problem.message}`, username);
   }
 
   if (!ok) {
