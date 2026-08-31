@@ -133,11 +133,51 @@ Settings -> Environment variables -> **Production**, both marked **Secret**:
 | `CMS_USERS`        | the `admin:pbkdf2$...` line |
 | `CMS_GITHUB_TOKEN` | the fine-grained PAT        |
 
-Production only. Preview branches then report "sign-in is not configured",
-which keeps the token off every preview URL.
+Production only, and deliberately so. A `*.pages.dev` preview URL is public
+and cannot sit behind Access — that is a per-zone feature (see phase 1) — so a
+working `CMS_GITHUB_TOKEN` there would put repository write access on an
+unprotected address. Preview branches are meant to fail sign-in.
+
+Do not "fix" this by setting the two variables on Preview, or by using the
+**all environments** option, which quietly does the same thing. To try the CMS,
+run it locally — see [Testing /admin locally](#testing-admin-locally).
 
 **Then redeploy.** Environment variables do not apply to a build that has
 already run.
+
+### Testing /admin locally
+
+`wrangler pages dev` runs `functions/` on the same workerd runtime Pages uses,
+so platform limits behave identically — including the 100,000 PBKDF2 iteration
+ceiling that silently differs from Node. Nothing here touches a public URL.
+
+```
+npm run build
+node scripts/hash-password.mjs admin        # prints admin:pbkdf2$100000$...
+npx wrangler pages dev dist   --binding CMS_USERS='admin:pbkdf2$100000$...'   --binding CMS_GITHUB_TOKEN='<a token you are happy to use locally>'
+```
+
+Then open <http://localhost:8788/admin>. Use a throwaway password: this hash
+never leaves the machine, and it does not have to match production's.
+
+Saving from the CMS commits to the real repository, so use a token scoped to a
+fork — or expect the edits to land on `main`. To exercise sign-in alone,
+without saving, any non-empty token string is enough; the password check runs
+before the token is ever used.
+
+### If sign-in reports "temporarily unavailable"
+
+That message is deliberately vague in the browser. The reason is in the logs:
+
+```
+npx wrangler pages deployment tail --project-name amaliautama-website
+```
+
+Look for `[auth] misconfigured:` — it names the exact fault. The usual cause is
+a `CMS_USERS` hash minted above the iteration ceiling by an older copy of
+`scripts/hash-password.mjs`; regenerate it and update the variable **on the
+environment you are actually hitting**, since production and preview hold
+separate values.
 
 ## 5. Attach the custom domain
 
