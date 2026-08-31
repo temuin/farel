@@ -26,8 +26,23 @@ const products = defineCollection({
        * The first one doubles as the card thumbnail and the OG image.
        */
       images: z.array(z.url()).min(1),
-      /** Also used as the meta description on detail pages. */
-      description: z.string().min(1).max(200),
+      /**
+       * Also used as the meta description on detail pages, and in the Product
+       * structured data.
+       *
+       * Deliberately unbounded above. This carried a 200-character cap, which
+       * made the schema stricter than the CMS is willing to be: staff pasting
+       * the manufacturer's own copy would save it through /admin, and the build
+       * would then fail on a validation error they had no way to see coming --
+       * turning an editing decision into a broken deploy. Length is a matter of
+       * taste here, not correctness: Google trims the snippet it shows, the
+       * product card clamps to two lines, and the detail page is happy with a
+       * paragraph. Guidance for what reads well lives in the CMS hint.
+       *
+       * Still required to be non-empty: an empty value would emit an empty meta
+       * description, which is worse than a long one.
+       */
+      description: z.string().min(1),
       /** Sorts the product first within its brand's landing page preview. */
       featured: z.boolean().default(false),
     }),
