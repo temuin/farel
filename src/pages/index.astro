@@ -205,9 +205,10 @@ const pageTitle = `${site.legalName} — Kelme & Adidas Team Sportswear Distribu
                   />
                 ) : (
                   /*
-                   * Autoplays muted so the clip is moving when the section
-                   * comes into view; controls stay on so a viewer can unmute
-                   * or scrub. Muted is what lets browsers honour autoplay.
+                   * Autoplays muted and loops so the clip is always moving
+                   * when the section comes into view; controls stay on so a
+                   * viewer can unmute or scrub. Muted is what lets browsers
+                   * honour autoplay.
                    */
                   <video
                     class="h-full w-full object-cover"
@@ -215,6 +216,7 @@ const pageTitle = `${site.legalName} — Kelme & Adidas Team Sportswear Distribu
                     aria-label={tile.alt}
                     autoplay
                     muted
+                    loop
                     controls
                     preload="metadata"
                     playsinline
