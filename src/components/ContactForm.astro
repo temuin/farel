@@ -4,6 +4,19 @@ import WhatsAppIcon from './WhatsAppIcon.astro';
 import { WEB3FORMS_ACCESS_KEY, contact, isContactFormEnabled, site } from '../config/site';
 import { generalEnquiryUrl } from '../lib/whatsapp';
 
+/*
+ * Google Ads conversion for a completed enquiry.
+ *
+ * With no JavaScript the form posts natively and Web3Forms shows its own
+ * confirmation page, unchanged. When both the Ads ID and the contact label are
+ * set, the inline script below progressively enhances it: the submit is sent by
+ * fetch so the visitor stays on the page, and the conversion fires only once
+ * Web3Forms confirms the message was accepted.
+ */
+const googleAdsId = import.meta.env.PUBLIC_GOOGLE_ADS_ID;
+const gadsContactLabel = import.meta.env.PUBLIC_GADS_CONTACT_LABEL;
+const conversionTracking = Boolean(googleAdsId && gadsContactLabel);
+
 /**
  * Native form post to Web3Forms — no JavaScript. The browser submits directly
  * and Web3Forms renders its own confirmation page, keeping the site static.
@@ -41,7 +54,8 @@ const inputClass =
       </div>
     </div>
   ) : (
-    <form action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
+    <Fragment>
+    <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
   <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
   <input type="hidden" name="subject" value={`New enquiry from ${site.name} website`} />
   <input type="hidden" name="from_name" value={site.name} />
@@ -88,5 +102,65 @@ const inputClass =
         message us on WhatsApp.
       </p>
     </form>
+    {conversionTracking && (
+      <Fragment>
+        <div
+          id="contact-form-status"
+          role="status"
+          aria-live="polite"
+          tabindex="-1"
+          hidden
+          class="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 text-sm leading-relaxed text-neutral-700 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
+        />
+        <script
+          is:inline
+          set:html={`
+            (function () {
+              var form = document.getElementById('contact-form');
+              var status = document.getElementById('contact-form-status');
+              if (!form || !status) return;
+
+              form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                var button = form.querySelector('button[type="submit"]');
+                var payload = JSON.stringify(Object.fromEntries(new FormData(form).entries()));
+
+                if (button) button.disabled = true;
+                status.hidden = true;
+
+                fetch(form.action, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                  body: payload,
+                })
+                  .then(function (response) { return response.json(); })
+                  .then(function (result) {
+                    if (result.success) {
+                      if (typeof gtag === 'function') {
+                        gtag('event', 'conversion', { send_to: ${JSON.stringify(`${googleAdsId}/${gadsContactLabel}`)} });
+                      }
+                      form.reset();
+                      form.hidden = true;
+                      status.textContent = 'Thank you — your enquiry is on its way. We will reply within one business day.';
+                      status.hidden = false;
+                      status.focus();
+                    } else {
+                      if (button) button.disabled = false;
+                      status.textContent = (result && result.message) || 'Something went wrong. Please try again, or message us on WhatsApp.';
+                      status.hidden = false;
+                    }
+                  })
+                  .catch(function () {
+                    if (button) button.disabled = false;
+                    status.textContent = 'Could not send just now. Please try again, or message us on WhatsApp.';
+                    status.hidden = false;
+                  });
+              });
+            })();
+          `}
+        />
+      </Fragment>
+    )}
+    </Fragment>
   )
 }

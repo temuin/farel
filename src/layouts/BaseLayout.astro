@@ -58,6 +58,15 @@ const jsonLd = buildGraph(logo.src, schema);
 const robots = noindex
   ? 'noindex, nofollow'
   : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+/*
+ * Google Ads conversion tracking. The gtag.js snippet is emitted only when a
+ * conversion ID is configured, so an unset env var means no third-party script
+ * ships at all. The WhatsApp/phone label gates its own click snippet the same
+ * way. All gtag calls are guarded with `typeof gtag === 'function'`.
+ */
+const googleAdsId = import.meta.env.PUBLIC_GOOGLE_ADS_ID;
+const gadsWhatsappLabel = import.meta.env.PUBLIC_GADS_WHATSAPP_LABEL;
 ---
 
 <!doctype html>
@@ -97,6 +106,36 @@ const robots = noindex
 
     {/* Machine-readable identity. See src/lib/schema.ts for what and why. */}
     <script type="application/ld+json" is:inline set:html={jsonLd} />
+
+    {
+      googleAdsId && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} />
+          <script
+            is:inline
+            set:html={`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', ${JSON.stringify(googleAdsId)});
+            `}
+          />
+          {gadsWhatsappLabel && (
+            <script
+              is:inline
+              set:html={`
+                document.addEventListener('click', function (event) {
+                  var link = event.target.closest && event.target.closest('a[href^="https://wa.me/"], a[href^="tel:"]');
+                  if (link && typeof gtag === 'function') {
+                    gtag('event', 'conversion', { send_to: ${JSON.stringify(`${googleAdsId}/${gadsWhatsappLabel}`)} });
+                  }
+                });
+              `}
+            />
+          )}
+        </>
+      )
+    }
   </head>
   <body class="flex min-h-screen flex-col">
     <a
