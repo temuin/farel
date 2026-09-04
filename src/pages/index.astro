@@ -204,11 +204,17 @@ const pageTitle = `${site.legalName} — Kelme & Adidas Team Sportswear Distribu
                     playsinline
                   />
                 ) : (
-                  /* preload="metadata" so a long clip costs a poster frame, not the file. */
+                  /*
+                   * Autoplays muted so the clip is moving when the section
+                   * comes into view; controls stay on so a viewer can unmute
+                   * or scrub. Muted is what lets browsers honour autoplay.
+                   */
                   <video
                     class="h-full w-full object-cover"
                     src={tile.video}
                     aria-label={tile.alt}
+                    autoplay
+                    muted
                     controls
                     preload="metadata"
                     playsinline
