@@ -8,14 +8,18 @@ import { generalEnquiryUrl } from '../lib/whatsapp';
  * Google Ads conversion for a completed enquiry.
  *
  * With no JavaScript the form posts natively and Web3Forms shows its own
- * confirmation page, unchanged. When both the Ads ID and the contact label are
- * set, the inline script below progressively enhances it: the submit is sent by
- * fetch so the visitor stays on the page, and the conversion fires only once
- * Web3Forms confirms the message was accepted.
+ * confirmation page, unchanged. When both the Ads ID and the conversion event
+ * name are set, the inline script below progressively enhances it: the submit
+ * is sent by fetch so the visitor stays on the page, and the conversion event
+ * fires only once Web3Forms confirms the message was accepted.
+ *
+ * PUBLIC_GADS_CONTACT_EVENT is the event name from the conversion action's tag
+ * setup in Google Ads, e.g. `ads_conversion_Contact_Us_1`. The account already
+ * knows which conversion that name maps to, so no send_to is needed.
  */
 const googleAdsId = import.meta.env.PUBLIC_GOOGLE_ADS_ID;
-const gadsContactLabel = import.meta.env.PUBLIC_GADS_CONTACT_LABEL;
-const conversionTracking = Boolean(googleAdsId && gadsContactLabel);
+const gadsContactEvent = import.meta.env.PUBLIC_GADS_CONTACT_EVENT;
+const conversionTracking = Boolean(googleAdsId && gadsContactEvent);
 
 /**
  * Native form post to Web3Forms — no JavaScript. The browser submits directly
@@ -137,7 +141,7 @@ const inputClass =
                   .then(function (result) {
                     if (result.success) {
                       if (typeof gtag === 'function') {
-                        gtag('event', 'conversion', { send_to: ${JSON.stringify(`${googleAdsId}/${gadsContactLabel}`)} });
+                        gtag('event', ${JSON.stringify(gadsContactEvent)}, {});
                       }
                       form.reset();
                       form.hidden = true;
