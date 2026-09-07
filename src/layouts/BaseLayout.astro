@@ -63,14 +63,15 @@ const robots = noindex
  * Google Ads conversion tracking. The gtag.js snippet is emitted only when a
  * conversion ID is configured, so an unset env var means no third-party script
  * ships at all. The WhatsApp/phone click snippet renders only when its
- * conversion event name is also set. All gtag calls are guarded with
+ * send_to target is also set. All gtag calls are guarded with
  * `typeof gtag === 'function'`.
  *
- * PUBLIC_GADS_WHATSAPP_EVENT is the event name from a Google Ads conversion
- * action's tag setup, e.g. `ads_conversion_WhatsApp_1`.
+ * PUBLIC_GADS_WHATSAPP_SEND_TO is the full `send_to` value from a click
+ * conversion action's snippet, e.g. `AW-XXXXXXXXX/AbC-D_efGhIJ`. Click actions
+ * still use the send_to form; only page-load actions get a named event.
  */
 const googleAdsId = import.meta.env.PUBLIC_GOOGLE_ADS_ID;
-const gadsWhatsappEvent = import.meta.env.PUBLIC_GADS_WHATSAPP_EVENT;
+const gadsWhatsappSendTo = import.meta.env.PUBLIC_GADS_WHATSAPP_SEND_TO;
 ---
 
 <!doctype html>
@@ -124,14 +125,14 @@ const gadsWhatsappEvent = import.meta.env.PUBLIC_GADS_WHATSAPP_EVENT;
               gtag('config', ${JSON.stringify(googleAdsId)});
             `}
           />
-          {gadsWhatsappEvent && (
+          {gadsWhatsappSendTo && (
             <script
               is:inline
               set:html={`
                 document.addEventListener('click', function (event) {
                   var link = event.target.closest && event.target.closest('a[href^="https://wa.me/"], a[href^="tel:"]');
                   if (link && typeof gtag === 'function') {
-                    gtag('event', ${JSON.stringify(gadsWhatsappEvent)}, {});
+                    gtag('event', 'conversion', { send_to: ${JSON.stringify(gadsWhatsappSendTo)} });
                   }
                 });
               `}
