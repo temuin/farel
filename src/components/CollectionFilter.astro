@@ -64,6 +64,7 @@ const groups = [
   type Dimension = 'brand' | 'category' | 'sport';
 
   const ALL = 'all';
+  const DIMENSIONS: Dimension[] = ['brand', 'category', 'sport'];
 
   document.querySelectorAll<HTMLElement>('[data-catalog]').forEach((catalog) => {
     const buttons = catalog.querySelectorAll<HTMLButtonElement>('[data-filter]');
@@ -74,15 +75,72 @@ const groups = [
 
     const selection: Record<Dimension, string> = { brand: ALL, category: ALL, sport: ALL };
 
-    // Lets links like `/collections?brand=Kelme` land pre-filtered.
+    /*
+     * The canonical spelling of a filter value -- `Kelme`, never `kelme`.
+     *
+     * The buttons carry the capitalised values from src/config/catalog.ts, and
+     * those are what `matches()` compares against each card's data attributes.
+     * A URL is read case-insensitively so a lower-cased or hand-typed link
+     * still lands pre-filtered, but the answer is always the button's own
+     * value rather than whatever casing the link happened to use -- otherwise
+     * `?brand=kelme` would set a selection that matches no card at all.
+     */
+    const canonical = (dimension: Dimension, value: string) =>
+      [...buttons].find(
+        (button) =>
+          button.dataset.filter === dimension &&
+          button.dataset.value?.toLowerCase() === value.toLowerCase(),
+      )?.dataset.value;
+
+    // Lets links like `/collections/?brand=kelme` land pre-filtered.
     const requested = new URLSearchParams(window.location.search);
-    (Object.keys(selection) as Dimension[]).forEach((dimension) => {
-      const value = requested.get(dimension);
-      const isValidOption = [...buttons].some(
-        (button) => button.dataset.filter === dimension && button.dataset.value === value,
-      );
-      if (value && isValidOption) selection[dimension] = value;
+    DIMENSIONS.forEach((dimension) => {
+      const requestedValue = requested.get(dimension);
+      const match = requestedValue ? canonical(dimension, requestedValue) : undefined;
+      if (match) selection[dimension] = match;
     });
+
+    /*
+     * Mirrors the active filters back into the address bar, so a filtered view
+     * can be bookmarked, sent to a client, or used as an ad landing page.
+     *
+     * replaceState rather than pushState: Back keeps doing what it has always
+     * done on this page -- leaving it -- instead of unwinding one filter click
+     * at a time, which after half a dozen toggles would strand someone here.
+     *
+     * Only the three filter keys are touched; every other parameter is carried
+     * through untouched. That matters more than it looks -- `gclid` and the
+     * `utm_*` set arrive on ad traffic, and dropping them here would break the
+     * conversion attribution the site already reports to Google Ads.
+     *
+     * Values are written lower-case because that is what reads well in a link
+     * pasted into a chat; `canonical()` maps them back on the way in. A
+     * dimension left at `all` is removed rather than written out, so the
+     * unfiltered view stays a clean `/collections/`.
+     */
+    const syncUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+
+      DIMENSIONS.forEach((dimension) => {
+        const value = selection[dimension];
+        if (value === ALL) params.delete(dimension);
+        else params.set(dimension, value.toLowerCase());
+      });
+
+      const query = params.toString();
+      const next = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+
+      /*
+       * A handful of sandboxed contexts throw on replaceState rather than
+       * no-opping. The address bar is a convenience; the filter itself has to
+       * keep working either way.
+       */
+      try {
+        history.replaceState(history.state, '', next);
+      } catch {
+        /* Leave the URL as it was. */
+      }
+    };
 
     const matches = (item: HTMLElement) =>
       (selection.brand === ALL || item.dataset.brand === selection.brand) &&
@@ -131,10 +189,17 @@ const groups = [
           syncSportPanel();
         }
         render();
+        syncUrl();
       });
     });
 
     syncSportPanel();
     render();
+    /*
+     * Once on load too. A link can arrive with different casing, an unknown
+     * value, or a `sport` the category does not allow -- writing the state
+     * back leaves the address bar showing exactly the filters in effect.
+     */
+    syncUrl();
   });
 </script>
