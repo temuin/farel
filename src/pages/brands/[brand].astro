@@ -1,0 +1,147 @@
+---
+/**
+ * A landing page per brand -- the indexable counterpart to the client-side
+ * filter on /collections.
+ *
+ * `/collections/?brand=kelme` cannot rank, and no amount of markup would
+ * change that: the site is a static build, so every query-string variant is
+ * served by the one `collections/index.html` file, carrying one title, one
+ * description, one H1 and a canonical pointing at the bare `/collections/`.
+ * Search engines correctly read those variants as the same page. A brand that
+ * needs its own search result therefore needs its own emitted page, which is
+ * what this route generates.
+ *
+ * The two live side by side and do different jobs: this page is what Google
+ * indexes, the query-string view is what a person shares or an ad lands on.
+ *
+ * Copy is read from BRAND_PROFILES rather than authored here or in the CMS --
+ * nothing on the page is invented, and it stays in step with the same text the
+ * home page shows.
+ */
+import type { GetStaticPaths } from 'astro';
+import { getImage } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
+import { BRAND_PROFILES, type Brand } from '../../config/catalog';
+import { getProducts, getUsedBrands, productUrl, type Product } from '../../lib/products';
+import { breadcrumbs, itemList } from '../../lib/schema';
+import { site } from '../../config/site';
+import { whatsappUrl } from '../../lib/whatsapp';
+
+export const getStaticPaths = (async () => {
+  const products = await getProducts();
+
+  /*
+   * Only brands that actually stock something get a page. A brand added to
+   * the config ahead of its first product would otherwise emit an empty
+   * landing page -- indexable, and worse than not existing.
+   */
+  return getUsedBrands(products).map((brand) => ({
+    params: { brand: brand.toLowerCase() },
+    props: {
+      brand,
+      products: products.filter((product) => product.data.brand === brand),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  brand: Brand;
+  products: Product[];
+}
+
+const { brand, products } = Astro.props;
+const profile = BRAND_PROFILES[brand];
+const path = `/brands/${brand.toLowerCase()}`;
+
+/** The filterable view of the same set -- trailing slash, so it lands in one hop. */
+const filteredCatalogueUrl = `/collections/?brand=${brand.toLowerCase()}`;
+
+/*
+ * Social preview card, built the same way the product pages build theirs and
+ * for the same reason: the originals in the bucket are 18-28 MB camera files,
+ * far past what WhatsApp or Facebook will fetch for a link preview. WhatsApp
+ * is this business's main channel, so a brand link that unfurls properly is
+ * worth the two extra derivatives at build time.
+ */
+const cover = products[0]?.data.images[0];
+const ogImage = cover
+  ? await getImage({
+      src: cover,
+      inferSize: true,
+      width: 1200,
+      height: 630,
+      fit: 'cover',
+      format: 'jpeg',
+      quality: 78,
+    })
+  : undefined;
+
+/*
+ * Every tag below differs per brand -- title, description, H1, canonical and
+ * the ItemList. That difference is the entire point of the page: it is what
+ * the query-string view structurally cannot have.
+ */
+const title = `${brand} Team Sportswear Distributor in Indonesia`;
+const description = `${site.legalName} is an authorised Indonesian distributor of ${brand}. Browse ${products.length} ${brand} products for clubs, schools and companies, with nationwide shipping.`;
+
+const schema = [
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: brand, path },
+  ]),
+  itemList({
+    name: `${brand} catalogue`,
+    items: products.map((entry) => ({ name: entry.data.name, path: productUrl(entry) })),
+  }),
+];
+---
+
+<BaseLayout title={title} description={description} image={ogImage?.src} schema={schema}>
+  <section class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
+    <div class="shell py-16 sm:py-20">
+      <nav aria-label="Breadcrumb" class="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li><a href="/" class="hover:text-neutral-900 dark:hover:text-white">Home</a></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-neutral-900 dark:text-white">{brand}</li>
+        </ol>
+      </nav>
+
+      <SectionHeading
+        as="h1"
+        eyebrow="Authorised distributor"
+        title={`${brand} team sportswear in Indonesia`}
+        description={profile.summary}
+      />
+
+      <p class="mt-6 max-w-2xl text-base font-semibold text-balance text-neutral-900 dark:text-white">
+        {profile.statement}
+      </p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href={whatsappUrl(`Hello, I would like to enquire about your ${brand} range.`)} external>
+          <WhatsAppIcon class="h-4 w-4" />
+          Enquire about {brand}
+        </Button>
+        <Button href={filteredCatalogueUrl} variant="secondary">Filter the full catalogue</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell py-12 sm:py-16">
+    <h2 class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+      {products.length} {brand} products
+    </h2>
+    <p class="mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-400">
+      Covering {profile.focus}. Send us a product name on WhatsApp for pricing and availability.
+    </p>
+
+    <div class="mt-8">
+      <ProductGrid products={products} eagerCount={4} />
+    </div>
+  </section>
+</BaseLayout>

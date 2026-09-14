@@ -176,8 +176,15 @@ const meta = [
                   </div>
                 )}
 
+                {/*
+                  Points at the brand's own page rather than the filtered
+                  catalogue view. Both show the same products, but only the
+                  landing page can be indexed -- and this link is what stops it
+                  being an orphan Google never finds. The filtered view is still
+                  one click away from there.
+                */}
                 <div class="mt-4 lg:mt-6">
-                  <Button href={`/collections?brand=${preview.brand}`} variant="inverted">
+                  <Button href={`/brands/${preview.brand.toLowerCase()}/`} variant="inverted">
                     Explore {preview.brand} range
                   </Button>
                 </div>
