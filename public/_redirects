@@ -11,6 +11,12 @@
 # the placeholder slug "a" (see git history: "Tidy the demo product left over
 # from the old slug field"). Anyone who indexed or bookmarked the old address
 # lands on the same product instead of a 404.
+#
+# Both forms are listed because Cloudflare only auto-adds the trailing slash
+# for a path that still has a matching asset behind it. This one doesn't --
+# the product was renamed away from this slug -- so the bare form has to be
+# matched here explicitly, or it 404s instead of redirecting.
+/collections/a  /collections/adizero-evo-sl/  301
 /collections/a/  /collections/adizero-evo-sl/  301
 
 # @astrojs/sitemap only ever wrote /sitemap-index.xml; nothing on the site or
