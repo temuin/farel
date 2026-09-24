@@ -57,4 +57,44 @@ const schema = [
       No products match this combination. Try clearing one of the filters.
     </p>
   </section>
+
+  {
+    /*
+     * /collections/?brand=kelme and /collections/?brand=adidas serve the
+     * exact same prerendered HTML as the plain page above -- CollectionFilter
+     * applies the filter client-side -- and the <meta name="robots"> tag
+     * from BaseLayout already ships as "index, follow" in that HTML. The
+     * canonical tag correctly points every variant at /collections/, but
+     * Search Console shows Google indexed /collections/?brand=kelme as its
+     * own page anyway and never indexed /collections/ itself: rel=canonical
+     * is only ever a hint, and Google evidently chose to ignore it here.
+     * noindex is a directive it reliably obeys, so this pushes a filtered
+     * URL out of the index the moment it's next crawled, while `follow`
+     * keeps link equity flowing to the products it links to.
+     *
+     * This can only run in the browser: a static build has no request to
+     * read a query string from, so every URL variant is, and must stay,
+     * byte-for-byte the same file. Google does read a robots meta tag
+     * changed by JavaScript before it finishes indexing a page.
+     *
+     * Deliberately NOT is:inline. Astro's CSP integration only computes a
+     * script-src hash for scripts it bundles itself (the type="module"
+     * scripts every other component on this page uses, e.g.
+     * CollectionFilter's own script) -- an is:inline tag is never hashed, so
+     * the browser silently drops it as a CSP violation. That turned out to
+     * already be true of every is:inline script on the site (BaseLayout's
+     * dark-mode script, both Google Ads snippets) -- reported separately,
+     * since fixing those is outside this change. This script only needs to
+     * exist in the page, not to run before paint, so the ordinary bundled
+     * form works with no downside.
+     */
+  }
+  <script>
+    const FILTER_PARAMS = ['brand', 'category', 'sport'];
+    const params = new URLSearchParams(location.search);
+    if (FILTER_PARAMS.some((key) => params.has(key))) {
+      const robots = document.querySelector('meta[name="robots"]');
+      if (robots) robots.setAttribute('content', 'noindex, follow');
+    }
+  </script>
 </BaseLayout>
