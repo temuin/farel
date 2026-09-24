@@ -42,6 +42,16 @@ export default defineConfig({
    */
   site: process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? 'https://example.com',
   output: 'static',
+  /*
+   * Astro builds every route as a directory (`/about/index.html`), so the
+   * canonical tag, the sitemap and structured data all already carry a
+   * trailing slash -- see `pageUrl` in src/lib/schema.ts. `always` makes the
+   * dev server enforce the same shape, so a missing slash is caught locally
+   * instead of only showing up as a live 308 redirect. Internal links are
+   * still written with the slash by hand; this setting does not add it for
+   * them.
+   */
+  trailingSlash: 'always',
 
   /*
    * Search engines need a list of the site's URLs; without one they are left to

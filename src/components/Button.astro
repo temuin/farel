@@ -16,6 +16,27 @@ interface Props {
 
 const { href, type = 'button', variant = 'primary', class: className, external = false } = Astro.props;
 
+/*
+ * Every route on this site is a directory (`/about/index.html`), so its real
+ * URL ends in a slash -- see `pageUrl` in src/lib/schema.ts. A same-site path
+ * written without one still works, but only after a 308 redirect, which is
+ * wasted round trips for a visitor and shows up in Search Console as "Page
+ * with redirect". Normalising here, in the one component nearly every
+ * internal link renders through, means a path typed without a slash in a CMS
+ * field (e.g. src/data/home.json) still resolves directly.
+ *
+ * Left untouched: external URLs, protocol links (mailto:, tel:, wa.me),
+ * root ("/"), and anything already ending in a slash.
+ */
+const normalizeHref = (value: string): string => {
+  if (!value.startsWith('/') || value.startsWith('//')) return value;
+  const [path, query] = value.split('?');
+  if (path === '/' || path.endsWith('/')) return value;
+  return query ? `${path}/?${query}` : `${path}/`;
+};
+
+const resolvedHref = href ? normalizeHref(href) : href;
+
 const BASE =
   'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors';
 
@@ -32,7 +53,7 @@ const externalAttrs = external ? { target: '_blank', rel: 'noopener noreferrer' 
 
 {
   href ? (
-    <a href={href} class={classes} {...externalAttrs}>
+    <a href={resolvedHref} class={classes} {...externalAttrs}>
       <slot />
     </a>
   ) : (
