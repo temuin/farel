@@ -70,5 +70,5 @@ export function imageAlt(product: Product, index: number): string {
  * did not match the file and quietly break the page.
  */
 export function productUrl(product: Product): string {
-  return `/collections/${product.id}`;
+  return `/collections/${product.id}/`;
 }

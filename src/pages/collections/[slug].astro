@@ -9,6 +9,7 @@ import { getProducts, imageAlt, productUrl, type Product } from '../../lib/produ
 import { breadcrumbs, product as productSchema } from '../../lib/schema';
 import { productEnquiryUrl } from '../../lib/whatsapp';
 import RemoteImage from '../../components/RemoteImage.astro';
+import { site } from '../../config/site';
 
 export const getStaticPaths = (async () => {
   const products = await getProducts();
@@ -51,6 +52,23 @@ const ogImage = await getImage({
 const path = productUrl(product);
 
 /*
+ * A handful of products were added to the catalogue with a placeholder or
+ * empty description (a SKU code, or nothing at all) -- fine for a page that
+ * is mid-setup, but a bare SKU as the entire Google snippet and Product
+ * description reads as broken. Below this length, the <meta> tag and
+ * structured data fall back to a generated line instead; the paragraph
+ * rendered on the page itself always shows the real field, unchanged, so
+ * client staff still see exactly what they typed and nothing about the visible
+ * page moves.
+ */
+const MIN_DESCRIPTION_LENGTH = 20;
+const article = /^[aeiou]/i.test(brand) ? 'an' : 'a';
+const metaDescription =
+  description.trim().length >= MIN_DESCRIPTION_LENGTH
+    ? description
+    : `${name} — ${article} ${brand} ${category.toLowerCase()} available from ${site.legalName}, an authorised distributor of Kelme and Adidas team sportswear in Indonesia.`;
+
+/*
  * The breadcrumb list mirrors the nav rendered below it, so a result in Google
  * shows the same trail a visitor sees. The Product node carries the brand,
  * which is the useful part: it is what lets a search for "Kelme track jacket"
@@ -63,18 +81,18 @@ const path = productUrl(product);
 const schema = [
   breadcrumbs([
     { name: 'Home', path: '/' },
-    { name: 'Collections', path: '/collections' },
+    { name: 'Collections', path: '/collections/' },
     { name, path },
   ]),
-  productSchema({ name, description, brand, category, images: [ogImage.src], path }),
+  productSchema({ name, description: metaDescription, brand, category, images: [ogImage.src], path }),
 ];
 ---
 
-<BaseLayout title={name} description={description} image={ogImage.src} schema={schema}>
+<BaseLayout title={name} description={metaDescription} image={ogImage.src} schema={schema}>
   <div class="shell py-10 sm:py-14">
     <nav aria-label="Breadcrumb" class="text-sm text-zinc-500 dark:text-neutral-400">
       <ol class="flex flex-wrap items-center gap-2">
-        <li><a href="/collections" class="hover:text-zinc-900 dark:hover:text-white">Collections</a></li>
+        <li><a href="/collections/" class="hover:text-zinc-900 dark:hover:text-white">Collections</a></li>
         <li aria-hidden="true">/</li>
         <li class="text-zinc-900 dark:text-white">{name}</li>
       </ol>

@@ -1,0 +1,19 @@
+# Cloudflare Pages redirects (evaluated before the static file server, so
+# these apply regardless of a build's trailingSlash setting).
+#
+# Only entries backed by something confirmed in this repository's own history
+# are added here -- see AGENTS.md / DEPLOYMENTS.md context. The other "Not
+# found (404)" pages reported by Search Console need the exact URLs from
+# Page indexing -> Not found (404) before a redirect target can be chosen
+# correctly; guessing at those would just create a second wrong URL.
+
+# The product now at /collections/adizero-evo-sl/ was originally filed under
+# the placeholder slug "a" (see git history: "Tidy the demo product left over
+# from the old slug field"). Anyone who indexed or bookmarked the old address
+# lands on the same product instead of a 404.
+/collections/a/  /collections/adizero-evo-sl/  301
+
+# @astrojs/sitemap only ever wrote /sitemap-index.xml; nothing on the site or
+# in Search Console should be pointed at /sitemap.xml, but redirecting it
+# costs nothing if an old submission or backlink still uses that name.
+/sitemap.xml  /sitemap-index.xml  301

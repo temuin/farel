@@ -6,6 +6,12 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
+# Cloudflare's email-obfuscation rewrite. Every mailto: link on the site is
+# rewritten to one of these at request time, so Google was finding and
+# crawling them as if they were real pages -- they 404, since /cdn-cgi/ is
+# served by Cloudflare itself, not this site.
+Disallow: /cdn-cgi/
+
 # Written by @astrojs/sitemap at build time. The index is what to submit in
 # Google Search Console; it points at the sitemap holding the actual URLs.
 #

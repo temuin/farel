@@ -6,6 +6,7 @@ import SectionHeading from '../../components/SectionHeading.astro';
 import { getProducts, getUsedBrands, getUsedCategories, productUrl } from '../../lib/products';
 import { breadcrumbs, itemList } from '../../lib/schema';
 import { SPORTS } from '../../config/catalog';
+import { site } from '../../config/site';
 
 const products = await getProducts();
 const brands = getUsedBrands(products);
@@ -19,7 +20,7 @@ const categories = getUsedCategories(products);
 const schema = [
   breadcrumbs([
     { name: 'Home', path: '/' },
-    { name: 'Collections', path: '/collections' },
+    { name: 'Collections', path: '/collections/' },
   ]),
   itemList({
     name: 'Kelme and Adidas catalogue',
@@ -29,7 +30,8 @@ const schema = [
 ---
 
 <BaseLayout
-  title="Collections"
+  title={`Kelme & Adidas Catalogue — ${site.legalName}`}
+  appendSiteName={false}
   description="Browse the full Kelme and Adidas catalogue — apparel, footwear and accessories for clubs, schools and retailers in Indonesia."
   schema={schema}
 >

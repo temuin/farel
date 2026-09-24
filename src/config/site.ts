@@ -143,11 +143,18 @@ export const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(a
 export const WEB3FORMS_ACCESS_KEY = settings.web3formsAccessKey?.trim() ?? '';
 export const isContactFormEnabled = WEB3FORMS_ACCESS_KEY.length > 0;
 
+/*
+ * Every href below ends in a slash to match the URL the page is actually
+ * served at (see `pageUrl` in src/lib/schema.ts). Without it, every internal
+ * link sends a visitor -- and Googlebot -- through a 308 redirect first,
+ * which wastes crawl budget and shows up in Search Console as "Page with
+ * redirect".
+ */
 export const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/collections', label: 'Collections' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/about/', label: 'About' },
+  { href: '/collections/', label: 'Collections' },
+  { href: '/contact/', label: 'Contact' },
 ] as const;
 
 /**

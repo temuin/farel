@@ -7,8 +7,15 @@ import WhatsAppIcon from './WhatsAppIcon.astro';
 
 const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 
-const isActive = (href: string) =>
-  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+/*
+ * navLinks now carries a trailing slash on every href (see src/config/site.ts)
+ * so nav anchors match the page's real URL and never trigger a redirect.
+ * Stripped here too, so the comparison still works exactly as before.
+ */
+const isActive = (href: string) => {
+  const path = href.replace(/\/+$/, '') || '/';
+  return path === '/' ? currentPath === '/' : currentPath.startsWith(path);
+};
 ---
 
 <header class="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
