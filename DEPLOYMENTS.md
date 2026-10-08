@@ -236,11 +236,6 @@ end to end, since it is the whole point of the setup.
 
 ## 10. After go-live
 
-`.github/workflows/deploy.yml` still deploys to Azure App Service on every push.
-Once Cloudflare is confirmed, delete the workflow, the App Service, and its
-separate copy of the GitHub token together: a second public copy of the site
-competes in search results and doubles the token's exposure.
-
 Diarise the PAT expiry — when it lapses, /admin stops saving.
 
 ---

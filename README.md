@@ -39,7 +39,7 @@ src/
 ├── pages/               / · /about · /collections · /collections/[slug] · /contact
 └── styles/global.css    Tailwind entry, theme tokens, .shell container
 deploy/
-├── server.mjs           Static server + CMS sign-in routes (Azure / VPS only)
+├── server.mjs           Static server + CMS sign-in routes (Node/VPS only)
 ├── auth.mjs             CMS sign-in: password + GitHub OAuth, shared with functions/
 └── package.json         Hosting shim manifest — no dependencies by design
 functions/api/           Same sign-in routes as Cloudflare Pages Functions
@@ -146,8 +146,8 @@ Vimeo is ignored rather than framed into the page.
 ### Signing in
 
 Decap only requires that the sign-in popup hand it a GitHub token; it does not care how that token
-was obtained. `deploy/auth.mjs` uses that to offer two routes in, and it is shared by the Azure
-Node server and the Cloudflare Pages Functions in `functions/api/`.
+was obtained. `deploy/auth.mjs` uses that to offer two routes in, and it is shared by the Node
+server and the Cloudflare Pages Functions in `functions/api/`.
 
 **Username and password (default).** Client staff who have no GitHub account sign in against
 credentials held on the server, and the CMS is handed a GitHub token the server holds.
@@ -167,12 +167,8 @@ developers, because commits are attributed to the real person.
 node scripts/hash-password.mjs client
 ```
 
-3. Set both values on the server:
-
-```bash
-az webapp config appsettings set -g rg-temuin -n amaliautama-preview \
-  --settings CMS_GITHUB_TOKEN=<token> CMS_USERS='client:<hash>'
-```
+3. Set both as secret environment variables on the Pages project (see DEPLOYMENTS.md, phase 4):
+   `CMS_GITHUB_TOKEN=<token>` and `CMS_USERS='client:<hash>'`.
 
 `CMS_USERS` takes comma-separated `user:hash` pairs, so several people can have their own login.
 
@@ -184,26 +180,19 @@ identity. Per-user GitHub sign-in is genuinely more secure; this exists because 
 accounts from non-technical staff is not realistic.
 
 Failed sign-ins lock a username out for 15 minutes after 8 attempts. That counter lives in the
-server process, so it protects a single App Service instance but would not survive a host that
-spreads requests across many isolates.
+server process, so it would not survive a host that spreads requests across many isolates — on
+Cloudflare Pages the edge rate-limit rule in DEPLOYMENTS.md (phase 7) does that job.
 
 #### Optional: also allow GitHub sign-in
 
 1. Create an OAuth app at **Settings → Developer settings → OAuth Apps → New OAuth App**:
-   - Homepage URL: `https://amaliautama-preview.azurewebsites.net`
-   - Authorization callback URL: `https://amaliautama-preview.azurewebsites.net/api/callback`
-2. Generate a client secret, then:
+   - Homepage URL: `https://amaliautama.co.id`
+   - Authorization callback URL: `https://amaliautama.co.id/api/callback`
+2. Generate a client secret, then set `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` as
+   environment variables on the Pages project.
 
-```bash
-az webapp config appsettings set -g rg-temuin -n amaliautama-preview \
-  --settings GITHUB_OAUTH_CLIENT_ID=<id> GITHUB_OAUTH_CLIENT_SECRET=<secret>
-```
-
-Anyone who can push to the repo can then sign in that way, committing as themselves.
-
-When the site moves to Cloudflare Pages, set the same variables in the Pages project. For the
-GitHub route the callback URL must match the origin the CMS is served from, so register the new
-one on the OAuth app.
+Anyone who can push to the repo can then sign in that way, committing as themselves. The callback
+URL must match the origin the CMS is served from.
 
 ## Adding a product
 
@@ -244,76 +233,4 @@ Set the public origin at build time with `SITE_URL`, or canonical and Open Graph
 SITE_URL="https://your-domain.com" npm run build
 ```
 
-### Current preview deployment (temporary)
-
-Live at **https://amaliautama-preview.azurewebsites.net** — an Azure App Service in `rg-temuin`
-(subscription `Azure for Students`, Indonesia Central). It shares the existing `tse-web-plan`
-B1 plan, so it costs nothing extra.
-
-`deploy/` holds the hosting shim: App Service needs a process listening on `$PORT`, so
-`server.mjs` serves `dist/` using only Node built-ins — no dependencies, therefore no install step
-on the host. Vercel and Netlify serve `dist/` directly and do not need it; a plain VPS can run it
-as-is.
-
-### Continuous deployment
-
-`.github/workflows/deploy.yml` redeploys the preview on every push to `main`, so any contributor's
-merged work goes live automatically. It builds, asserts the package is complete, deploys, then
-polls the live URL and fails the run if the site does not come back healthy.
-
-Authentication uses **OIDC federation** — there is no password or publish profile stored anywhere.
-Entra ID trusts a short-lived token that GitHub mints, and only for `repo:temuin/farel` on
-`refs/heads/main`. This matters because the repo is public, and because App Service has SCM basic
-auth disabled, which rules out publish-profile deployment entirely.
-
-Three repository secrets are required (Settings → Secrets and variables → Actions). These are
-identifiers, not passwords — on their own they grant nothing without a GitHub-issued token for
-this exact repo:
-
-| Secret | Value |
-| :----- | :---- |
-| `AZURE_CLIENT_ID` | `b5bc9cd2-8d61-4855-9b11-42678ac314cc` |
-| `AZURE_TENANT_ID` | `7fe9e0ca-4f37-4bf5-8dc4-f052e6fe9e03` |
-| `AZURE_SUBSCRIPTION_ID` | `5387361f-a1f4-4c8e-b950-9efddd8c3a80` |
-
-The service principal holds **Contributor on the single web app only** — not the resource group —
-so it cannot touch `tse-web` or anything else in the subscription.
-
-Two federated credentials are registered on the app, because the subject claim GitHub sends
-depends on the workflow:
-
-| Subject | Applies when |
-| :------ | :----------- |
-| `repo:temuin/farel:environment:preview` | the job declares `environment:` (what `deploy.yml` does today) |
-| `repo:temuin/farel:ref:refs/heads/main` | the job does **not** declare an environment |
-
-Declaring an `environment:` swaps the subject from the branch ref to the environment name. If you
-add, rename or remove the environment in the workflow, add the matching credential or the login
-fails with `AADSTS700213: No matching federated identity record found`.
-
-To point the build at a different domain later, add a repository variable `SITE_URL`; the workflow
-prefers it over the Azure default.
-
-### Manual redeploy
-
-```bash
-SITE_URL="https://amaliautama-preview.azurewebsites.net" npm run build
-```
-
-Then stage `deploy/server.mjs`, `deploy/package.json` and `dist/` into one folder, zip it (with
-forward-slash paths — Windows PowerShell's `Compress-Archive` writes backslashes, which Linux
-hosts cannot extract), and run:
-
-```bash
-az webapp deploy -g rg-temuin -n amaliautama-preview --src-path deploy.zip --type zip
-```
-
-To tear the whole preview down when the client moves to their own infrastructure:
-
-```bash
-az webapp delete -g rg-temuin -n amaliautama-preview
-az ad app delete --id b5bc9cd2-8d61-4855-9b11-42678ac314cc
-```
-
-That removes the preview app and the deploy identity; `tse-web` and the shared plan are untouched.
-Delete `.github/workflows/deploy.yml` too, or the workflow will start failing on every push.
+Production hosting is Cloudflare Pages; see [DEPLOYMENTS.md](DEPLOYMENTS.md).
