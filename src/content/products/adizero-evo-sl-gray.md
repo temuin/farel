@@ -1,5 +1,5 @@
 ---
-name: ADIZERO EVO SL Gray
+name: ADIZERO EVO SL WOVEN White
 brand: Adidas
 category: Footwear
 sport: Running
@@ -11,10 +11,10 @@ description: The adidas Adizero Evo SL brings race-day technology to everyday
   one of the lightest trainers in adidas’ running range, built for tempo runs,
   progression runs, and everyday miles.
 images:
-  - https://media.amaliautama.co.id/images/adizero-evo-sl-gray-2.jpg
-  - https://media.amaliautama.co.id/images/adizero-evo-sl-gray-4.jpg
-  - https://media.amaliautama.co.id/images/adizero-evo-sl-gray-1.jpg
-  - https://media.amaliautama.co.id/images/adizero-evo-sl-gray-3.jpg
+  - https://media.amaliautama.co.id/images/woven-whit-1.jpg
+  - https://media.amaliautama.co.id/images/woven-whit-2.jpg
+  - https://media.amaliautama.co.id/images/woven-whit-3.jpg
+  - https://media.amaliautama.co.id/images/woven-whit-4.jpg
 featured: false
 ---
 **adidas Adizero Evo SL: Race-Day Speed for Everyday Training**
