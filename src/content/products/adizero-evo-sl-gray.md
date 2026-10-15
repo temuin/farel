@@ -15,7 +15,7 @@ images:
   - https://media.amaliautama.co.id/images/woven-whit-2.jpg
   - https://media.amaliautama.co.id/images/woven-whit-3.jpg
   - https://media.amaliautama.co.id/images/woven-whit-4.jpg
-featured: false
+featured: true
 ---
 **adidas Adizero Evo SL: Race-Day Speed for Everyday Training**
 
