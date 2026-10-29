@@ -91,6 +91,12 @@
         "playback": "Loop silently",
         "image": "https://media.amaliautama.co.id/images/20-2.png",
         "alt": "Adidas Team Uniform"
+      },
+      {
+        "shape": "Portrait",
+        "playback": "Loop silently",
+        "image": "https://media.amaliautama.co.id/images/20-4.png",
+        "alt": "Adidas Team Shoes"
       }
     ]
   },
