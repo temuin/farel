@@ -89,14 +89,26 @@
       {
         "shape": "Portrait",
         "playback": "Loop silently",
-        "image": "https://media.amaliautama.co.id/images/20-2.png",
-        "alt": "Adidas Team Uniform"
+        "video": "https://media.amaliautama.co.id/videos/adidas-september.mp4",
+        "alt": "Adidas EVO SL"
       },
       {
         "shape": "Portrait",
         "playback": "Loop silently",
         "image": "https://media.amaliautama.co.id/images/20-4.png",
         "alt": "Adidas Team Shoes"
+      },
+      {
+        "shape": "Portrait",
+        "playback": "Loop silently",
+        "video": "https://media.amaliautama.co.id/videos/adidas-september-2.mp4",
+        "alt": "Adidas EVO SL"
+      },
+      {
+        "shape": "Portrait",
+        "playback": "Loop silently",
+        "image": "https://media.amaliautama.co.id/images/20-2.png",
+        "alt": "Adidas Team Uniform"
       }
     ]
   },
