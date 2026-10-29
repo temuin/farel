@@ -107,8 +107,20 @@
       {
         "shape": "Portrait",
         "playback": "Loop silently",
+        "image": "https://media.amaliautama.co.id/images/adidas-september-5-3.png",
+        "alt": "Adidas Team Polo"
+      },
+      {
+        "shape": "Portrait",
+        "playback": "Loop silently",
         "image": "https://media.amaliautama.co.id/images/adidas-september-4-2.png",
-        "alt": "Adidas Team Uniform"
+        "alt": "Kelme Indonesia Jersey"
+      },
+      {
+        "shape": "Portrait",
+        "playback": "Loop silently",
+        "image": "https://media.amaliautama.co.id/images/adidas-september.png",
+        "alt": "Adidas Football Jersey"
       }
     ]
   },
